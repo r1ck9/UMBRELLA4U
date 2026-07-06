@@ -28,7 +28,7 @@ export default function Landing() {
         </div>
         <p className="care-intro">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here — just be kind to yourself, and to everyone else.</p>
         <div className="cta">
-          <Link className="btn prim" href="/signup">Create an account</Link>
+          <Link className="btn prim" href="/signup">Create or log in to an account</Link>
           <Link className="btn ghost" href="/feed">Browse as a guest</Link>
         </div>
       </section>

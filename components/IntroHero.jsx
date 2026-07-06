@@ -134,7 +134,7 @@ export default function IntroHero() {
         <h1>A place to say what you actually feel.</h1>
         <p>An anonymous community where young people share what they&apos;re going through — and show up for each other. No real names. No pile-ons. No judgment.</p>
         <div className="cta">
-          <Link className="btn prim" href="/signup">Create an account</Link>
+          <Link className="btn prim" href="/signup">Create or log in to an account</Link>
           <Link className="btn ghost light" href="/feed">Look around first</Link>
         </div>
       </div>
