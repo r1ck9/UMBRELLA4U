@@ -1,8 +1,9 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
+import { getMe } from '@/lib/me'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -20,8 +21,21 @@ export default function StoryCard({ story }) {
   const [showNote, setShowNote] = useState(false)
   const [noteText, setNoteText] = useState('')
   const [sent, setSent] = useState('')
+  const [me, setMe] = useState({ userId: null, isModerator: false })
+  const [removed, setRemoved] = useState(false)
+
+  useEffect(() => { getMe().then(setMe) }, [])
 
   const canNote = story.intent && story.intent !== 'listen'
+  const canRemove = (me.userId && me.userId === story.author_id) || me.isModerator
+
+  async function handleRemove() {
+    const own = me.userId === story.author_id
+    if (!window.confirm(own ? 'Delete your story? This can’t be undone.' : 'Take this story down for everyone?')) return
+    const { error } = await supabase.from('stories').delete().eq('id', story.id)
+    if (error) { alert(error.message); return }
+    setRemoved(true)
+  }
 
   function fireBurst() {
     window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { variant: 'open', message: 'You opened your umbrella for them. ☂' } }))
@@ -51,6 +65,8 @@ export default function StoryCard({ story }) {
 
   const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
 
+  if (removed) return null
+
   return (
     <article className="card">
       <div className="chead">
@@ -75,6 +91,11 @@ export default function StoryCard({ story }) {
         <span className="hint">
           {story.intent === 'listen' ? 'Just listen — the umbrella is the whole message.' : 'One umbrella each — no threads.'}
         </span>
+        {canRemove && (
+          <button className="takedown" onClick={handleRemove}>
+            {me.userId === story.author_id ? 'Delete' : '🛑 Take down'}
+          </button>
+        )}
       </div>
 
       {showNote && canNote && !opened && (

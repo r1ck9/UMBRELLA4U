@@ -104,6 +104,8 @@ a{color:inherit}
 .umb.on{background:var(--shelter); color:var(--on-accent)}
 .umb span{font-variant-numeric:tabular-nums}
 .hint{font-size:12px; color:var(--ink-3)}
+.takedown{margin-left:auto; background:none; border:none; color:var(--ink-3); font-size:12px; font-weight:600; cursor:pointer}
+.takedown:hover{color:var(--care)}
 
 /* right rail */
 .rail{position:sticky; top:80px; display:flex; flex-direction:column; gap:16px}
