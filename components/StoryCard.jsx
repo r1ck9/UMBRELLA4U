@@ -23,8 +23,17 @@ export default function StoryCard({ story }) {
   const [sent, setSent] = useState('')
   const [me, setMe] = useState({ userId: null, isModerator: false })
   const [removed, setRemoved] = useState(false)
+  const [reported, setReported] = useState(false)
 
   useEffect(() => { getMe().then(setMe) }, [])
+
+  async function handleReport() {
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) { router.push('/signup'); return }
+    setReported(true)
+    const { error } = await supabase.from('reports').insert({ target_type: 'story', target_id: story.id, reporter_id: data.user.id })
+    if (error && !/duplicate/i.test(error.message)) { setReported(false); alert(error.message) }
+  }
 
   const canNote = story.intent && story.intent !== 'listen'
   const canRemove = (me.userId && me.userId === story.author_id) || me.isModerator
@@ -91,11 +100,13 @@ export default function StoryCard({ story }) {
         <span className="hint">
           {story.intent === 'listen' ? 'Just listen — the umbrella is the whole message.' : 'One umbrella each — no threads.'}
         </span>
-        {canRemove && (
-          <button className="takedown" onClick={handleRemove}>
-            {me.userId === story.author_id ? 'Delete' : '🛑 Take down'}
-          </button>
-        )}
+        <span className="cfoot-actions">
+          {me.userId && me.userId !== story.author_id && !reported &&
+            <button className="report" onClick={handleReport}>🛑 Report</button>}
+          {reported && <span className="reported">Reported ✓</span>}
+          {canRemove &&
+            <button className="takedown" onClick={handleRemove}>{me.userId === story.author_id ? 'Delete' : '🛑 Take down'}</button>}
+        </span>
       </div>
 
       {showNote && canNote && !opened && (

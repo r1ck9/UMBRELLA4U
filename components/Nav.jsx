@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import GuidelinesButton from '@/components/GuidelinesButton'
+import NavReports from '@/components/NavReports'
 
 const CATS = [
   { k: 'identity', n: 'Identity',      d: 'Who you are — gender, sexuality, culture', c: '#8b6fc9' },
@@ -15,6 +16,7 @@ export default function Nav({ active = 'all' }) {
     <nav className="nav" aria-label="Main">
       <Link href="/feed" className={'navitem' + (active === 'all' ? ' on' : '')}>Home</Link>
       <Link href="/inbox" className={'navitem' + (active === 'inbox' ? ' on' : '')}>Inbox</Link>
+      <NavReports active={active} />
       <Link href="/resources" className="navitem">Resource hub</Link>
       <GuidelinesButton className="navitem" />
       <div className="nav-sep" />
