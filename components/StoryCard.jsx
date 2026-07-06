@@ -24,6 +24,7 @@ export default function StoryCard({ story }) {
   const [me, setMe] = useState({ userId: null, isModerator: false })
   const [removed, setRemoved] = useState(false)
   const [reported, setReported] = useState(false)
+  const [marked, setMarked] = useState(false)
 
   useEffect(() => { getMe().then(setMe) }, [])
 
@@ -33,6 +34,16 @@ export default function StoryCard({ story }) {
     setReported(true)
     const { error } = await supabase.from('reports').insert({ target_type: 'story', target_id: story.id, reporter_id: data.user.id })
     if (error && !/duplicate/i.test(error.message)) { setReported(false); alert(error.message) }
+  }
+
+  // Quiet "this doesn't belong here" signal — no score is shown to the poster.
+  async function handleNotRelevant() {
+    if (!supabase) { setMarked(true); return } // sample mode
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) { router.push('/signup'); return }
+    setMarked(true)
+    const { error } = await supabase.from('relevance_marks').insert({ story_id: story.id, user_id: data.user.id })
+    if (error && !/duplicate|unique/i.test(error.message)) { setMarked(false); alert(error.message) }
   }
 
   const canNote = story.intent && story.intent !== 'listen'
@@ -101,6 +112,9 @@ export default function StoryCard({ story }) {
           {story.intent === 'listen' ? 'Just listen — the umbrella is the whole message.' : 'One umbrella each — no threads.'}
         </span>
         <span className="cfoot-actions">
+          {me.userId && me.userId !== story.author_id && !marked && !reported &&
+            <button className="notrel" onClick={handleNotRelevant} title="Quietly flag this as spam, a joke, or off-topic. The poster is never shown a score.">Not relevant here</button>}
+          {marked && <span className="marked">Thanks — noted ✓</span>}
           {me.userId && me.userId !== story.author_id && !reported &&
             <button className="report" onClick={handleReport}>🛑 Report</button>}
           {reported && <span className="reported">Reported ✓</span>}

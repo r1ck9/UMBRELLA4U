@@ -5,8 +5,13 @@ import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
 
 const CRISIS = /(kill myself|end it all|don'?t want to (be here|live)|no reason to live|suicide|hurt myself|hopeless)/i
-// quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate)
-const HARM = /\b(kill yourself|kys|go die|you should die|f[a@]ggot|n[i1]gger|retard|tranny|kike|spic)\b/i
+// Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
+// We normalize first — de-leet + strip non-letters — so "f u c k", "sh1t", "xxfaggotxx" are all caught.
+const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
+const norm = (t) => t.toLowerCase().replace(/[0134578@$!|]/g, (c) => LEET[c] || '').replace(/[^a-z]/g, '')
+// terms matched even when hidden inside other text (mirror of the DB 'substr' list, worst offenders)
+const HARM_EMBEDDED = ['killyourself', 'killurself', 'godie', 'youshoulddie', 'faggot', 'nigger', 'nigga', 'kike', 'motherfucker', 'fuck']
+const HARM = (t) => { const n = norm(t); return HARM_EMBEDDED.some((w) => n.includes(w)) }
 const REJECT_MSG = "This can't be posted — it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
 
 export default function Composer() {
@@ -27,7 +32,7 @@ export default function Composer() {
       alert("That sounds really heavy right now. Please reach out to someone trained:\n\n988 — Suicide Crisis Helpline (call or text)\nKids Help Phone — text CONNECT to 686868")
       return
     }
-    if (HARM.test(text)) { setRejected(REJECT_MSG); return }
+    if (HARM(text)) { setRejected(REJECT_MSG); return }
     if (!supabase) { alert('Connect Supabase to post — see README.md.'); return }
     setRejected(''); setAgreed(false); setConfirming(true)
   }

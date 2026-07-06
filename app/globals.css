@@ -105,9 +105,9 @@ a{color:inherit}
 .umb span{font-variant-numeric:tabular-nums}
 .hint{font-size:12px; color:var(--ink-3)}
 .cfoot-actions{margin-left:auto; display:flex; gap:12px; align-items:center}
-.takedown,.report{background:none; border:none; color:var(--ink-3); font-size:12px; font-weight:600; cursor:pointer}
-.takedown:hover,.report:hover{color:var(--care)}
-.reported{font-size:12px; color:var(--shelter-deep); font-weight:600}
+.takedown,.report,.notrel{background:none; border:none; color:var(--ink-3); font-size:12px; font-weight:600; cursor:pointer}
+.takedown:hover,.report:hover,.notrel:hover{color:var(--care)}
+.reported,.marked{font-size:12px; color:var(--shelter-deep); font-weight:600}
 
 /* right rail */
 .rail{position:sticky; top:80px; display:flex; flex-direction:column; gap:16px}
