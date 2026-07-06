@@ -12,7 +12,7 @@ begin
   where user_id = auth.uid()
     and created_at >= date_trunc('day', now());   -- resets at UTC midnight
 
-  if cnt >= 25 then
+  if cnt >= 5 then
     raise exception using message = 'daily_umbrella_limit';
   end if;
 
