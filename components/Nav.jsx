@@ -18,6 +18,8 @@ export default function Nav({ active = 'all' }) {
       <Link href="/inbox" className={'navitem' + (active === 'inbox' ? ' on' : '')}>Inbox</Link>
       <NavReports active={active} />
       <Link href="/resources" className="navitem">Resource hub</Link>
+      <Link href="/welcome" className="navitem">How it works</Link>
+      <Link href="/settings" className="navitem">Settings</Link>
       <GuidelinesButton className="navitem" />
       <div className="nav-sep" />
       <div className="nav-lbl">Weather by kind</div>

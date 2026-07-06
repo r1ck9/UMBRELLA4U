@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
@@ -25,6 +25,18 @@ export default function Composer() {
   const [agreed, setAgreed] = useState(false)
   const [busy, setBusy] = useState(false)
   const [rejected, setRejected] = useState('')
+  const [prompt, setPrompt] = useState(null)
+
+  // The "Answer this" button in the Rail opens the composer with the prompt pinned.
+  useEffect(() => {
+    function onAnswer(e) {
+      setPrompt(e.detail)
+      setOpen(true)
+      setTimeout(() => document.querySelector('.composer textarea')?.focus(), 50)
+    }
+    window.addEventListener('umbrella:answer-prompt', onAnswer)
+    return () => window.removeEventListener('umbrella:answer-prompt', onAnswer)
+  }, [])
 
   function startShare() {
     if (!text.trim()) return
@@ -63,7 +75,7 @@ export default function Composer() {
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); router.refresh() }, 3100)
+    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPrompt(null); router.refresh() }, 3100)
   }
 
   return (
@@ -73,6 +85,12 @@ export default function Composer() {
       ) : (
         <div className="composer">
           {rejected && <div className="reject-banner">{rejected}</div>}
+          {prompt && (
+            <div className="prompt-pin">
+              <span>☂ Answering this week’s prompt</span>
+              <em>{prompt.text}</em>
+            </div>
+          )}
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (rejected) setRejected('') }}
             placeholder="You don't have to share your worst moment — just whatever you're carrying right now." />
           <div className="row">
@@ -100,7 +118,7 @@ export default function Composer() {
             🕶️ Post fully anonymously (not linked to your account name)
           </label>
           <div className="row end">
-            <button className="btn ghost sm" onClick={() => setOpen(false)}>Cancel</button>
+            <button className="btn ghost sm" onClick={() => { setOpen(false); setPrompt(null) }}>Cancel</button>
             <button className="btn prim sm" onClick={startShare}>☂ Share</button>
           </div>
         </div>

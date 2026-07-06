@@ -1,9 +1,11 @@
 'use client'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
+import { BANNERS, bannerStyle } from '@/lib/banners'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
 const PRESETS = ['☂', '🌧', '🌱', '🌊', '🏐', '🎧', '🎨', '🌙']
@@ -13,8 +15,10 @@ export default function Profile() {
   const [loading, setLoading] = useState(true)
   const [saved, setSaved] = useState(false)
   const [stats, setStats] = useState({ stories: 0, received: 0 })
+  const [tagInput, setTagInput] = useState('')
   const [p, setP] = useState({
-    username: '', display_name: '', pronouns: '', status_weather: '', about_me: '', accent_color: '#3f6fa3', avatar_url: ''
+    username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
+    accent_color: '#3f6fa3', avatar_url: '', banner_theme: 'rain', tags: []
   })
 
   useEffect(() => {
@@ -27,7 +31,8 @@ export default function Profile() {
       if (prof) setP({
         username: prof.username || '', display_name: prof.display_name || '', pronouns: prof.pronouns || '',
         status_weather: prof.status_weather || '', about_me: prof.about_me || '',
-        accent_color: prof.accent_color || '#3f6fa3', avatar_url: prof.avatar_url || ''
+        accent_color: prof.accent_color || '#3f6fa3', avatar_url: prof.avatar_url || '',
+        banner_theme: prof.banner_theme || 'rain', tags: prof.tags || []
       })
       const { data: mine } = await supabase.from('stories').select('id,umbrella_count').eq('author_id', data.user.id)
       const s = mine || []
@@ -38,10 +43,18 @@ export default function Profile() {
 
   function set(k, v) { setP((prev) => ({ ...prev, [k]: v })); setSaved(false) }
 
+  function addTag() {
+    const t = tagInput.trim().replace(/^#/, '').slice(0, 20)
+    if (t && !p.tags.includes(t) && p.tags.length < 8) set('tags', [...p.tags, t])
+    setTagInput('')
+  }
+  function removeTag(t) { set('tags', p.tags.filter((x) => x !== t)) }
+
   async function save() {
     const { error } = await supabase.from('profiles').update({
       display_name: p.display_name, pronouns: p.pronouns, status_weather: p.status_weather,
-      about_me: p.about_me, accent_color: p.accent_color, avatar_url: p.avatar_url
+      about_me: p.about_me, accent_color: p.accent_color, avatar_url: p.avatar_url,
+      banner_theme: p.banner_theme, tags: p.tags
     }).eq('id', user.id)
     if (error) { alert(error.message); return }
     setSaved(true)
@@ -65,7 +78,7 @@ export default function Profile() {
         <main className="feed">
           {/* presentable profile */}
           <div className="profile-card">
-            <div className="pf-banner" style={{ background: `linear-gradient(120deg, ${p.accent_color}, #26344e)` }} />
+            <div className="pf-banner" style={bannerStyle(p.banner_theme)} />
             <div className="pf-top">
               <div className="pf-avatar" style={avStyle}>{avInner}</div>
               <div className="pf-id">
@@ -79,6 +92,8 @@ export default function Profile() {
               <div><b>{stats.received}</b> umbrellas received</div>
             </div>
             {p.about_me && <p className="pf-about">{p.about_me}</p>}
+            {p.tags.length > 0 && <div className="pf-tags">{p.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>}
+            {p.username && <Link className="pf-viewlink" href={`/u/${encodeURIComponent(p.username)}`}>View my public profile →</Link>}
           </div>
 
           {/* editor */}
@@ -104,6 +119,28 @@ export default function Profile() {
                   {ACCENTS.map((c) => (
                     <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={{ background: c }} onClick={() => set('accent_color', c)} aria-label={c} />
                   ))}
+                </div>
+              </label>
+              <label>Banner
+                <div className="swatches bnset">
+                  {BANNERS.map((b) => (
+                    <button key={b.key} type="button" title={b.name}
+                      className={'sw bn' + (p.banner_theme === b.key ? ' on' : '')}
+                      style={bannerStyle(b.key)} onClick={() => set('banner_theme', b.key)} aria-label={b.name} />
+                  ))}
+                </div>
+              </label>
+              <label>Interests / tags
+                <div className="tag-edit">
+                  {p.tags.map((t) => (
+                    <span key={t} className="tag rm" onClick={() => removeTag(t)}>{t} ✕</span>
+                  ))}
+                  {p.tags.length < 8 && (
+                    <input className="tag-input" value={tagInput} maxLength={20}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
+                      onBlur={addTag} placeholder="+ add a tag (Enter)" />
+                  )}
                 </div>
               </label>
               <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>

@@ -1,11 +1,14 @@
 'use client'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
 export default function TopBar() {
+  const router = useRouter()
   const [email, setEmail] = useState(null)
   const [unread, setUnread] = useState(0)
+  const [q, setQ] = useState('')
 
   useEffect(() => {
     if (!supabase) return
@@ -37,6 +40,9 @@ export default function TopBar() {
   return (
     <header className="topbar">
       <Link href="/" className="brand">☂ Umbrella</Link>
+      <form className="tb-search" onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`) }}>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
+      </form>
       <div className="tb-right">
         {email ? (
           <>

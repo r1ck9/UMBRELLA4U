@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
+import { WEEKLY_PROMPT } from '@/lib/prompt'
 
 export default function Rail() {
   const [stats, setStats] = useState({ stories: null, umbrellas: null })
@@ -47,7 +48,11 @@ export default function Rail() {
 
       <div className="panel prompt">
         <h3>This week</h3>
-        <p className="q">When did you last stop yourself from saying or wearing something — and wish you hadn&apos;t?</p>
+        <p className="q">{WEEKLY_PROMPT.text}</p>
+        <button className="btn ghost sm prompt-answer"
+          onClick={() => window.dispatchEvent(new CustomEvent('umbrella:answer-prompt', { detail: WEEKLY_PROMPT }))}>
+          ☂ Answer this
+        </button>
       </div>
 
       <div className="panel">

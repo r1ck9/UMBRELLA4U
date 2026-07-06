@@ -1,9 +1,11 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase, isConfigured } from '@/lib/supabase'
 
 export default function Signup() {
+  const router = useRouter()
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
   const [msg, setMsg] = useState('')
@@ -11,9 +13,11 @@ export default function Signup() {
   async function submit(e) {
     e.preventDefault()
     if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
-    const { error } = await supabase.auth.signUp({ email, password: pw })
+    const { data, error } = await supabase.auth.signUp({ email, password: pw })
     if (error) { setMsg(error.message); return }
-    setMsg('Account created. Check your email to confirm, then log in. (For testing you can turn off email confirmation in Supabase → Authentication.)')
+    // If email confirmation is OFF, a session exists now → go straight to setup.
+    if (data.session) { router.push('/onboarding'); return }
+    setMsg('Account created. Check your email to confirm, then log in — we’ll walk you through setting up your profile.')
   }
 
   return (

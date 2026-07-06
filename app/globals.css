@@ -331,3 +331,98 @@ a{color:inherit}
 @keyframes celeMsg{from{opacity:0; transform:translateY(16px)} to{opacity:1; transform:none}}
 @keyframes celeDrop{from{transform:translateY(-14vh)} to{transform:translateY(118vh)}}
 @media (prefers-reduced-motion:reduce){ .celebrate,.cele-canopy,.cele-glow,.cele-rings span,.cele-flash,.cele-msg,.cele-rain span,.cele-beam,.celebrate.post .cele-umb{animation-duration:.01ms !important} }
+
+/* ---------- clickable author + tags ---------- */
+.namelink{color:inherit; text-decoration:none; border-bottom:1.5px solid transparent}
+.namelink:hover{border-bottom-color:var(--shelter)}
+.pf-tags{display:flex; flex-wrap:wrap; gap:7px; padding:0 22px 20px}
+.tag{display:inline-block; font-size:12.5px; font-weight:600; color:var(--shelter-deep);
+  background:var(--shelter-wash); padding:4px 11px; border-radius:999px}
+.pf-viewlink{display:inline-block; margin:0 22px 20px; font-size:13.5px; color:var(--shelter); text-decoration:none; font-weight:600}
+.pf-viewlink:hover{text-decoration:underline}
+.pf-actions{padding:0 22px 20px}
+.tag-edit{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px}
+.tag.rm{cursor:pointer}
+.tag.rm:hover{background:var(--care); color:#fff}
+.tag-input{flex:1; min-width:150px; border:1.5px solid var(--rain-2); border-radius:999px; padding:6px 13px; font:inherit; font-size:13px; background:var(--panel); color:var(--ink-1)}
+.sw.bn{width:44px; height:30px}
+.bnset{flex-wrap:wrap}
+
+/* ---------- weekly prompt ---------- */
+.prompt-answer{margin-top:10px}
+.prompt-pin{display:flex; flex-direction:column; gap:3px; background:var(--shelter-wash);
+  border-left:3px solid var(--shelter); border-radius:10px; padding:10px 13px; margin-bottom:10px}
+.prompt-pin span{font-size:12px; font-weight:700; color:var(--shelter-deep); text-transform:uppercase; letter-spacing:.03em}
+.prompt-pin em{font-style:normal; font-family:var(--serif); font-size:15px; color:var(--ink-1)}
+
+/* ---------- top-bar search ---------- */
+.tb-search{flex:1; max-width:340px; margin:0 8px}
+.tb-search input{width:100%; border:1.5px solid var(--rain-2); background:var(--rain-1); border-radius:999px;
+  padding:8px 15px; font:inherit; font-size:14px; color:var(--ink-1)}
+.tb-search input:focus{outline:none; border-color:var(--shelter); background:var(--panel)}
+
+/* ---------- search results ---------- */
+.search-lbl{font-size:13px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin:22px 0 10px}
+.people-row{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:8px}
+.person-chip{display:flex; align-items:center; gap:10px; text-decoration:none; background:var(--panel);
+  border:1px solid var(--rain-2); border-radius:14px; padding:8px 14px 8px 8px}
+.person-chip:hover{border-color:var(--shelter)}
+.pc-av{width:38px; height:38px; border-radius:11px; display:grid; place-items:center; font-size:18px; color:#fff; background-size:cover; background-position:center}
+.pc-name{display:flex; flex-direction:column; font-weight:700; color:var(--ink-1); font-size:14px; line-height:1.2}
+.pc-name em{font-style:normal; font-weight:500; font-size:12px; color:var(--ink-3)}
+
+/* ---------- settings ---------- */
+.set-group{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:18px 20px; margin-bottom:16px; box-shadow:var(--shadow)}
+.set-group h3{margin:0 0 12px; font-size:15px}
+.set-row{display:flex; align-items:center; justify-content:space-between; gap:18px; cursor:pointer}
+.set-row span{display:flex; flex-direction:column; gap:3px}
+.set-row b{font-size:14.5px; color:var(--ink-1)}
+.set-row em{font-style:normal; font-size:12.5px; color:var(--ink-3); line-height:1.45}
+.set-line{margin:0 0 12px; font-size:14px}
+.set-line a{color:var(--shelter); text-decoration:none; font-weight:600}
+.toggle{flex:0 0 auto; width:46px; height:27px; border-radius:999px; border:none; background:var(--rain-2); cursor:pointer; position:relative; transition:background .18s}
+.toggle.on{background:var(--shelter)}
+.toggle span{position:absolute; top:3px; left:3px; width:21px; height:21px; border-radius:50%; background:#fff; transition:transform .18s}
+.toggle.on span{transform:translateX(19px)}
+
+/* ---------- welcome / tutorial ---------- */
+.welcome{max-width:760px}
+.wl-eyebrow{text-align:center; text-transform:uppercase; letter-spacing:.14em; font-size:12px; color:var(--ink-3); margin:8px 0 0}
+.wl-title{text-align:center; font-family:var(--serif); font-size:44px; margin:4px 0 0}
+.wl-lead{text-align:center; font-size:17px; color:var(--ink-2); line-height:1.55; max-width:56ch; margin:14px auto 34px}
+.wl-sec{margin:34px 0}
+.wl-sec > h2{font-family:var(--serif); font-size:26px; margin:0 0 18px; text-wrap:balance}
+.wl-steps{display:flex; flex-direction:column; gap:14px}
+.wl-step{display:flex; gap:16px; background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
+.wl-step h3{margin:0 0 4px; font-size:16px}
+.wl-step p{margin:0; font-size:14.5px; color:var(--ink-2); line-height:1.55}
+.wl-ico{font-size:26px; line-height:1; flex:0 0 auto}
+.wl-safe{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.wl-card{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
+.wl-card .wl-ico{display:block; margin-bottom:8px}
+.wl-card h3{margin:0 0 6px; font-size:16px}
+.wl-card p{margin:0; font-size:14px; color:var(--ink-2); line-height:1.55}
+.wl-cta{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:38px 0 10px}
+@media (max-width:620px){ .wl-safe{grid-template-columns:1fr} .wl-title{font-size:36px} }
+
+/* ---------- onboarding ---------- */
+.onb{max-width:560px}
+.onb-dots{display:flex; gap:8px; justify-content:center; margin:6px 0 26px}
+.onb-dot{width:34px; height:5px; border-radius:999px; background:var(--rain-2)}
+.onb-dot.on{background:var(--shelter)}
+.onb-dot.done{background:var(--shelter-deep)}
+.onb-step{min-height:280px}
+.onb-step > h1{font-family:var(--serif); font-size:30px; margin:0 0 10px}
+.onb-lead{font-size:15.5px; color:var(--ink-2); line-height:1.55; margin:0 0 20px}
+.onb-step label{display:block; font-size:13.5px; color:var(--ink-2); margin-bottom:14px}
+.onb-step input:not(.tag-input):not([type=checkbox]), .onb-step textarea{display:block; width:100%; margin-top:6px;
+  border:1.5px solid var(--rain-2); border-radius:12px; padding:11px 14px; font:inherit; font-size:15px; background:var(--panel); color:var(--ink-1)}
+.onb-step textarea{min-height:90px; resize:vertical}
+.onb-quick{list-style:none; padding:0; margin:0 0 18px; display:flex; flex-direction:column; gap:10px}
+.onb-quick li{background:var(--panel); border:1px solid var(--rain-2); border-radius:12px; padding:12px 15px; font-size:14.5px; color:var(--ink-2)}
+.onb-more a{color:var(--shelter); text-decoration:none; font-weight:600; font-size:14px}
+.onb-preview{position:relative; border-radius:16px; overflow:hidden; margin-bottom:22px; border:1px solid var(--rain-2)}
+.onb-preview .pf-banner{height:90px}
+.onb-preview .pf-avatar{position:absolute; left:20px; bottom:-6px; width:70px; height:70px; font-size:30px; display:grid; place-items:center; color:#fff}
+.onb-nav{display:flex; justify-content:space-between; gap:12px; margin-top:22px}
+.onb-nav .btn.prim{margin-left:auto}

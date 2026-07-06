@@ -15,7 +15,7 @@ export default function Login() {
     if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
     const { error } = await supabase.auth.signInWithPassword({ email, password: pw })
     if (error) { setMsg(error.message); return }
-    router.push('/feed')
+    router.push('/onboarding') // bounces to /feed automatically if already set up
   }
 
   return (

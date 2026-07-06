@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
 import { getMe } from '@/lib/me'
@@ -92,7 +93,11 @@ export default function StoryCard({ story }) {
       <div className="chead">
         <span className={'avatar' + (story.anonymous ? ' anon' : '')} aria-hidden="true">{story.anonymous ? '🕶️' : ''}</span>
         <div>
-          <div className="name">{who}{story.anonymous && <span className="lock"> · 🔒 hidden</span>}</div>
+          <div className="name">
+            {story.anonymous || !story.author_name
+              ? <>{who}{story.anonymous && <span className="lock"> · 🔒 hidden</span>}</>
+              : <Link href={`/u/${encodeURIComponent(story.author_name)}`} className="namelink">{who}</Link>}
+          </div>
           <div className="meta">{story.category}</div>
         </div>
         <span className="badge">{INTENT[story.intent] || INTENT.listen}</span>
