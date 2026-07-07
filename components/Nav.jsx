@@ -15,6 +15,7 @@ export default function Nav({ active = 'all' }) {
       <Link href="/welcome" className="navitem">How it works</Link>
       <TourButton className="navitem" />
       <Link href="/settings" className="navitem">Settings</Link>
+      <Link href="/feedback" className="navitem">Send feedback</Link>
       <GuidelinesButton className="navitem" />
       <div className="nav-sep" />
       <div className="nav-lbl">Weather by kind</div>

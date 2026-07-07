@@ -2,6 +2,7 @@ import TopBar from '@/components/TopBar'
 import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import ReportsList from '@/components/ReportsList'
+import StatsPanel from '@/components/StatsPanel'
 
 export default function Moderation() {
   return (
@@ -10,8 +11,9 @@ export default function Moderation() {
       <div className="shell">
         <Nav active="moderation" />
         <main className="feed">
-          <h2 className="feedhead">Reports</h2>
-          <p className="sub" style={{ color: 'var(--ink-3)', margin: '0 0 4px' }}>
+          <h2 className="feedhead">Moderation</h2>
+          <StatsPanel />
+          <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
             Posts people flagged for review. Take them down or dismiss.
           </p>
           <ReportsList />

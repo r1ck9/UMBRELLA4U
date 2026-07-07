@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import IntroHero from '@/components/IntroHero'
+import ViewCounter from '@/components/ViewCounter'
 
 export default function Landing() {
   return (
     <>
+      <ViewCounter />
       <IntroHero />
       <section className="introabout">
         <h2>What Umbrella is</h2>
@@ -38,6 +40,7 @@ export default function Landing() {
           <Link href="/welcome">How it works</Link>
           <Link href="/resources">Resources</Link>
           <Link href="/guidelines">Guidelines</Link>
+          <Link href="/feedback">Feedback</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </nav>

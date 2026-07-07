@@ -13,6 +13,7 @@ const LINKS = [
   { href: '/resources', icon: '📎', label: 'Resource hub' },
   { href: '/welcome', icon: '☂', label: 'How it works' },
   { href: '/settings', icon: '⚙️', label: 'Settings' },
+  { href: '/feedback', icon: '💬', label: 'Feedback' },
   { href: '/guidelines', icon: '📜', label: 'Guidelines' }
 ]
 

@@ -49,7 +49,8 @@ export default function Rail() {
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
           : <p className="qbig"><b>{left}</b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
         {postsLeft !== null && <p className="qbig"><b>{postsLeft}</b> of {DAILY_STORY_LIMIT} posts left</p>}
-        <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day — so each one really means something.</p>
+        <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day, so each one really counts.</p>
+        <p className="qcare">🫂 One umbrella can mean the world to someone. Spend yours kindly, and help make this a place worth standing in.</p>
       </div>
 
       <div className="panel prompt">
