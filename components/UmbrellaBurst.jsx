@@ -56,10 +56,10 @@ export default function UmbrellaBurst() {
     const ctx = cv.getContext('2d')
     const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches
     const warm = burst.variant !== 'post'
-    const glow = warm ? '246,176,102' : '132,180,236'
-    const spray = warm ? '255,228,190' : '216,232,255'
-    const umbHi = warm ? '#f7b56e' : '#8fb8ea', umbLo = warm ? '#d47a30' : '#4a7ec4'
-    const rib = warm ? 'rgba(96,48,10,.22)' : 'rgba(18,38,78,.28)', pole = warm ? '#ecd9bb' : '#cfdaec'
+    const glow = warm ? '240,164,79' : '132,180,236'                        // original amber glow
+    const spray = warm ? '198,214,238' : '216,232,255'                      // water droplets stay cool (like the original rain)
+    const umbHi = warm ? '#f5b168' : '#8fb8ea', umbLo = warm ? '#c9721f' : '#4a7ec4'   // original canopy gradient
+    const rib = warm ? 'rgba(60,30,0,.16)' : 'rgba(18,38,78,.28)', pole = warm ? '#d9c4a6' : '#cfdaec'
     const bigR = warm ? 0.205 : 0.165                       // "open" is larger
     const cyF = warm ? 0.37 : 0.40                          // "open" sits a touch higher / centered
 
