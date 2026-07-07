@@ -151,15 +151,21 @@ a{color:inherit}
 
 /* intro hero (animated) */
 .introhero{position:relative; z-index:1; height:100vh; min-height:620px; overflow:hidden;
-  display:flex; align-items:flex-end; justify-content:center;
+  display:flex; align-items:center; justify-content:flex-start;
   background:linear-gradient(180deg,#0b0f17 0%,#182233 55%,#26344e 100%)}
 .introcanvas{position:absolute; inset:0; width:100%; height:100%; z-index:1}
-.introhero .inner{position:relative; z-index:2; text-align:center; max-width:600px; padding:0 24px 13vh; color:#eef2fb;
+.introhero .inner{position:relative; z-index:2; text-align:left; max-width:500px; margin-left:clamp(24px,8vw,110px); padding:0 24px; color:#eef2fb;
   animation:ihrise 1.1s ease 1.6s both}
 .ih-brand{font-family:var(--serif); font-weight:800; font-size:18px; opacity:.92; margin-bottom:16px}
 .introhero h1{font-family:var(--serif); font-size:clamp(32px,6vw,58px); line-height:1.05; margin:0 0 16px; text-wrap:balance; color:#fff}
-.introhero p{font-size:clamp(16px,2.2vw,19px); color:#c3cfe6; margin:0 auto 28px; max-width:46ch; line-height:1.6}
-.introhero .cta{display:flex; gap:14px; justify-content:center; flex-wrap:wrap}
+.introhero p{font-size:clamp(16px,2.2vw,19px); color:#c3cfe6; margin:0 0 28px; max-width:44ch; line-height:1.6}
+.introhero .cta{display:flex; gap:14px; justify-content:flex-start; flex-wrap:wrap}
+@media (max-width:760px){
+  .introhero{align-items:flex-end; justify-content:center}
+  .introhero .inner{text-align:center; max-width:600px; margin:0 auto; padding:0 24px 12vh}
+  .introhero p{margin-left:auto; margin-right:auto}
+  .introhero .cta{justify-content:center}
+}
 .btn.ghost.light{border-color:rgba(255,255,255,.32); color:#eef2fb}
 .btn.ghost.light:hover{border-color:#fff; background:rgba(255,255,255,.08)}
 @keyframes ihrise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}

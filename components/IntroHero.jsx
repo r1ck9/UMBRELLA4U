@@ -62,7 +62,10 @@ export default function IntroHero() {
     let angle = 0, last = null, tt = 0
 
     function render() {
-      const cx = W / 2, cy = H * 0.36, scale = Math.min(W, H) * 0.24
+      const narrow = W < 760
+      const cx = narrow ? W / 2 : W * 0.72     // wide: pushed right so it bleeds off the edge; mobile: centered
+      const cy = narrow ? H * 0.34 : H * 0.50
+      const scale = Math.min(W, H) * (narrow ? 0.24 : 0.34)
       const ca = Math.cos(angle), sa = Math.sin(angle), ct = Math.cos(tilt), st = Math.sin(tilt)
       const bob = Math.sin(tt * 0.8) * 0.05
 
