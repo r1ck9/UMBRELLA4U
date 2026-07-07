@@ -1,3 +1,4 @@
+'use client'
 import Link from 'next/link'
 import GuidelinesButton from '@/components/GuidelinesButton'
 import NavReports from '@/components/NavReports'

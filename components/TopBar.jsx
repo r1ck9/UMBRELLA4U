@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import MobileMenu from '@/components/MobileMenu'
 
 export default function TopBar() {
   const router = useRouter()
@@ -50,6 +51,7 @@ export default function TopBar() {
 
   return (
     <header className="topbar">
+      <MobileMenu />
       <Link href="/feed" className="brand" title="Back to the main feed">☂ Umbrella</Link>
       <form className="tb-search" onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`) }}>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
@@ -61,7 +63,7 @@ export default function TopBar() {
             <Link href="/profile" className="tb-avatar" style={avStyle} title={`Your profile${email ? ' · ' + email : ''}`}>
               {isEmoji ? url.slice(6) : (isImg ? '' : initial)}
             </Link>
-            <button className="btn ghost sm" onClick={logout}>Log out</button>
+            <button className="btn ghost sm tb-logout" onClick={logout}>Log out</button>
           </>
         ) : (
           <>

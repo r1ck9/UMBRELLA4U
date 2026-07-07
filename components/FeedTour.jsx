@@ -52,7 +52,7 @@ export default function FeedTour() {
     if (idx >= STEPS.length) { finish(); return }
     const step = STEPS[idx]
     const el = document.querySelector(step.sel)
-    if (!el) { setIdx((i) => i + 1); return } // skip missing target
+    if (!el || el.offsetParent === null) { setIdx((i) => i + 1); return } // skip missing/hidden target (e.g. sidebar on mobile)
 
     let raf
     const measure = () => {
