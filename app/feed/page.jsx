@@ -4,6 +4,7 @@ import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import Composer from '@/components/Composer'
 import StoryCard from '@/components/StoryCard'
+import FeedTour from '@/components/FeedTour'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,7 @@ export default async function Feed({ searchParams }) {
         </main>
         <Rail />
       </div>
+      <FeedTour />
     </>
   )
 }

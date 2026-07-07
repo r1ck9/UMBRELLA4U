@@ -60,6 +60,7 @@ export default function Onboarding() {
     setSaving(false)
     if (error) {
       if (/duplicate|unique/i.test(error.message)) { setErr('That username is taken — try another.'); setStep(1) }
+      else if (/blocked_content/i.test(error.message)) { setErr('Please remove any hurtful or unsafe words from your name, bio, or tags. 💛'); setStep(1) }
       else setErr(error.message)
       return
     }

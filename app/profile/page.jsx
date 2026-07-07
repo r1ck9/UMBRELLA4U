@@ -56,7 +56,12 @@ export default function Profile() {
       about_me: p.about_me, accent_color: p.accent_color, avatar_url: p.avatar_url,
       banner_theme: p.banner_theme, tags: p.tags
     }).eq('id', user.id)
-    if (error) { alert(error.message); return }
+    if (error) {
+      alert(/blocked_content/i.test(error.message)
+        ? "Some of your profile text isn’t allowed — please remove any hurtful or unsafe words and try again. 💛"
+        : error.message)
+      return
+    }
     setSaved(true)
   }
 

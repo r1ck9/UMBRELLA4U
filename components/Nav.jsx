@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import GuidelinesButton from '@/components/GuidelinesButton'
 import NavReports from '@/components/NavReports'
+import TourButton from '@/components/TourButton'
 
 const CATS = [
   { k: 'identity', n: 'Identity',      d: 'Who you are — gender, sexuality, culture', c: '#8b6fc9' },
@@ -19,6 +20,7 @@ export default function Nav({ active = 'all' }) {
       <NavReports active={active} />
       <Link href="/resources" className="navitem">Resource hub</Link>
       <Link href="/welcome" className="navitem">How it works</Link>
+      <TourButton className="navitem" />
       <Link href="/settings" className="navitem">Settings</Link>
       <GuidelinesButton className="navitem" />
       <div className="nav-sep" />
