@@ -6,9 +6,34 @@ import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
+import EmojiPicker from '@/components/EmojiPicker'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
-const PRESETS = ['☂', '🌧', '🌱', '🌊', '🏐', '🎧', '🎨', '🌙']
+
+// Rotating example bios — a fresh one is picked each time the page opens.
+const BIO_EXAMPLES = [
+  'Volleyball, playlists on repeat, and still figuring it out. 🌱',
+  'Art kid. Overthinker. Trying to be kinder to myself.',
+  'Loves rainy days, bad puns, and my dog. Here to listen.',
+  'Just a teen navigating school, friends, and everything in between.',
+  'Books over parties. Anxiety is loud — but so is my hope.',
+  'Learning guitar (badly). Big feelings, small steps.',
+  'Third-culture kid finding where I belong. 🌍',
+  'Some days heavy, some days light — either way, I’m here.',
+  'Coffee, coding, and cats. Say hi. ☕',
+  'Trying my best, one deep breath at a time.',
+  'Music makes it bearable. Ask me for song recs. 🎧',
+  'New school, new city, still me. Figuring it out.',
+  'Soft-spoken, but I’ve always got your back.',
+  'Plant parent in training 🌿 — here to hold umbrellas.',
+  'Gamer, dreamer, occasional crier. All are welcome here.'
+]
+const STATUS_EXAMPLES = [
+  '🌧 heavy but managing', '⛅ better than yesterday', '🌱 slowly growing',
+  '🌊 riding the waves', '☀️ actually okay today', '🌙 tired but hopeful',
+  '🌫 a little foggy', '⛈ rough week, still standing'
+]
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 
 export default function Profile() {
   const [user, setUser] = useState(null)
@@ -16,6 +41,8 @@ export default function Profile() {
   const [saved, setSaved] = useState(false)
   const [stats, setStats] = useState({ stories: 0, received: 0 })
   const [tagInput, setTagInput] = useState('')
+  // Fresh example placeholders each time the page mounts.
+  const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES) }))
   const [p, setP] = useState({
     username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
     accent_color: '#3f6fa3', avatar_url: '', banner_theme: 'rain', tags: []
@@ -106,19 +133,14 @@ export default function Profile() {
             <h3>Edit profile</h3>
             <div className="pform">
               <label>Avatar
-                <div className="swatches avset">
-                  {PRESETS.map((e) => (
-                    <button key={e} type="button" className={'sw av' + (p.avatar_url === 'emoji:' + e ? ' on' : '')}
-                      style={{ background: p.accent_color }} onClick={() => set('avatar_url', 'emoji:' + e)} aria-label={'avatar ' + e}>{e}</button>
-                  ))}
-                </div>
+                <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
               </label>
-              <p className="up-note">Pick an avatar for now. Custom photo uploads are coming once we add image moderation to keep everyone safe. 🔒</p>
+              <p className="up-note">Choose any emoji as your picture — on Apple devices you’ll see the Apple emoji set. Custom photo uploads are coming once we add image moderation to keep everyone safe. 🔒</p>
 
               <label>Display name<input value={p.display_name} maxLength={30} onChange={(e) => set('display_name', e.target.value)} placeholder={p.username} /></label>
               <label>Pronouns<input value={p.pronouns} maxLength={30} onChange={(e) => set('pronouns', e.target.value)} placeholder="they/them (optional)" /></label>
-              <label>Today&apos;s weather (status)<input value={p.status_weather} maxLength={60} onChange={(e) => set('status_weather', e.target.value)} placeholder="🌧 heavy but managing" /></label>
-              <label>About me<textarea value={p.about_me} maxLength={300} onChange={(e) => set('about_me', e.target.value)} placeholder="Volleyball. Pink hoodies. Still figuring it out." /></label>
+              <label>Today&apos;s weather (status)<input value={p.status_weather} maxLength={60} onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
+              <label>About me<textarea value={p.about_me} maxLength={300} onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
               <label>Accent color
                 <div className="swatches">
                   {ACCENTS.map((c) => (

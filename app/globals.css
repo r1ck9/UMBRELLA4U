@@ -481,3 +481,17 @@ a{color:inherit}
 @media (max-width:780px){ .hamburger{display:flex} }
 @media (max-width:600px){ .tb-logout{display:none} .tb-search{max-width:none; margin:0 6px} }
 @media (prefers-reduced-motion:reduce){ .drawer,.drawer-scrim{animation:none} }
+
+/* ---------- emoji avatar picker ---------- */
+.emoji-pick{margin-top:6px}
+.emoji-row{display:flex; align-items:center; gap:12px}
+.emoji-current{width:56px; height:56px; border-radius:16px; border:none; display:grid; place-items:center; font-size:30px; cursor:pointer; color:#fff}
+.emoji-current:hover{filter:brightness(1.06)}
+.emoji-hint{font-size:13px; color:var(--ink-3)}
+.emoji-panel{margin-top:12px; max-height:290px; overflow-y:auto; border:1px solid var(--rain-2); border-radius:14px; padding:10px 12px; background:var(--rain-0)}
+.emoji-group{margin-bottom:10px}
+.emoji-gname{font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); margin:4px 0 6px; font-weight:700}
+.emoji-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:4px}
+.emoji-cell{border:none; background:none; border-radius:10px; font-size:24px; line-height:1; padding:6px 0; cursor:pointer}
+.emoji-cell:hover{background:var(--rain-2)}
+.emoji-cell.on{background:var(--shelter-wash); box-shadow:0 0 0 2px var(--shelter) inset}
