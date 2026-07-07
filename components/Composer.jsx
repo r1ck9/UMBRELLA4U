@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
 import { CATEGORIES } from '@/lib/categories'
+import { DAILY_STORY_LIMIT } from '@/lib/config'
 
 const CRISIS = /(kill myself|end it all|don'?t want to (be here|live)|no reason to live|suicide|hurt myself|hopeless)/i
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
@@ -68,7 +69,9 @@ export default function Composer() {
     const { error } = await supabase.from('stories').insert({ text: text.trim(), intent, category, anonymous: anon })
     setBusy(false)
     if (error) {
-      if (/blocked_content/i.test(error.message)) { setConfirming(false); setRejected(REJECT_MSG) }
+      setConfirming(false)
+      if (/blocked_content/i.test(error.message)) setRejected(REJECT_MSG)
+      else if (/daily_story_limit/i.test(error.message)) setRejected(`You've shared your ${DAILY_STORY_LIMIT} stories for today. Come back tomorrow — a fresh page, a fresh start. ☂`)
       else alert(error.message)
       return
     }

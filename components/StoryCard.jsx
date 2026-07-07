@@ -13,13 +13,17 @@ const INTENT = {
 const NOTE_PROMPT = {
   advice: 'one line of advice…', similar: '“me too” — in a sentence…', resources: 'a link or resource that helped…'
 }
+const RESPOND_LABEL = {
+  advice: '💡 They asked for advice — offer one kind line:',
+  similar: '💬 Let them know they’re not alone — share a “me too”:',
+  resources: '📎 Share a link or resource that helped you:'
+}
 
 export default function StoryCard({ story }) {
   const router = useRouter()
   const [count, setCount] = useState(story.umbrella_count ?? 0)
   const [opened, setOpened] = useState(false)
   const [revealed, setRevealed] = useState(!story.content_warning)
-  const [showNote, setShowNote] = useState(false)
   const [noteText, setNoteText] = useState('')
   const [sent, setSent] = useState('')
   const [me, setMe] = useState({ userId: null, isModerator: false })
@@ -67,7 +71,7 @@ export default function StoryCard({ story }) {
     if (!supabase) { setOpened(true); setCount((c) => c + 1); if (note) setSent(note); fireBurst(); return } // sample mode
     const { data } = await supabase.auth.getUser()
     if (!data.user) { router.push('/signup'); return }
-    setOpened(true); setCount((c) => c + 1); setShowNote(false); if (note) setSent(note)
+    setOpened(true); setCount((c) => c + 1); if (note) setSent(note)
     const { error } = await supabase.from('umbrellas')
       .insert({ story_id: story.id, user_id: data.user.id, note: note || null })
     if (error) {
@@ -112,9 +116,10 @@ export default function StoryCard({ story }) {
           title={opened ? 'Umbrella opened' : 'Open an umbrella'}>
           <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <span>{count}</span>
         </button>
-        {canNote && !opened && <button className="addword" onClick={() => setShowNote((v) => !v)}>+ add a word</button>}
         <span className="hint">
-          {story.intent === 'listen' ? 'Just listen — the umbrella is the whole message.' : 'One umbrella each — no threads.'}
+          {story.intent === 'listen'
+            ? 'Just listen — the umbrella is the whole message.'
+            : (opened ? 'One umbrella each — no threads.' : 'Add a word below, or just open an umbrella.')}
         </span>
         <span className="cfoot-actions">
           {me.userId && me.userId !== story.author_id && !marked && !reported &&
@@ -128,11 +133,15 @@ export default function StoryCard({ story }) {
         </span>
       </div>
 
-      {showNote && canNote && !opened && (
-        <div className="noterow">
-          <input value={noteText} onChange={(e) => setNoteText(e.target.value)} maxLength={120}
-            placeholder={NOTE_PROMPT[story.intent] || 'a word of support…'} />
-          <button className="btn prim sm" onClick={() => noteText.trim() && openUmbrella(noteText.trim())}>Send ☂</button>
+      {canNote && !opened && (
+        <div className="respond">
+          <div className="respond-lbl">{RESPOND_LABEL[story.intent] || 'Leave a word of support:'}</div>
+          <div className="noterow">
+            <input value={noteText} onChange={(e) => setNoteText(e.target.value)} maxLength={120}
+              placeholder={NOTE_PROMPT[story.intent] || 'a word of support…'} />
+            <button className="btn prim sm" disabled={!noteText.trim()}
+              onClick={() => noteText.trim() && openUmbrella(noteText.trim())}>Send ☂</button>
+          </div>
         </div>
       )}
       {sent && <div className="sent">☂ Sent: &ldquo;{sent}&rdquo;</div>}

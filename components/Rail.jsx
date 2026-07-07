@@ -2,12 +2,13 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
+import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 
 export default function Rail() {
   const [stats, setStats] = useState({ stories: null, umbrellas: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
+  const [postsLeft, setPostsLeft] = useState(null) // stories left today
 
   useEffect(() => {
     if (!supabase) return
@@ -23,6 +24,10 @@ export default function Rail() {
           .select('*', { count: 'exact', head: true })
           .eq('user_id', data.user.id).gte('created_at', start.toISOString())
         setLeft(Math.max(0, DAILY_UMBRELLA_LIMIT - (t.count ?? 0)))
+        const ps = await supabase.from('stories')
+          .select('*', { count: 'exact', head: true })
+          .eq('author_id', data.user.id).gte('created_at', start.toISOString())
+        setPostsLeft(Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0)))
       }
     })()
   }, [])
@@ -42,8 +47,9 @@ export default function Rail() {
         <h3>Your umbrellas today</h3>
         {left === null
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
-          : <p className="qbig"><b>{left}</b> of {DAILY_UMBRELLA_LIMIT} left</p>}
-        <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} a day — so each umbrella you open really means something.</p>
+          : <p className="qbig"><b>{left}</b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
+        {postsLeft !== null && <p className="qbig"><b>{postsLeft}</b> of {DAILY_STORY_LIMIT} posts left</p>}
+        <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day — so each one really means something.</p>
       </div>
 
       <div className="panel prompt">

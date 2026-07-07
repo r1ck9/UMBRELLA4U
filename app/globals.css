@@ -226,6 +226,9 @@ a{color:inherit}
 /* umbrella note (story card) */
 .addword{background:none; border:none; color:var(--ink-3); font-weight:600; font-size:13px; cursor:pointer}
 .addword:hover{color:var(--shelter-deep)}
+.respond{margin-top:12px; padding:12px 13px; background:var(--shelter-wash); border-radius:12px}
+.respond-lbl{font-size:13px; font-weight:600; color:var(--shelter-deep); margin-bottom:8px}
+.respond .noterow{margin-top:0}
 .noterow{display:flex; gap:8px; margin-top:11px}
 .noterow input{flex:1; border:1.5px solid var(--rain-2); background:var(--rain-0); color:var(--ink-1); border-radius:999px; padding:8px 14px; font:inherit; font-size:14px}
 .noterow input:focus{outline:none; border-color:var(--shelter)}
