@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { getMe } from '@/lib/me'
@@ -18,9 +19,11 @@ const LINKS = [
 export default function MobileMenu() {
   const [open, setOpen] = useState(false)
   const [isMod, setIsMod] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
 
+  useEffect(() => { setMounted(true) }, [])
   useEffect(() => { getMe().then((m) => setIsMod(m.isModerator)) }, [])
   useEffect(() => { setOpen(false) }, [pathname])
   useEffect(() => {
@@ -40,7 +43,7 @@ export default function MobileMenu() {
         <span /><span /><span />
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <div className="mm-panel" role="dialog" aria-label="Menu">
           <div className="mm-head">
             <span className="mm-title">☂ Menu</span>
@@ -71,7 +74,8 @@ export default function MobileMenu() {
               </Link>
             ))}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   )
