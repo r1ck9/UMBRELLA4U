@@ -31,7 +31,16 @@ export default function StoryCard({ story }) {
   const [reported, setReported] = useState(false)
   const [marked, setMarked] = useState(false)
 
-  useEffect(() => { getMe().then(setMe) }, [])
+  useEffect(() => {
+    getMe().then((m) => {
+      setMe(m)
+      // Remember across refreshes: did I already open an umbrella on this story?
+      if (m.userId && supabase) {
+        supabase.from('umbrellas').select('note').eq('story_id', story.id).eq('user_id', m.userId).maybeSingle()
+          .then(({ data }) => { if (data) { setOpened(true); if (data.note) setSent(data.note) } })
+      }
+    })
+  }, [])
 
   async function handleReport() {
     const { data } = await supabase.auth.getUser()

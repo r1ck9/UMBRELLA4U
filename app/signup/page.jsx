@@ -13,7 +13,10 @@ export default function Signup() {
   async function submit(e) {
     e.preventDefault()
     if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
-    const { data, error } = await supabase.auth.signUp({ email, password: pw })
+    const { data, error } = await supabase.auth.signUp({
+      email, password: pw,
+      options: { emailRedirectTo: `${window.location.origin}/login` }
+    })
     if (error) { setMsg(error.message); return }
     // If email confirmation is OFF, a session exists now → go straight to setup.
     if (data.session) { router.push('/onboarding'); return }
