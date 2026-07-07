@@ -6,6 +6,8 @@ import { useEffect, useState, useCallback } from 'react'
 const STEPS = [
   { sel: '.composer-peek, .composer', title: 'Share your weather',
     body: 'Tap here to post whatever you’re carrying — a hard day, a worry, a small win. You choose how you’d like people to respond.' },
+  { sel: '.hamburger', title: 'The menu', pad: 4,
+    body: 'Tap here anytime for categories, the resource hub, settings, how-to-use, and to replay this tour.' },
   { sel: '.nav', title: 'Browse by weather', pad: 6,
     body: 'Filter stories by what they’re about — school, identity, mental health, small wins, venting, and more.' },
   { sel: '.umb', title: 'Open an umbrella',

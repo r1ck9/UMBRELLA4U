@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
 import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
+import ThemeChooser from '@/components/ThemeChooser'
 import { supabase } from '@/lib/supabase'
 
 export default function Settings() {
@@ -46,6 +47,12 @@ export default function Settings() {
         <Nav active="" />
         <main className="feed">
           <h2 className="feedhead">Settings</h2>
+
+          <div className="set-group">
+            <h3>Appearance</h3>
+            <p className="set-hint">Pick the color that feels right — it applies everywhere, just for you.</p>
+            <ThemeChooser />
+          </div>
 
           <div className="set-group">
             <h3>Privacy</h3>

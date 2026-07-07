@@ -57,6 +57,7 @@ export default function TopBar() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
       </form>
       <div className="tb-right">
+        <Link href="/welcome" className="tb-help" title="How to use Umbrella">?</Link>
         {email ? (
           <>
             <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn">{unread}</span>}</Link>

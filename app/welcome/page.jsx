@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
+import ThemeChooser from '@/components/ThemeChooser'
 
 export const metadata = { title: 'How Umbrella works' }
 
@@ -50,6 +51,12 @@ export default function Welcome() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className="wl-sec">
+          <h2>Make it yours</h2>
+          <p className="wl-sub">Umbrella should feel like your space. Pick a color theme — it applies everywhere and you can change it anytime in Settings.</p>
+          <ThemeChooser />
         </section>
 
         <div className="wl-cta">
