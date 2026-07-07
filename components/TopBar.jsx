@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 export default function TopBar() {
   const router = useRouter()
   const [email, setEmail] = useState(null)
+  const [av, setAv] = useState(null)
   const [unread, setUnread] = useState(0)
   const [q, setQ] = useState('')
 
@@ -19,6 +20,9 @@ export default function TopBar() {
       if (!active) return
       setEmail(user?.email ?? null)
       if (user) {
+        const { data: prof } = await supabase.from('profiles')
+          .select('avatar_url,accent_color,username').eq('id', user.id).single()
+        if (active && prof) setAv(prof)
         const { data: mine } = await supabase.from('stories').select('id').eq('author_id', user.id)
         const ids = (mine || []).map((s) => s.id)
         if (ids.length) {
@@ -37,6 +41,13 @@ export default function TopBar() {
 
   async function logout() { await supabase?.auth.signOut() }
 
+  // Render the profile picture (preset emoji / uploaded image / colored initial).
+  const url = av?.avatar_url || ''
+  const isEmoji = url.startsWith('emoji:')
+  const isImg = /^https?:/.test(url)
+  const initial = (av?.username || email || '☂').trim().charAt(0).toUpperCase()
+  const avStyle = isImg ? { backgroundImage: `url(${url})` } : { background: av?.accent_color || 'var(--shelter)' }
+
   return (
     <header className="topbar">
       <Link href="/feed" className="brand" title="Back to the main feed">☂ Umbrella</Link>
@@ -47,7 +58,9 @@ export default function TopBar() {
         {email ? (
           <>
             <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn">{unread}</span>}</Link>
-            <Link href="/profile" className="chip">{email}</Link>
+            <Link href="/profile" className="tb-avatar" style={avStyle} title={`Your profile${email ? ' · ' + email : ''}`}>
+              {isEmoji ? url.slice(6) : (isImg ? '' : initial)}
+            </Link>
             <button className="btn ghost sm" onClick={logout}>Log out</button>
           </>
         ) : (

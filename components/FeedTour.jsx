@@ -14,6 +14,8 @@ const STEPS = [
     body: 'When someone opens an umbrella on your story, it lands here. The little number is unread support waiting for you.' },
   { sel: '.tb-search', title: 'Find anything', pad: 4,
     body: 'Search stories and people by name or by tag.' },
+  { sel: '.tb-avatar', title: 'Your profile', pad: 4,
+    body: 'Tap your avatar to open your profile — customize your picture, banner colour, display name, pronouns, status, tags and bio. It’s how people get to know who they’re standing with, while you stay anonymous.' },
   { sel: '.quota', title: 'Your umbrellas today',
     body: 'You get a handful each day — so every umbrella you open really means something.' },
   { sel: '.prompt', title: 'This week’s prompt',
