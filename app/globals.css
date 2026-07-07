@@ -544,5 +544,32 @@ a{color:inherit}
 .tc-meta em{font-style:normal; font-size:12px; color:var(--ink-3); line-height:1.35}
 @media (max-width:560px){ .theme-choose{grid-template-columns:1fr} }
 
+/* ---------- legal pages (privacy / terms) ---------- */
+.legal{max-width:720px}
+.legal-eyebrow{text-transform:uppercase; letter-spacing:.2em; font-size:12px; color:var(--ink-3); margin:0 0 6px; font-weight:700}
+.legal h1{font-family:var(--serif); font-size:clamp(28px,5vw,40px); margin:0}
+.legal-date{color:var(--ink-3); font-size:13.5px; margin:6px 0 22px}
+.legal-tldr{background:var(--shelter-wash); border-left:3px solid var(--shelter); border-radius:10px; padding:14px 16px; font-size:14.5px; line-height:1.6; color:var(--ink-1); margin-bottom:8px}
+.legal h2{font-family:var(--serif); font-size:20px; margin:30px 0 8px}
+.legal p, .legal li{font-size:15px; line-height:1.65; color:var(--ink-2)}
+.legal ul{padding-left:20px; display:flex; flex-direction:column; gap:7px; margin:8px 0}
+.legal a{color:var(--shelter); text-decoration:none; font-weight:600}
+.legal a:hover{text-decoration:underline}
+.legal strong{color:var(--ink-1)}
+.legal-note{margin-top:26px; padding-top:16px; border-top:1px solid var(--rain-2); font-size:13px; color:var(--ink-3); font-style:italic}
+.legal-back{margin-top:22px; font-size:14px}
+
+/* signup age/terms agreement */
+.auth-agree{display:flex; gap:10px; align-items:flex-start; text-align:left; font-size:13.5px; color:var(--ink-2); line-height:1.5; margin:2px 0}
+.auth-agree input{margin-top:2px; width:18px; height:18px; accent-color:var(--shelter); flex:0 0 auto}
+.auth-agree a{color:var(--shelter); font-weight:600}
+
+/* landing footer */
+.site-footer{border-top:1px solid var(--rain-2); padding:28px 24px 60px; max-width:1000px; margin:0 auto;
+  display:flex; flex-wrap:wrap; gap:14px 24px; align-items:center; justify-content:space-between; color:var(--ink-3); font-size:13.5px}
+.site-footer nav{display:flex; flex-wrap:wrap; gap:8px 18px}
+.site-footer a{color:var(--ink-2); text-decoration:none; font-weight:600}
+.site-footer a:hover{color:var(--shelter)}
+
 /* celebration canvas (umbrella-open bloom) */
 .cele-canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}

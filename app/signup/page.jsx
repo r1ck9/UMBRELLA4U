@@ -8,10 +8,12 @@ export default function Signup() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
+  const [agree, setAgree] = useState(false)
   const [msg, setMsg] = useState('')
 
   async function submit(e) {
     e.preventDefault()
+    if (!agree) { setMsg('Please confirm you’re 13 or older and agree to the Terms and Privacy Policy.'); return }
     if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
     const { data, error } = await supabase.auth.signUp({
       email, password: pw,
@@ -30,7 +32,11 @@ export default function Signup() {
       <form onSubmit={submit}>
         <input type="email" placeholder="Email (a fresh one just for Umbrella is fine)" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required />
-        <button className="btn prim" type="submit">Create account</button>
+        <label className="auth-agree">
+          <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+          <span>I&apos;m 13 or older, and I agree to the <Link href="/terms">Terms of Use</Link> and <Link href="/privacy">Privacy Policy</Link>.</span>
+        </label>
+        <button className="btn prim" type="submit" disabled={!agree}>Create account</button>
       </form>
       {msg && <p className="msg">{msg}</p>}
       <p className="alt">Already have an account? <Link href="/login">Log in</Link></p>

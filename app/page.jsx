@@ -32,6 +32,16 @@ export default function Landing() {
           <Link className="btn ghost" href="/feed">Browse as a guest</Link>
         </div>
       </section>
+      <footer className="site-footer">
+        <div>☂ Umbrella — peer support, not a substitute for professional or crisis help.</div>
+        <nav>
+          <Link href="/welcome">How it works</Link>
+          <Link href="/resources">Resources</Link>
+          <Link href="/guidelines">Guidelines</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+        </nav>
+      </footer>
     </>
   )
 }
