@@ -465,22 +465,32 @@ a{color:inherit}
 .cc-text em{font-style:normal; font-size:12px; color:var(--ink-3); line-height:1.4}
 @media (max-width:560px){ .cat-chips{grid-template-columns:1fr} }
 
-/* ---------- mobile menu (hamburger + slide-out drawer) ---------- */
+/* ---------- mobile menu (hamburger + full-screen button grid) ---------- */
 .hamburger{display:none; flex-direction:column; justify-content:center; gap:4px; width:40px; height:38px;
   border:1.5px solid var(--rain-2); border-radius:11px; background:none; cursor:pointer; padding:0 9px; flex:0 0 auto}
 .hamburger span{display:block; height:2px; border-radius:2px; background:var(--ink-1)}
-.drawer-scrim{position:fixed; inset:0; z-index:60; background:rgba(10,12,14,.5); animation:scrimIn .18s ease}
-.drawer{position:fixed; top:0; left:0; bottom:0; width:84%; max-width:300px; background:var(--panel);
-  border-right:1px solid var(--rain-2); box-shadow:0 0 60px -10px rgba(0,0,0,.55); padding:16px 16px 44px;
-  overflow-y:auto; animation:drawerIn .22s ease}
-.drawer-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px}
-.drawer-close{background:none; border:none; font-size:20px; color:var(--ink-2); cursor:pointer; line-height:1; padding:4px 8px}
-.drawer .nav{position:static; top:auto; display:flex}   /* beats the ≤780 ".nav{display:none}" rule */
-@keyframes drawerIn{from{transform:translateX(-100%)} to{transform:none}}
-@keyframes scrimIn{from{opacity:0} to{opacity:1}}
+.mm-panel{position:fixed; inset:0; z-index:60; background:var(--panel); display:flex; flex-direction:column;
+  padding:16px 16px calc(env(safe-area-inset-bottom) + 20px); overflow-y:auto; animation:mmIn .18s ease}
+.mm-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
+.mm-title{font-family:var(--serif); font-size:22px; font-weight:800}
+.mm-close{background:none; border:1.5px solid var(--rain-2); border-radius:11px; width:40px; height:38px;
+  font-size:17px; color:var(--ink-2); cursor:pointer; line-height:1}
+.mm-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.mm-item{display:flex; align-items:center; gap:11px; padding:16px 14px; border:1px solid var(--rain-2);
+  border-radius:15px; background:var(--rain-0); text-decoration:none; color:var(--ink-1); font-weight:700;
+  font-size:15px; cursor:pointer; text-align:left; font-family:inherit}
+.mm-item .mi-ic{font-size:22px; line-height:1}
+.mm-item:active,.mm-item:hover{border-color:var(--shelter); background:var(--shelter-wash)}
+.mm-section{font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); font-weight:700; margin:20px 0 9px}
+.mm-cats{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+.mm-cat{display:flex; align-items:center; gap:9px; padding:13px 13px; border:1px solid var(--rain-2);
+  border-radius:13px; background:var(--panel); text-decoration:none; color:var(--ink-1); font-weight:600; font-size:14px}
+.mm-cat .dot{width:10px; height:10px; border-radius:50%; flex:0 0 auto}
+.mm-cat:active,.mm-cat:hover{border-color:var(--shelter)}
+@keyframes mmIn{from{opacity:0; transform:scale(.98)} to{opacity:1; transform:none}}
 @media (max-width:780px){ .hamburger{display:flex} }
 @media (max-width:600px){ .tb-logout{display:none} .tb-search{max-width:none; margin:0 6px} }
-@media (prefers-reduced-motion:reduce){ .drawer,.drawer-scrim{animation:none} }
+@media (prefers-reduced-motion:reduce){ .mm-panel{animation:none} }
 
 /* ---------- emoji avatar picker ---------- */
 .emoji-pick{margin-top:6px}
