@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
+import { CATEGORIES } from '@/lib/categories'
 
 const CRISIS = /(kill myself|end it all|don'?t want to (be here|live)|no reason to live|suicide|hurt myself|hopeless)/i
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
@@ -102,16 +103,20 @@ export default function Composer() {
                 <option value="resources">Resources</option>
               </select>
             </label>
-            <label>Category
-              <select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option value="identity">Identity</option>
-                <option value="school">School life</option>
-                <option value="mind">Mental health</option>
-                <option value="culture">Culture</option>
-                <option value="wins">Small wins</option>
-                <option value="vent">Venting</option>
-              </select>
-            </label>
+          </div>
+          <div className="cat-pick">
+            <span className="cat-lbl">What&apos;s this about?</span>
+            <div className="cat-chips">
+              {CATEGORIES.map((c) => (
+                <button type="button" key={c.key}
+                  className={'cat-chip' + (category === c.key ? ' on' : '')}
+                  onClick={() => setCategory(c.key)}
+                  aria-pressed={category === c.key}>
+                  <span className="cc-dot" style={{ background: c.color }} />
+                  <span className="cc-text"><b>{c.name}</b><em>{c.desc}</em></span>
+                </button>
+              ))}
+            </div>
           </div>
           <label className="anon">
             <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} />
