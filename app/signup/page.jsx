@@ -20,7 +20,7 @@ export default function Signup() {
     if (error) { setMsg(error.message); return }
     // If email confirmation is OFF, a session exists now → go straight to setup.
     if (data.session) { router.push('/onboarding'); return }
-    setMsg('Account created. Check your email to confirm, then log in — we’ll walk you through setting up your profile.')
+    setMsg('Account created! We just emailed you a confirmation link — click it, then log in and we’ll set you up. Don’t see it? Check your spam / junk folder (and mark it “Not spam” so we always land in your inbox). It can take a minute to arrive.')
   }
 
   return (
