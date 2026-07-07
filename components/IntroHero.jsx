@@ -59,7 +59,7 @@ export default function IntroHero() {
       return 'rgb(' + (r | 0) + ',' + (g | 0) + ',' + (b | 0) + ')'
     }
 
-    let angle = 0, last = null, tt = 0
+    let angle = 0, last = null, tt = 0, rain = [], rainAcc = 0
 
     function render() {
       const narrow = W < 760
@@ -77,6 +77,14 @@ export default function IntroHero() {
       const pr = (P) => { const f = fov / (camZ - P.z); return { x: cx + P.x * f * scale, y: cy - P.y * f * scale, z: P.z } }
 
       ctx.clearRect(0, 0, W, H)
+      // slow drifting ambient light — gives the flat gradient subtle life (#3)
+      const lx = W * 0.5 + Math.sin(tt * 0.12) * W * 0.28, ly = H * 0.34 + Math.cos(tt * 0.09) * H * 0.12
+      const amb = ctx.createRadialGradient(lx, ly, 0, lx, ly, Math.max(W, H) * 0.6)
+      amb.addColorStop(0, 'rgba(130,160,205,.10)'); amb.addColorStop(1, 'rgba(130,160,205,0)')
+      ctx.fillStyle = amb; ctx.fillRect(0, 0, W, H)
+      // faint ambient rain behind the umbrella
+      ctx.lineCap = 'round'
+      for (const rn of rain) { ctx.strokeStyle = 'rgba(178,200,230,.13)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(rn.x, rn.y); ctx.lineTo(rn.x - 1.4, rn.y - rn.len); ctx.stroke() }
       // warm key glow
       const glow = ctx.createRadialGradient(cx, cy - 40, 20, cx, cy - 40, Math.min(W, H) * 0.75)
       glow.addColorStop(0, 'rgba(240,164,79,.12)'); glow.addColorStop(1, 'rgba(240,164,79,0)')
@@ -125,7 +133,14 @@ export default function IntroHero() {
       ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H)
     }
 
-    function loop(ts) { if (last === null) last = ts; const dt = Math.min((ts - last) / 1000, 0.05); last = ts; tt += dt; angle += dt * 0.34; render(); raf = requestAnimationFrame(loop) }
+    function loop(ts) {
+      if (last === null) last = ts
+      const dt = Math.min((ts - last) / 1000, 0.05); last = ts; tt += dt; angle += dt * 0.34
+      rainAcc += dt * W * 0.05
+      while (rainAcc > 1) { rainAcc--; rain.push({ x: Math.random() * W, y: -20, len: 22 + Math.random() * 30, spd: 420 + Math.random() * 320 }) }
+      for (let i = rain.length - 1; i >= 0; i--) { const rn = rain[i]; rn.y += rn.spd * dt; if (rn.y > H + 24) rain.splice(i, 1) }
+      render(); raf = requestAnimationFrame(loop)
+    }
 
     resize(); window.addEventListener('resize', resize)
     if (reduce) { angle = 0.6; render() } else raf = requestAnimationFrame(loop)
@@ -144,6 +159,7 @@ export default function IntroHero() {
           <Link className="btn ghost light" href="/feed">Look around first</Link>
         </div>
       </div>
+      <div className="scroll-cue" aria-hidden="true"><span>Scroll</span><i>⌄</i></div>
     </section>
   )
 }

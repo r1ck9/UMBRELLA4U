@@ -170,6 +170,11 @@ a{color:inherit}
 .btn.ghost.light:hover{border-color:#fff; background:rgba(255,255,255,.08)}
 @keyframes ihrise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
 @media (prefers-reduced-motion:reduce){ .introhero .inner{animation:none} }
+.scroll-cue{position:absolute; left:50%; bottom:26px; transform:translateX(-50%); z-index:2; display:flex; flex-direction:column; align-items:center; gap:2px;
+  color:rgba(238,242,251,.6); font-size:11px; letter-spacing:.2em; text-transform:uppercase; animation:cueBob 2.1s ease-in-out infinite}
+.scroll-cue i{font-style:normal; font-size:20px; line-height:.5}
+@keyframes cueBob{0%,100%{transform:translate(-50%,0)} 50%{transform:translate(-50%,7px)}}
+@media (prefers-reduced-motion:reduce){ .scroll-cue{animation:none} }
 
 /* intro "what it is" section */
 .introabout{position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:84px 24px}
