@@ -45,9 +45,13 @@ const reportHtml = (n) => shell(
 
 export async function GET(request) {
   const secret = process.env.CRON_SECRET
-  if (secret && request.headers.get('authorization') !== `Bearer ${secret}`) {
-    return new Response('unauthorized', { status: 401 })
-  }
+  // Vercel Cron sends "Authorization: Bearer <secret>". For manual testing you can
+  // also hit /api/notify?secret=<secret> in a browser.
+  const url = new URL(request.url)
+  const ok = !secret ||
+    request.headers.get('authorization') === `Bearer ${secret}` ||
+    url.searchParams.get('secret') === secret
+  if (!ok) return new Response('unauthorized', { status: 401 })
   const sb = adminSupabase()
   if (!sb) return Response.json({ error: 'admin not configured (missing SUPABASE_SERVICE_ROLE_KEY)' }, { status: 500 })
 
