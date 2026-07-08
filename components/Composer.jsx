@@ -23,6 +23,8 @@ export default function Composer() {
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
   const [intent, setIntent] = useState('similar')   // default nudges toward "me too" replies → more interaction
+  const [intentTouched, setIntentTouched] = useState(false)  // did the user pick an intent themselves?
+  const [heavy, setHeavy] = useState(false)                  // heavy/crisis language detected → suggest "just listen"
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
   const [pollOn, setPollOn] = useState(false)
@@ -43,6 +45,14 @@ export default function Composer() {
     window.addEventListener('umbrella:answer-prompt', onAnswer)
     return () => window.removeEventListener('umbrella:answer-prompt', onAnswer)
   }, [])
+
+  // Gently steer heavy posts toward "Just listen" so someone sharing something
+  // hard isn't met with unsolicited advice — unless they've chosen an intent.
+  useEffect(() => {
+    const isHeavy = CRISIS.test(text)
+    setHeavy(isHeavy)
+    if (!intentTouched) setIntent(isHeavy ? 'listen' : 'similar')
+  }, [text, intentTouched])
 
   function startShare() {
     if (!text.trim()) return
@@ -107,7 +117,7 @@ export default function Composer() {
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPollOn(false); setPollOpts(['', '']); setPrompt(null); router.refresh() }, 3100)
+    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); router.refresh() }, 3100)
   }
 
   return (
@@ -128,7 +138,7 @@ export default function Composer() {
           <p className="compose-privacy">🔒 Keep it anonymous — please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
           <div className="row">
             <label>Respond with
-              <select value={intent} onChange={(e) => setIntent(e.target.value)}>
+              <select value={intent} onChange={(e) => { setIntent(e.target.value); setIntentTouched(true) }}>
                 <option value="similar">Similar stories</option>
                 <option value="listen">Just listen</option>
                 <option value="advice">Give advice</option>
@@ -136,6 +146,9 @@ export default function Composer() {
               </select>
             </label>
           </div>
+          {heavy && !intentTouched && intent === 'listen' && (
+            <p className="intent-hint">🫂 This sounds heavy — we set this to <b>Just listen</b> so you can share without getting advice. Change it anytime.</p>
+          )}
           <div className="cat-pick">
             <span className="cat-lbl">What&apos;s this about?</span>
             <div className="cat-chips">
