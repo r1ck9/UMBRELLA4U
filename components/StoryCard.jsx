@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
 import { getMe } from '@/lib/me'
 import { streakBadge } from '@/lib/badges'
+import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -146,6 +147,7 @@ export default function StoryCard({ story }) {
 
   async function openUmbrella(note) {
     if (opened || isOwn) return
+    if (note && CRISIS.test(note)) { alert(CRISIS_MESSAGE); return }
     if (note && /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(note)) {
       alert('Please remove the email from your note — keep everyone anonymous. 💛'); return
     }

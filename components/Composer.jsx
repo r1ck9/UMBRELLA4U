@@ -5,8 +5,7 @@ import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
 import { CATEGORIES } from '@/lib/categories'
 import { DAILY_STORY_LIMIT } from '@/lib/config'
-
-const CRISIS = /(kill myself|end it all|don'?t want to (be here|live)|no reason to live|suicide|hurt myself|hopeless)/i
+import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
 // We normalize first — de-leet + strip non-letters — so "f u c k", "sh1t", "xxfaggotxx" are all caught.
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
@@ -47,10 +46,7 @@ export default function Composer() {
 
   function startShare() {
     if (!text.trim()) return
-    if (CRISIS.test(text)) {
-      alert("That sounds really heavy right now. Please reach out to someone trained:\n\n988 — Suicide Crisis Helpline (call or text)\nKids Help Phone — text CONNECT to 686868")
-      return
-    }
+    if (CRISIS.test(text)) { alert(CRISIS_MESSAGE); return }
     if (HARM(text)) { setRejected(REJECT_MSG); return }
     if (EMAIL.test(text)) { setRejected(PII_MSG); return }
     if (pollOn) {
