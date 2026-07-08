@@ -395,6 +395,13 @@ a{color:inherit}
   border-left:3px solid var(--shelter); border-radius:10px; padding:10px 13px; margin-bottom:10px}
 .prompt-pin span{font-size:12px; font-weight:700; color:var(--shelter-deep); text-transform:uppercase; letter-spacing:.03em}
 .prompt-pin em{font-style:normal; font-family:var(--serif); font-size:15px; color:var(--ink-1)}
+.prompt-suggest{display:flex; align-items:center; gap:12px; background:var(--shelter-wash);
+  border-left:3px solid var(--shelter); border-radius:10px; padding:10px 13px; margin-bottom:10px}
+.prompt-suggest .ps-text{display:flex; flex-direction:column; gap:3px; flex:1; min-width:0}
+.prompt-suggest .ps-text span{font-size:12px; font-weight:700; color:var(--shelter-deep); text-transform:uppercase; letter-spacing:.03em}
+.prompt-suggest .ps-text em{font-style:normal; font-family:var(--serif); font-size:15px; color:var(--ink-1)}
+.prompt-suggest .ps-btn{flex:none}
+@media (max-width:560px){ .prompt-suggest{flex-wrap:wrap} .prompt-suggest .ps-text{flex-basis:100%} }
 
 /* ---------- top-bar search ---------- */
 .tb-search{flex:1; max-width:340px; margin:0 8px}

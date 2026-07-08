@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
 import { CATEGORIES } from '@/lib/categories'
+import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { DAILY_STORY_LIMIT } from '@/lib/config'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
@@ -127,10 +128,21 @@ export default function Composer() {
       ) : (
         <div className="composer">
           {rejected && <div className="reject-banner">{rejected}</div>}
-          {prompt && (
+          {prompt ? (
             <div className="prompt-pin">
               <span>☂ Answering this week’s prompt</span>
               <em>{prompt.text}</em>
+            </div>
+          ) : (
+            <div className="prompt-suggest">
+              <div className="ps-text">
+                <span>☂ This week’s prompt</span>
+                <em>{WEEKLY_PROMPT.text}</em>
+              </div>
+              <button type="button" className="btn ghost sm ps-btn"
+                onClick={() => { setPrompt(WEEKLY_PROMPT); document.querySelector('.composer textarea')?.focus() }}>
+                Answer this
+              </button>
             </div>
           )}
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (rejected) setRejected('') }}
