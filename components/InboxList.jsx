@@ -21,9 +21,14 @@ export default function InboxList() {
       const user = data.user
       if (!user) { setState({ loading: false, user: null, items: [] }); return }
 
-      const { data: stories } = await supabase.from('stories').select('id,text,category').eq('author_id', user.id)
-      const map = {}; (stories || []).forEach((s) => { map[s.id] = s })
-      const ids = (stories || []).map((s) => s.id)
+      // my own stories (incl. anonymous) via the private author link
+      const { data: sa } = await supabase.from('story_authors').select('story_id')
+      const ids = (sa || []).map((r) => r.story_id)
+      const map = {}
+      if (ids.length) {
+        const { data: stories } = await supabase.from('stories').select('id,text,category').in('id', ids)
+        ;(stories || []).forEach((s) => { map[s.id] = s })
+      }
 
       let umbs = []
       if (ids.length) {

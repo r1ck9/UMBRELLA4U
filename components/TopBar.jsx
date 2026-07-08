@@ -25,8 +25,8 @@ export default function TopBar() {
         const { data: prof } = await supabase.from('profiles')
           .select('avatar_url,accent_color,username').eq('id', user.id).single()
         if (active && prof) setAv(prof)
-        const { data: mine } = await supabase.from('stories').select('id').eq('author_id', user.id)
-        const ids = (mine || []).map((s) => s.id)
+        const { data: mine } = await supabase.from('story_authors').select('story_id')
+        const ids = (mine || []).map((s) => s.story_id)
         if (ids.length) {
           const seen = localStorage.getItem('umbrella_inbox_seen') || '1970-01-01T00:00:00Z'
           const { count } = await supabase.from('umbrellas')

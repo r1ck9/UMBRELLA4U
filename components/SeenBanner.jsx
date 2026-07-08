@@ -19,8 +19,8 @@ export default function SeenBanner() {
     ;(async () => {
       const me = await getMe()
       if (!me.userId) return
-      const { data: mine } = await supabase.from('stories').select('id').eq('author_id', me.userId)
-      const ids = (mine || []).map((s) => s.id)
+      const { data: mine } = await supabase.from('story_authors').select('story_id')
+      const ids = (mine || []).map((s) => s.story_id)
       if (!ids.length) return
       let seen = '1970-01-01T00:00:00Z'
       try { seen = localStorage.getItem('umbrella_inbox_seen') || seen } catch {}

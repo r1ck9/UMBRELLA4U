@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
-import { getMe } from '@/lib/me'
+import { getMe, getMyStoryIds } from '@/lib/me'
 import { streakBadge } from '@/lib/badges'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 
@@ -29,6 +29,7 @@ export default function StoryCard({ story }) {
   const [noteText, setNoteText] = useState('')
   const [sent, setSent] = useState('')
   const [me, setMe] = useState({ userId: null, isModerator: false })
+  const [mine, setMine] = useState(false)   // is this story mine? (covers anonymous posts)
   const [removed, setRemoved] = useState(false)
   const [reported, setReported] = useState(false)
   const [marked, setMarked] = useState(false)
@@ -50,6 +51,12 @@ export default function StoryCard({ story }) {
       if (m.userId && supabase) {
         supabase.from('umbrellas').select('note').eq('story_id', story.id).eq('user_id', m.userId).maybeSingle()
           .then(({ data }) => { if (data) { setOpened(true); if (data.note) setSent(data.note) } })
+      }
+      // Is this my own story? (author_id is null on anonymous posts, so check
+      // the private author link too.)
+      if (m.userId) {
+        if (m.userId === story.author_id) setMine(true)
+        else getMyStoryIds().then((ids) => { if (ids.has(story.id)) setMine(true) })
       }
       // Moderators: reflect whether I've boosted this story.
       if (m.isModerator && supabase) {
@@ -148,13 +155,12 @@ export default function StoryCard({ story }) {
     if (error && !/duplicate|unique/i.test(error.message)) { setMarked(false); alert(error.message) }
   }
 
-  const isOwn = me.userId && me.userId === story.author_id
+  const isOwn = !!(me.userId && (me.userId === story.author_id || mine))
   const canNote = story.intent && story.intent !== 'listen'
   const canRemove = isOwn || me.isModerator
 
   async function handleRemove() {
-    const own = me.userId === story.author_id
-    if (!window.confirm(own ? 'Delete your story? This can’t be undone.' : 'Take this story down for everyone?')) return
+    if (!window.confirm(isOwn ? 'Delete your story? This can’t be undone.' : 'Take this story down for everyone?')) return
     const { error } = await supabase.from('stories').delete().eq('id', story.id)
     if (error) { alert(error.message); return }
     setRemoved(true)
@@ -283,7 +289,7 @@ export default function StoryCard({ story }) {
               ▲ {boosted ? 'Boosted' : 'Boost'}{boostCount > 0 ? ` · ${boostCount}` : ''}
             </button>}
           {canRemove &&
-            <button className="takedown" onClick={handleRemove}>{me.userId === story.author_id ? 'Delete' : '🛑 Take down'}</button>}
+            <button className="takedown" onClick={handleRemove}>{isOwn ? 'Delete' : '🛑 Take down'}</button>}
         </span>
       </div>
 
