@@ -157,6 +157,7 @@ export default function Onboarding() {
               onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
             <label>About me<textarea value={p.about_me} maxLength={300}
               onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
+            <p className="privacy-note">🔒 Skip your real name, school, or address. Staying anonymous is what keeps you safe here.</p>
             <label>Interests / tags
               <div className="tag-edit">
                 {p.tags.map((t) => <span key={t} className="tag rm" onClick={() => set('tags', p.tags.filter((x) => x !== t))}>{t} ✕</span>)}

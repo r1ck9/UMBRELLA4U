@@ -8,21 +8,20 @@ import { CATEGORIES } from '@/lib/categories'
 export default function Nav({ active = 'all' }) {
   return (
     <nav className="nav" aria-label="Main">
-      <Link href="/feed" className={'navitem' + (active === 'all' ? ' on' : '')}>Home</Link>
-      <Link href="/inbox" className={'navitem' + (active === 'inbox' ? ' on' : '')}>Inbox</Link>
+      <Link href="/feed" className={'navitem' + (active === 'all' ? ' on' : '')}><span className="ni-ic" aria-hidden="true">🏠</span>Home</Link>
+      <Link href="/inbox" className={'navitem' + (active === 'inbox' ? ' on' : '')}><span className="ni-ic" aria-hidden="true">📨</span>Inbox</Link>
       <NavReports active={active} />
-      <Link href="/resources" className="navitem">Resource hub</Link>
-      <Link href="/welcome" className="navitem">How it works</Link>
+      <Link href="/resources" className="navitem"><span className="ni-ic" aria-hidden="true">📎</span>Resources</Link>
+      <Link href="/welcome" className="navitem"><span className="ni-ic" aria-hidden="true">☂</span>How it works</Link>
       <TourButton className="navitem" />
-      <Link href="/settings" className="navitem">Settings</Link>
-      <Link href="/feedback" className="navitem">Send feedback</Link>
+      <Link href="/settings" className="navitem"><span className="ni-ic" aria-hidden="true">⚙️</span>Settings</Link>
+      <Link href="/feedback" className="navitem"><span className="ni-ic" aria-hidden="true">💬</span>Feedback</Link>
       <GuidelinesButton className="navitem" />
       <div className="nav-sep" />
-      <div className="nav-lbl">Weather by kind</div>
+      <div className="nav-lbl">Weather</div>
       {CATEGORIES.map((c) => (
-        <Link key={c.key} href={`/feed?cat=${c.key}`} className={'navitem cat' + (active === c.key ? ' on' : '')}>
-          <span className="dot" style={{ background: c.color }} />
-          <span className="navtext"><b>{c.name}</b><em>{c.desc}</em></span>
+        <Link key={c.key} href={`/feed?cat=${c.key}`} className={'navitem cat' + (active === c.key ? ' on' : '')} title={c.desc}>
+          <span className="dot" style={{ background: c.color }} />{c.name}
         </Link>
       ))}
     </nav>

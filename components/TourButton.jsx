@@ -10,5 +10,5 @@ export default function TourButton({ className }) {
     if (pathname === '/feed') window.dispatchEvent(new CustomEvent('umbrella:start-tour'))
     else router.push('/feed?tour=1')
   }
-  return <button className={className} onClick={go}>Take a tour</button>
+  return <button className={className} onClick={go}><span className="ni-ic" aria-hidden="true">🧭</span>Take a tour</button>
 }

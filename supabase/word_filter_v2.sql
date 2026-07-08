@@ -52,6 +52,15 @@ insert into blocked_terms (term, match_type) values
   ('dumbass','substr'),('jackass','substr'),('dickhead','substr'),('bastard','substr'),
   ('cunt','substr'),('twat','substr'),('wanker','substr'),('bollocks','substr'),
   ('whore','substr'),('douchebag','substr'),
+  -- crude sexual-organ slang (safe to match embedded)
+  ('schlong','substr'),('shlong','substr'),('wiener','substr'),('weiner','substr'),
+  ('boner','substr'),('hardon','substr'),('hard on','substr'),('tallywacker','substr'),
+  ('todger','substr'),('my meat','substr'),
+  -- clinical anatomy terms (added by request)
+  ('penis','substr'),('penises','substr'),('vagina','substr'),('vaginas','substr'),
+  ('vulva','substr'),('clitoris','substr'),('scrotum','substr'),('testicle','substr'),
+  ('testicles','substr'),('genitalia','substr'),('genitals','substr'),('ejaculate','substr'),
+  ('masturbate','substr'),('masturbation','substr'),
   -- slurs (safe to match embedded)
   ('nigger','substr'),('niggers','substr'),('nigga','substr'),('niggas','substr'),
   ('faggot','substr'),('faggots','substr'),('kike','substr'),('wetback','substr'),
@@ -66,7 +75,12 @@ insert into blocked_terms (term, match_type) values
   ('pussy','word'),('slut','word'),('prick','word'),('kys','word'),
   ('fag','word'),('fags','word'),('retard','word'),('retards','word'),('retarded','word'),
   ('tranny','word'),('trannies','word'),('spic','word'),('chink','word'),('gook','word'),
-  ('coon','word'),('dyke','word'),('beaner','word'),('paki','word')
+  ('coon','word'),('dyke','word'),('beaner','word'),('paki','word'),
+  -- crude sexual-organ slang, whole-word only (avoids collisions like
+  -- wood[pecker], door[knob], and real names like Willy/Wang/Dong/Johnson)
+  ('dih','word'),('puh','word'),('pinnar','word'),('winnar','word'),('pennar','word'),
+  ('willy','word'),('knob','word'),('pecker','word'),
+  ('anus','word'),('cum','word')   -- whole-word: 'anus' is in Ur[anus]/m[anus], 'cum' in do[cum]ent/[cucum]ber
 on conflict (term) do update set match_type = excluded.match_type;
 
 -- ---------- the screening trigger ----------

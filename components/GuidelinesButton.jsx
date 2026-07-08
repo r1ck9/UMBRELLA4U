@@ -5,7 +5,7 @@ export default function GuidelinesButton({ className }) {
   return (
     <button type="button" className={className}
       onClick={() => window.dispatchEvent(new Event('umbrella:guidelines'))}>
-      Community guidelines
+      <span className="ni-ic" aria-hidden="true">📜</span>Guidelines
     </button>
   )
 }

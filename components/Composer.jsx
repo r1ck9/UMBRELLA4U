@@ -15,6 +15,8 @@ const norm = (t) => t.toLowerCase().replace(/[0134578@$!|]/g, (c) => LEET[c] || 
 const HARM_EMBEDDED = ['killyourself', 'killurself', 'godie', 'youshoulddie', 'faggot', 'nigger', 'nigga', 'kike', 'motherfucker', 'fuck']
 const HARM = (t) => { const n = norm(t); return HARM_EMBEDDED.some((w) => n.includes(w)) }
 const REJECT_MSG = "This can't be posted — it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
+const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
+const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
 
 export default function Composer() {
   const router = useRouter()
@@ -47,6 +49,7 @@ export default function Composer() {
       return
     }
     if (HARM(text)) { setRejected(REJECT_MSG); return }
+    if (EMAIL.test(text)) { setRejected(PII_MSG); return }
     if (!supabase) { alert('Connect Supabase to post — see README.md.'); return }
     setRejected(''); setAgreed(false); setConfirming(true)
   }
@@ -71,6 +74,7 @@ export default function Composer() {
     if (error) {
       setConfirming(false)
       if (/blocked_content/i.test(error.message)) setRejected(REJECT_MSG)
+      else if (/personal_info/i.test(error.message)) setRejected(PII_MSG)
       else if (/daily_story_limit/i.test(error.message)) setRejected(`You've shared your ${DAILY_STORY_LIMIT} stories for today. Come back tomorrow — a fresh page, a fresh start. ☂`)
       else alert(error.message)
       return
@@ -97,6 +101,7 @@ export default function Composer() {
           )}
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (rejected) setRejected('') }}
             placeholder="You don't have to share your worst moment — just whatever you're carrying right now." />
+          <p className="compose-privacy">🔒 Keep it anonymous — please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
           <div className="row">
             <label>Respond with
               <select value={intent} onChange={(e) => setIntent(e.target.value)}>

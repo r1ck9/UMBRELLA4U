@@ -146,6 +146,7 @@ export default function Profile() {
               <label>Pronouns<input value={p.pronouns} maxLength={30} onChange={(e) => set('pronouns', e.target.value)} placeholder="they/them (optional)" /></label>
               <label>Today&apos;s weather (status)<input value={p.status_weather} maxLength={60} onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
               <label>About me<textarea value={p.about_me} maxLength={300} onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
+              <p className="privacy-note">🔒 Don&apos;t put your real name, school, or address here. Combining identifying details can reveal who you are.</p>
               <label>Accent color
                 <div className="swatches">
                   {ACCENTS.map((c) => (
