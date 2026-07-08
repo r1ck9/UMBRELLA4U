@@ -15,6 +15,7 @@ export default function TopBar() {
   useEffect(() => {
     if (!supabase) return
     let active = true
+    let channel
     async function load() {
       const { data } = await supabase.auth.getUser()
       const user = data.user
@@ -32,12 +33,23 @@ export default function TopBar() {
             .select('*', { count: 'exact', head: true })
             .in('story_id', ids).gt('created_at', seen).neq('user_id', user.id)
           if (active) setUnread(count || 0)
+          // Live: bump the bell the moment someone opens an umbrella on my story
+          // (no-op if realtime replication isn't enabled on the umbrellas table).
+          const mySet = new Set(ids)
+          channel = supabase.channel('bell:' + user.id)
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'umbrellas' }, (payload) => {
+              const row = payload.new
+              if (active && row && mySet.has(row.story_id) && row.user_id !== user.id) {
+                setUnread((u) => u + 1)
+              }
+            })
+            .subscribe()
         }
       }
     }
     load()
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setEmail(s?.user?.email ?? null))
-    return () => { active = false; sub.subscription.unsubscribe() }
+    return () => { active = false; sub.subscription.unsubscribe(); if (channel) supabase.removeChannel(channel) }
   }, [])
 
   async function logout() { await supabase?.auth.signOut() }
