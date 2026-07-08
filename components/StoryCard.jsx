@@ -172,6 +172,8 @@ export default function StoryCard({ story }) {
       }
     } else {
       fireBurst()
+      // tell the rail to refresh its live counts (umbrellas left today + community total)
+      window.dispatchEvent(new CustomEvent('umbrella:opened'))
     }
   }
 

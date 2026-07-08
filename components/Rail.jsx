@@ -49,6 +49,17 @@ export default function Rail() {
     })()
   }, [])
 
+  // When the visitor opens an umbrella anywhere on the page, update the live
+  // counts here immediately instead of waiting for a manual refresh.
+  useEffect(() => {
+    function onOpened() {
+      setLeft((n) => (typeof n === 'number' ? Math.max(0, n - 1) : n))
+      setStats((s) => ({ ...s, umbrellas: (s.umbrellas ?? 0) + 1 }))
+    }
+    window.addEventListener('umbrella:opened', onOpened)
+    return () => window.removeEventListener('umbrella:opened', onOpened)
+  }, [])
+
   return (
     <aside className="rail">
       {streak !== null && streak > 0 && (
