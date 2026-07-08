@@ -18,12 +18,15 @@ export default function StatsPanel() {
       const v = await supabase.from('site_metrics').select('value').eq('key', 'views').maybeSingle()
       const eng = await supabase.rpc('engagement_stats')
       const e = eng.data?.[0] || null
+      const ret = await supabase.rpc('retention_stats')
+      const r = ret.data?.[0] || null
       setStats({
         users: users.count ?? 0,
         stories: stories.count ?? 0,
         umbs: umbs.count ?? 0,
         views: v.data?.value ?? 0,
-        eng
+        eng,
+        ret: r
       })
     })()
   }, [])
@@ -47,6 +50,14 @@ export default function StatsPanel() {
     { n: Number(e.never_posted), l: `Signed up, never posted (${pct(e.never_posted)}%)` }
   ]
 
+  // day-after retention: how many came back the day after registering
+  const r = stats.ret
+  const retRate = r && Number(r.cohort) ? Math.round((Number(r.retained) / Number(r.cohort)) * 100) : 0
+  const retCards = r && [
+    { n: Number(r.active_today), l: 'Active users today' },
+    { n: Number(r.retained), l: `Came back next day (${retRate}%)` }
+  ]
+
   return (
     <>
       <div className="stats-grid">
@@ -62,6 +73,19 @@ export default function StatsPanel() {
           <h4 className="stats-sub">Averages &amp; activation</h4>
           <div className="stats-grid">
             {engCards.map((c) => (
+              <div className="stat-card" key={c.l}>
+                <div className="stat-n">{c.n.toLocaleString()}</div>
+                <div className="stat-l">{c.l}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      {retCards && (
+        <>
+          <h4 className="stats-sub">Active users &amp; retention</h4>
+          <div className="stats-grid">
+            {retCards.map((c) => (
               <div className="stat-card" key={c.l}>
                 <div className="stat-n">{c.n.toLocaleString()}</div>
                 <div className="stat-l">{c.l}</div>
