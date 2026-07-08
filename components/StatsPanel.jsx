@@ -39,15 +39,13 @@ export default function StatsPanel() {
     { n: stats.umbs, l: 'Umbrellas opened' }
   ]
 
-  // per-user averages + activation gap, from the moderator-gated RPC
+  // per-user averages + activation gap (computed in SQL by the RPC)
   const e = stats.eng
-  const avg = (x) => (e && e.users ? Math.round((Number(x) / e.users) * 10) / 10 : 0)
-  const pct = (x) => (e && e.users ? Math.round((Number(x) / e.users) * 100) : 0)
   const engCards = e && [
-    { n: avg(e.stories), l: 'Avg posts / user' },
-    { n: avg(e.umbrellas), l: 'Avg umbrellas / user' },
-    { n: avg(e.replies), l: 'Avg replies / user' },
-    { n: Number(e.never_posted), l: `Signed up, never posted (${pct(e.never_posted)}%)` }
+    { n: Number(e.avg_posts) || 0, l: 'Avg posts / user' },
+    { n: Number(e.avg_umbrellas) || 0, l: 'Avg umbrellas / user' },
+    { n: Number(e.avg_replies) || 0, l: 'Avg replies / user' },
+    { n: Number(e.never_posted) || 0, l: `Signed up, never posted (${Number(e.never_pct) || 0}%)` }
   ]
 
   // day-after retention: how many came back the day after registering

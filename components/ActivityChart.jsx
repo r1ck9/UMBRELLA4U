@@ -10,7 +10,8 @@ const SERIES = [
   { key: 'views', label: 'Views', color: 'var(--s-views)' },
   { key: 'stories', label: 'Posts', color: 'var(--s-posts)' },
   { key: 'umbrellas', label: 'Umbrellas', color: 'var(--s-umb)' },
-  { key: 'active_users', label: 'Active users', color: 'var(--s-active)' }
+  { key: 'active_users', label: 'Active users', color: 'var(--s-active)' },
+  { key: 'registrations', label: 'Registrations', color: 'var(--s-reg)' }
 ]
 const RANGES = [7, 30, 90]
 const W = 720, H = 280, PAD = { t: 16, r: 66, b: 34, l: 40 }

@@ -693,12 +693,12 @@ a{color:inherit}
 /* ---- moderator activity chart ---- */
 .activity{
   /* validated categorical slots 1–3 (blue / aqua / yellow), light values */
-  --s-views:#2a78d6; --s-posts:#1baf7a; --s-umb:#eda100; --s-active:#008300;
+  --s-views:#2a78d6; --s-posts:#1baf7a; --s-umb:#eda100; --s-active:#008300; --s-reg:#4a3aa7;
   --chart-grid:#e1e0d9; --chart-axis:#898781;
   background:var(--panel); border:1px solid var(--rain-2); border-radius:16px;
   padding:16px 18px; box-shadow:var(--shadow); margin-top:16px}
 @media (prefers-color-scheme:dark){
-  .activity{ --s-views:#3987e5; --s-posts:#199e70; --s-umb:#c98500; --s-active:#008300;
+  .activity{ --s-views:#3987e5; --s-posts:#199e70; --s-umb:#c98500; --s-active:#008300; --s-reg:#9085e9;
     --chart-grid:#2c2c2a; --chart-axis:#898781}
 }
 .activity-head{display:flex; align-items:center; justify-content:space-between; gap:12px}
