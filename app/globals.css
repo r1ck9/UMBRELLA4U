@@ -304,10 +304,12 @@ a{color:inherit}
 
 /* modals (guidelines popup + pre-post checkpoint) */
 .modal-scrim{position:fixed; inset:0; z-index:80; background:rgba(12,16,22,.55); backdrop-filter:blur(3px);
-  display:grid; place-items:center; padding:20px; animation:mfade .25s ease}
+  display:grid; place-items:center; padding:16px; overflow-y:auto; animation:mfade .25s ease}
 .modal-box{background:var(--panel); border:1px solid var(--rain-2); border-radius:20px; padding:26px; max-width:440px; width:100%;
-  box-shadow:var(--shadow); animation:mrise .3s cubic-bezier(.22,1,.36,1)}
+  box-shadow:var(--shadow); animation:mrise .3s cubic-bezier(.22,1,.36,1);
+  max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px); overflow-y:auto; -webkit-overflow-scrolling:touch}
 .modal-box h2{font-size:22px; margin:0 0 6px}
+.modal-box .row.end{position:sticky; bottom:-2px; background:var(--panel); padding:12px 0 2px; margin-top:14px}
 .ms-sub{color:var(--ink-2); font-size:14px; margin:0 0 16px}
 .care-line{background:var(--shelter-wash); color:var(--shelter-deep); border-radius:12px; padding:12px 14px;
   font-size:14px; line-height:1.5; font-weight:600; margin:0 0 14px}
