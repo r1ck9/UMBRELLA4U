@@ -2,21 +2,34 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { getMe } from '@/lib/me'
 import StoryCard from '@/components/StoryCard'
 
 const GUEST_LIMIT = 3 // how many stories a logged-out visitor can read before the wall
 
-export default function FeedList({ stories }) {
+export default function FeedList({ stories, category = null }) {
   const [guest, setGuest] = useState(null) // null = still checking
+  const [modRows, setModRows] = useState(null) // moderators: raw newest-first feed (no ranking)
 
   useEffect(() => {
     if (!supabase) { setGuest(false); return }
-    supabase.auth.getUser().then(({ data }) => setGuest(!data.user))
-  }, [])
+    getMe().then((m) => {
+      setGuest(!m.userId)
+      // Moderators see the feed in plain time order — no ranking, boost, or
+      // off-topic sinking — so it's easier to review everything as it comes in.
+      if (m.isModerator) {
+        let q = supabase.from('stories').select('*').eq('state', 'live')
+          .order('created_at', { ascending: false }).limit(100)
+        if (category) q = q.eq('category', category)
+        q.then(({ data }) => { if (data) setModRows(data) })
+      }
+    })
+  }, [category])
 
+  const list = modRows || stories
   const limited = guest === true
-  const visible = limited ? stories.slice(0, GUEST_LIMIT) : stories
-  const hidden = stories.length - visible.length
+  const visible = limited ? list.slice(0, GUEST_LIMIT) : list
+  const hidden = list.length - visible.length
 
   return (
     <>

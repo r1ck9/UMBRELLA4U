@@ -33,7 +33,7 @@ export default async function Feed({ searchParams }) {
           <Composer />
           {stories.length === 0
             ? <p className="empty">No stories here yet. Be the first to share this weather. ☂</p>
-            : <FeedList stories={stories} />}
+            : <FeedList stories={stories} category={cat === 'all' ? null : cat} />}
         </main>
         <Rail />
       </div>
