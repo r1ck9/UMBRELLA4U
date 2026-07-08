@@ -117,6 +117,10 @@ a{color:inherit}
 .cfoot-actions{margin-left:auto; display:flex; gap:12px; align-items:center}
 .takedown,.report,.notrel{background:none; border:none; color:var(--ink-3); font-size:12px; font-weight:600; cursor:pointer}
 .takedown:hover,.report:hover,.notrel:hover{color:var(--care)}
+.boost{background:none; border:1.5px solid var(--rain-2); color:var(--ink-3); font-size:12px; font-weight:700;
+  cursor:pointer; border-radius:999px; padding:4px 10px; font-variant-numeric:tabular-nums}
+.boost:hover{border-color:var(--shelter); color:var(--shelter-deep)}
+.boost.on{background:var(--shelter); border-color:var(--shelter); color:var(--on-accent)}
 .reported,.marked{font-size:12px; color:var(--shelter-deep); font-weight:600}
 
 /* right rail */

@@ -33,6 +33,8 @@ export default function StoryCard({ story }) {
   const [reported, setReported] = useState(false)
   const [marked, setMarked] = useState(false)
   const [poll, setPoll] = useState(null)   // null = loading · false = no poll · {options,total,myOption}
+  const [boosted, setBoosted] = useState(false)
+  const [boostCount, setBoostCount] = useState(story.boost_count ?? 0)
 
   // Count one view per story per browser session (feeds the ranking algorithm).
   useEffect(() => {
@@ -49,8 +51,25 @@ export default function StoryCard({ story }) {
         supabase.from('umbrellas').select('note').eq('story_id', story.id).eq('user_id', m.userId).maybeSingle()
           .then(({ data }) => { if (data) { setOpened(true); if (data.note) setSent(data.note) } })
       }
+      // Moderators: reflect whether I've boosted this story.
+      if (m.isModerator && supabase) {
+        supabase.from('story_boosts').select('story_id').eq('story_id', story.id).eq('mod_id', m.userId).maybeSingle()
+          .then(({ data }) => { if (data) setBoosted(true) })
+      }
     })
   }, [])
+
+  async function toggleBoost() {
+    const next = !boosted
+    setBoosted(next); setBoostCount((c) => Math.max(0, c + (next ? 1 : -1)))
+    if (!supabase) return // sample mode
+    const { data, error } = await supabase.rpc('toggle_boost', { sid: story.id })
+    if (error) {
+      setBoosted(!next); setBoostCount((c) => Math.max(0, c + (next ? -1 : 1)))
+      alert(error.message); return
+    }
+    if (typeof data === 'number') setBoostCount(data)
+  }
 
   // Load this story's poll (if any) + which option I picked. Then subscribe to
   // live vote inserts so tallies update in real time, like a live Instagram poll.
@@ -258,6 +277,11 @@ export default function StoryCard({ story }) {
           {me.userId && me.userId !== story.author_id && !reported &&
             <button className="report" onClick={handleReport}>🛑 Report</button>}
           {reported && <span className="reported">Reported ✓</span>}
+          {me.isModerator &&
+            <button className={'boost' + (boosted ? ' on' : '')} onClick={toggleBoost}
+              title="Boost this story so more people see it — moderators only">
+              ▲ {boosted ? 'Boosted' : 'Boost'}{boostCount > 0 ? ` · ${boostCount}` : ''}
+            </button>}
           {canRemove &&
             <button className="takedown" onClick={handleRemove}>{me.userId === story.author_id ? 'Delete' : '🛑 Take down'}</button>}
         </span>
