@@ -10,6 +10,10 @@ export const metadata = {
   description: "An anonymous space to share what you're carrying — and to know someone will stand with you."
 }
 
+// Ensure phones render at device width so the responsive top-bar rules apply
+// (some in-app browsers, e.g. Instagram, otherwise render at a wider default).
+export const viewport = { width: 'device-width', initialScale: 1 }
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en">

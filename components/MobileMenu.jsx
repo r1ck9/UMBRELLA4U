@@ -9,6 +9,7 @@ import { CATEGORIES } from '@/lib/categories'
 // Full-screen mobile menu: a grid of big tap targets (no long scrolling list).
 const LINKS = [
   { href: '/feed', icon: '🏠', label: 'Home' },
+  { href: '/search', icon: '🔍', label: 'Search' },
   { href: '/inbox', icon: '📨', label: 'Inbox' },
   { href: '/resources', icon: '📎', label: 'Resource hub' },
   { href: '/welcome', icon: '☂', label: 'How it works' },
