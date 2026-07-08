@@ -1,3 +1,6 @@
+-- NOTE: the day boundary here is SUPERSEDED by day_boundary_tz.sql
+-- (America/Vancouver instead of UTC). Run that after this one.
+--
 -- Daily post limit — run once in Supabase (SQL Editor). Safe to re-run.
 -- Stops anyone posting more than 5 stories per day, enforced in the database
 -- so it can't be bypassed from the browser. Change the 5 to adjust the limit

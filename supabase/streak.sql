@@ -1,3 +1,6 @@
+-- NOTE: touch_streak here is SUPERSEDED by day_boundary_tz.sql, which counts
+-- days in America/Vancouver instead of UTC. Run that after this one.
+--
 -- Umbrella streak — run once in Supabase SQL Editor. Safe to re-run.
 -- Counts consecutive days a member "shows up." touch_streak() is called when
 -- a logged-in member loads the feed; it's idempotent per day (can't be gamed

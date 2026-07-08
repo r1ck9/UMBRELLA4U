@@ -1,3 +1,6 @@
+-- NOTE: the day boundary here is SUPERSEDED by day_boundary_tz.sql
+-- (America/Vancouver instead of UTC). Run that after this one.
+--
 -- Daily umbrella limit — run this once in Supabase (SQL Editor).
 -- Stops anyone opening more than 5 umbrellas per day, enforced in the database
 -- so it can't be bypassed from the browser. Change the 5 to adjust the limit

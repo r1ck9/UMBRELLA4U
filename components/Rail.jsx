@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
+import { startOfDayISO } from '@/lib/day'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { STREAK_MILESTONES } from '@/lib/badges'
 
@@ -21,14 +22,14 @@ export default function Rail() {
 
       const { data } = await supabase.auth.getUser()
       if (data.user) {
-        const start = new Date(); start.setHours(0, 0, 0, 0)
+        const start = startOfDayISO()   // start of "today" in the app timezone (matches the DB)
         const t = await supabase.from('umbrellas')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', data.user.id).gte('created_at', start.toISOString())
+          .eq('user_id', data.user.id).gte('created_at', start)
         setLeft(Math.max(0, DAILY_UMBRELLA_LIMIT - (t.count ?? 0)))
         const ps = await supabase.from('stories')
           .select('*', { count: 'exact', head: true })
-          .eq('author_id', data.user.id).gte('created_at', start.toISOString())
+          .eq('author_id', data.user.id).gte('created_at', start)
         setPostsLeft(Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0)))
         // gentle daily streak — counts "showing up," idempotent per day
         const { data: sc } = await supabase.rpc('touch_streak')
