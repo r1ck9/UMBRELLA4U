@@ -22,7 +22,7 @@ export default function Composer() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [text, setText] = useState('')
-  const [intent, setIntent] = useState('listen')
+  const [intent, setIntent] = useState('similar')   // default nudges toward "me too" replies → more interaction
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
   const [pollOn, setPollOn] = useState(false)
@@ -129,9 +129,9 @@ export default function Composer() {
           <div className="row">
             <label>Respond with
               <select value={intent} onChange={(e) => setIntent(e.target.value)}>
+                <option value="similar">Similar stories</option>
                 <option value="listen">Just listen</option>
                 <option value="advice">Give advice</option>
-                <option value="similar">Similar stories</option>
                 <option value="resources">Resources</option>
               </select>
             </label>
