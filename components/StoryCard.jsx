@@ -31,6 +31,7 @@ export default function StoryCard({ story }) {
   const [removed, setRemoved] = useState(false)
   const [reported, setReported] = useState(false)
   const [marked, setMarked] = useState(false)
+  const [poll, setPoll] = useState(null)   // null = loading · false = no poll · {options,total,myOption}
 
   // Count one view per story per browser session (feeds the ranking algorithm).
   useEffect(() => {
@@ -49,6 +50,65 @@ export default function StoryCard({ story }) {
       }
     })
   }, [])
+
+  // Load this story's poll (if any) + which option I picked. Then subscribe to
+  // live vote inserts so tallies update in real time, like a live Instagram poll.
+  useEffect(() => {
+    if (!supabase || !story.id) { setPoll(false); return }
+    let channel
+    ;(async () => {
+      const { data: opts } = await supabase.from('poll_options')
+        .select('id,idx,label,vote_count').eq('story_id', story.id).order('idx')
+      if (!opts || !opts.length) { setPoll(false); return }
+      const total = opts.reduce((n, o) => n + (o.vote_count || 0), 0)
+      let myOption = null
+      const { data: u } = await supabase.auth.getUser()
+      if (u.user) {
+        const { data: v } = await supabase.from('poll_votes')
+          .select('option_id').eq('story_id', story.id).eq('user_id', u.user.id).maybeSingle()
+        if (v) myOption = v.option_id
+      }
+      setPoll({ options: opts, total, myOption })
+      // live updates (no-op if realtime replication isn't enabled on the table)
+      channel = supabase.channel('poll:' + story.id)
+        .on('postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'poll_votes', filter: 'story_id=eq.' + story.id },
+          () => refreshPollCounts())
+        .subscribe()
+    })()
+    return () => { if (channel) supabase.removeChannel(channel) }
+  }, [])
+
+  // Pull authoritative tallies from the DB (used on live events, avoids drift).
+  async function refreshPollCounts() {
+    const { data: opts } = await supabase.from('poll_options')
+      .select('id,idx,label,vote_count').eq('story_id', story.id).order('idx')
+    if (!opts) return
+    const total = opts.reduce((n, o) => n + (o.vote_count || 0), 0)
+    setPoll((p) => (p ? { ...p, options: opts, total } : p))
+  }
+
+  async function castVote(optionId) {
+    if (!poll || poll.myOption) return
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) { router.push('/signup'); return }
+    // optimistic: lock in my choice + bump the tally right away
+    setPoll((p) => ({
+      ...p, myOption: optionId, total: p.total + 1,
+      options: p.options.map((o) => o.id === optionId ? { ...o, vote_count: (o.vote_count || 0) + 1 } : o),
+    }))
+    const { error } = await supabase.from('poll_votes')
+      .insert({ story_id: story.id, option_id: optionId, user_id: data.user.id })
+    if (error) {
+      if (/duplicate|unique/i.test(error.message)) { refreshPollCounts(); return } // already voted elsewhere
+      // roll back the optimistic bump
+      setPoll((p) => ({
+        ...p, myOption: null, total: p.total - 1,
+        options: p.options.map((o) => o.id === optionId ? { ...o, vote_count: o.vote_count - 1 } : o),
+      }))
+      alert(error.message)
+    }
+  }
 
   async function handleReport() {
     const { data } = await supabase.auth.getUser()
@@ -141,6 +201,37 @@ export default function StoryCard({ story }) {
       {revealed
         ? <p className="text">{story.text}</p>
         : <button className="cw" onClick={() => setRevealed(true)}>🌧 Sensitive · tap to read</button>}
+
+      {poll && revealed && (() => {
+        const showResults = !!poll.myOption || isOwn
+        return (
+          <div className="poll">
+            <div className="poll-head">
+              <span className="poll-ico">📊</span>
+              <span className="poll-total">{poll.total} {poll.total === 1 ? 'vote' : 'votes'}</span>
+              {!showResults && <span className="poll-cta">· tap to vote</span>}
+            </div>
+            {poll.options.map((o) => {
+              const pct = poll.total ? Math.round((o.vote_count / poll.total) * 100) : 0
+              const mine = poll.myOption === o.id
+              if (!showResults) {
+                return (
+                  <button type="button" key={o.id} className="poll-vote-btn" onClick={() => castVote(o.id)}>
+                    {o.label}
+                  </button>
+                )
+              }
+              return (
+                <div key={o.id} className={'poll-result' + (mine ? ' mine' : '')}>
+                  <div className="poll-bar" style={{ width: pct + '%' }} aria-hidden="true" />
+                  <span className="poll-label">{mine && <span className="poll-check">✓</span>}{o.label}</span>
+                  <span className="poll-pct">{pct}%</span>
+                </div>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       <div className="cfoot">
         {isOwn

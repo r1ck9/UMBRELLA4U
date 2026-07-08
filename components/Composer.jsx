@@ -26,6 +26,8 @@ export default function Composer() {
   const [intent, setIntent] = useState('listen')
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
+  const [pollOn, setPollOn] = useState(false)
+  const [pollOpts, setPollOpts] = useState(['', ''])   // 2–4 options
   const [confirming, setConfirming] = useState(false)
   const [agreed, setAgreed] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -51,6 +53,12 @@ export default function Composer() {
     }
     if (HARM(text)) { setRejected(REJECT_MSG); return }
     if (EMAIL.test(text)) { setRejected(PII_MSG); return }
+    if (pollOn) {
+      const opts = pollOpts.map((o) => o.trim()).filter(Boolean)
+      if (opts.length < 2) { setRejected('A poll needs at least two options — or turn the poll off. 💛'); return }
+      const bad = opts.find((o) => HARM(o) || EMAIL.test(o))
+      if (bad) { setRejected(EMAIL.test(bad) ? PII_MSG : REJECT_MSG); return }
+    }
     if (!supabase) { alert('Connect Supabase to post — see README.md.'); return }
     setRejected(''); setAgreed(false); setConfirming(true)
   }
@@ -70,9 +78,11 @@ export default function Composer() {
       if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(mod.reason === 'doxxing' ? DOX_MSG : REJECT_MSG); return }
     } catch { /* network hiccup — fall through; the DB keyword trigger still guards */ }
 
-    const { error } = await supabase.from('stories').insert({ text: text.trim(), intent, category, anonymous: anon })
-    setBusy(false)
+    const { data: created, error } = await supabase.from('stories')
+      .insert({ text: text.trim(), intent, category, anonymous: anon })
+      .select('id').single()
     if (error) {
+      setBusy(false)
       setConfirming(false)
       if (/blocked_content/i.test(error.message)) setRejected(REJECT_MSG)
       else if (/personal_info/i.test(error.message)) setRejected(PII_MSG)
@@ -80,11 +90,28 @@ export default function Composer() {
       else alert(error.message)
       return
     }
+
+    // Attach the poll, if there is one. The DB screens every option with the
+    // same word/PII filters as the story; if any is rejected we undo the story
+    // so we never leave a story with a half-built poll.
+    if (pollOn) {
+      const rows = pollOpts.map((o) => o.trim()).filter(Boolean)
+        .map((label, idx) => ({ story_id: created.id, idx, label }))
+      const { error: pe } = await supabase.from('poll_options').insert(rows)
+      if (pe) {
+        await supabase.from('stories').delete().eq('id', created.id)
+        setBusy(false); setConfirming(false)
+        setRejected(/personal_info/i.test(pe.message) ? PII_MSG
+          : /blocked_content|empty_option/i.test(pe.message) ? REJECT_MSG : pe.message)
+        return
+      }
+    }
+    setBusy(false)
     setConfirming(false)
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPrompt(null); router.refresh() }, 3100)
+    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPollOn(false); setPollOpts(['', '']); setPrompt(null); router.refresh() }, 3100)
   }
 
   return (
@@ -131,8 +158,41 @@ export default function Composer() {
             <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} />
             🕶️ Post fully anonymously (not linked to your account name)
           </label>
+
+          <div className="poll-add">
+            {!pollOn ? (
+              <button type="button" className="poll-toggle" onClick={() => setPollOn(true)}>
+                📊 Add a poll
+              </button>
+            ) : (
+              <div className="poll-build">
+                <div className="poll-build-head">
+                  <span>📊 Poll</span>
+                  <button type="button" className="poll-off" onClick={() => { setPollOn(false); setPollOpts(['', '']) }}>Remove poll</button>
+                </div>
+                {pollOpts.map((opt, i) => (
+                  <div className="poll-opt-row" key={i}>
+                    <input type="text" className="poll-opt-input" value={opt} maxLength={80}
+                      placeholder={`Option ${i + 1}`}
+                      onChange={(e) => { const next = [...pollOpts]; next[i] = e.target.value; setPollOpts(next); if (rejected) setRejected('') }} />
+                    {pollOpts.length > 2 && (
+                      <button type="button" className="poll-opt-x" aria-label="Remove option"
+                        onClick={() => setPollOpts(pollOpts.filter((_, j) => j !== i))}>✕</button>
+                    )}
+                  </div>
+                ))}
+                {pollOpts.length < 4 && (
+                  <button type="button" className="poll-opt-add" onClick={() => setPollOpts([...pollOpts, ''])}>
+                    ＋ Add option
+                  </button>
+                )}
+                <p className="poll-note">Everyone can vote once. Results are public and update live. ☂</p>
+              </div>
+            )}
+          </div>
+
           <div className="row end">
-            <button className="btn ghost sm" onClick={() => { setOpen(false); setPrompt(null) }}>Cancel</button>
+            <button className="btn ghost sm" onClick={() => { setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']) }}>Cancel</button>
             <button className="btn prim sm" onClick={startShare}>☂ Share</button>
           </div>
         </div>

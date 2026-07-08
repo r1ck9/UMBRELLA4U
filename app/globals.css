@@ -34,7 +34,7 @@ h1,h2,h3,.brand,.hero-umb{font-family:var(--serif)}
 a{color:inherit}
 
 /* rain behind everything */
-.rainbg{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.7}
+.rainbg{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.85}
 .topbar,.shell,.landing,.auth{position:relative; z-index:1}
 
 /* buttons */
@@ -636,3 +636,47 @@ a{color:inherit}
 
 /* celebration canvas (umbrella-open bloom) */
 .cele-canvas{position:absolute; inset:0; width:100%; height:100%; pointer-events:none}
+
+/* ---- poll builder (in the composer) ---- */
+.poll-add{margin-top:12px}
+.poll-toggle{display:inline-flex; align-items:center; gap:7px; background:transparent;
+  border:1.5px dashed var(--rain-2); color:var(--ink-2); border-radius:12px; padding:9px 14px;
+  font:inherit; font-size:14px; font-weight:600; cursor:pointer}
+.poll-toggle:hover{border-color:var(--shelter); color:var(--shelter-deep)}
+.poll-build{background:var(--shelter-wash); border-radius:12px; padding:13px 14px}
+.poll-build-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;
+  font-weight:700; color:var(--shelter-deep); font-size:14px}
+.poll-off{background:none; border:none; color:var(--ink-3); font:inherit; font-size:12.5px; font-weight:600; cursor:pointer}
+.poll-off:hover{color:var(--shelter-deep)}
+.poll-opt-row{display:flex; align-items:center; gap:8px; margin-bottom:8px}
+.poll-opt-input{flex:1; border:1.5px solid var(--rain-2); background:var(--panel); color:var(--ink-1);
+  border-radius:10px; padding:9px 11px; font:inherit; font-size:14.5px; outline:none}
+.poll-opt-input:focus{border-color:var(--shelter)}
+.poll-opt-x{flex:none; width:30px; height:30px; border:none; border-radius:8px; background:var(--rain-1);
+  color:var(--ink-3); font-size:13px; cursor:pointer}
+.poll-opt-x:hover{background:var(--rain-2); color:var(--ink-1)}
+.poll-opt-add{background:none; border:none; color:var(--shelter-deep); font:inherit; font-size:13.5px;
+  font-weight:700; cursor:pointer; padding:2px 0}
+.poll-opt-add:hover{text-decoration:underline}
+.poll-note{margin:8px 0 0; font-size:12.5px; color:var(--ink-3)}
+
+/* ---- poll on a story card ---- */
+.poll{margin-top:12px}
+.poll-head{display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700;
+  color:var(--ink-2); margin-bottom:9px}
+.poll-total{font-variant-numeric:tabular-nums}
+.poll-cta{color:var(--shelter-deep); font-weight:600}
+.poll-vote-btn{display:block; width:100%; text-align:left; margin-bottom:8px; border:1.5px solid var(--shelter);
+  background:var(--panel); color:var(--shelter-deep); border-radius:12px; padding:11px 14px;
+  font:inherit; font-size:15px; font-weight:600; cursor:pointer; transition:background .12s,color .12s}
+.poll-vote-btn:hover{background:var(--shelter); color:var(--on-accent)}
+.poll-result{position:relative; overflow:hidden; margin-bottom:8px; border:1px solid var(--rain-2);
+  border-radius:12px; padding:11px 14px; display:flex; align-items:center; gap:10px}
+.poll-result.mine{border-color:var(--shelter)}
+.poll-bar{position:absolute; inset:0 auto 0 0; background:var(--shelter-wash); z-index:0;
+  transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.poll-result.mine .poll-bar{background:color-mix(in srgb, var(--shelter) 30%, var(--panel))}
+.poll-label{position:relative; z-index:1; flex:1; font-size:15px; font-weight:600; color:var(--ink-1)}
+.poll-check{color:var(--shelter-deep); font-weight:800; margin-right:6px}
+.poll-pct{position:relative; z-index:1; font-variant-numeric:tabular-nums; font-weight:700;
+  font-size:14px; color:var(--ink-2)}
