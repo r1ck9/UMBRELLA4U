@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
+import { WEEKLY_PROMPT } from '@/lib/prompt'
 
 // Moderator-only overview: totals, plus per-user averages and the activation gap.
 export default function StatsPanel() {
@@ -16,6 +17,8 @@ export default function StatsPanel() {
       const stories = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
       const umbs = await supabase.from('umbrellas').select('*', { count: 'exact', head: true })
       const v = await supabase.from('site_metrics').select('value').eq('key', 'views').maybeSingle()
+      const pa = await supabase.from('stories')
+        .select('*', { count: 'exact', head: true }).eq('prompt_id', WEEKLY_PROMPT.key)
       const eng = await supabase.rpc('engagement_stats')
       const e = eng.data?.[0] || null
       const ret = await supabase.rpc('retention_stats')
@@ -25,6 +28,7 @@ export default function StatsPanel() {
         stories: stories.count ?? 0,
         umbs: umbs.count ?? 0,
         views: v.data?.value ?? 0,
+        promptAnswers: pa.count ?? 0,
         eng,
         ret: r
       })
@@ -36,7 +40,8 @@ export default function StatsPanel() {
     { n: stats.views, l: 'Page views' },
     { n: stats.users, l: 'Registrations' },
     { n: stats.stories, l: 'Stories' },
-    { n: stats.umbs, l: 'Umbrellas opened' }
+    { n: stats.umbs, l: 'Umbrellas opened' },
+    { n: stats.promptAnswers, l: 'Prompt answers (this week)' }
   ]
 
   // per-user averages + activation gap (computed in SQL by the RPC)
