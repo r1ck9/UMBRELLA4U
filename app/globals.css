@@ -581,6 +581,8 @@ a{color:inherit}
 .streak-ico{font-size:26px}
 .streak-msg{margin:8px 0 0; font-size:13px; line-height:1.5; color:var(--ink-2)}
 .streak-badge{margin-left:6px; font-size:14px; vertical-align:middle; cursor:default}
+.umb.own{cursor:default; opacity:.85}
+.umb.own:hover{background:var(--panel)}
 
 /* safety notice */
 .safety-note{display:flex; gap:13px; align-items:flex-start; background:var(--shelter-wash); border:1px solid var(--shelter);

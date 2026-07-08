@@ -68,8 +68,9 @@ export default function StoryCard({ story }) {
     if (error && !/duplicate|unique/i.test(error.message)) { setMarked(false); alert(error.message) }
   }
 
+  const isOwn = me.userId && me.userId === story.author_id
   const canNote = story.intent && story.intent !== 'listen'
-  const canRemove = (me.userId && me.userId === story.author_id) || me.isModerator
+  const canRemove = isOwn || me.isModerator
 
   async function handleRemove() {
     const own = me.userId === story.author_id
@@ -84,7 +85,7 @@ export default function StoryCard({ story }) {
   }
 
   async function openUmbrella(note) {
-    if (opened) return
+    if (opened || isOwn) return
     if (!supabase) { setOpened(true); setCount((c) => c + 1); if (note) setSent(note); fireBurst(); return } // sample mode
     const { data } = await supabase.auth.getUser()
     if (!data.user) { router.push('/signup'); return }
@@ -97,6 +98,8 @@ export default function StoryCard({ story }) {
         alert(`You've opened all ${DAILY_UMBRELLA_LIMIT} umbrellas for today. They refill tomorrow — that's what makes each one mean something. ☂`)
       } else if (/duplicate|unique/i.test(error.message)) {
         setOpened(true) // already sheltered this one — the "one umbrella each" rule
+      } else if (/self_umbrella/i.test(error.message)) {
+        // can't umbrella your own story — just quietly undo (UI already hides this)
       } else {
         alert(error.message)
       }
@@ -133,14 +136,18 @@ export default function StoryCard({ story }) {
         : <button className="cw" onClick={() => setRevealed(true)}>🌧 Sensitive · tap to read</button>}
 
       <div className="cfoot">
-        <button className={'umb' + (opened ? ' on' : '')} onClick={() => openUmbrella(null)}
-          title={opened ? 'Umbrella opened' : 'Open an umbrella'}>
-          <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <span>{count}</span>
-        </button>
+        {isOwn
+          ? <span className="umb own" title="Umbrellas others opened for you"><span className="umb-ico">☂</span> <span>{count}</span></span>
+          : <button className={'umb' + (opened ? ' on' : '')} onClick={() => openUmbrella(null)}
+              title={opened ? 'Umbrella opened' : 'Open an umbrella'}>
+              <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <span>{count}</span>
+            </button>}
         <span className="hint">
-          {story.intent === 'listen'
-            ? 'Just listen — the umbrella is the whole message.'
-            : (opened ? 'One umbrella each — no threads.' : 'Add a word below, or just open an umbrella.')}
+          {isOwn
+            ? 'Your story. Umbrellas people open for you land in your inbox. ☂'
+            : story.intent === 'listen'
+              ? 'Just listen — the umbrella is the whole message.'
+              : (opened ? 'One umbrella each — no threads.' : 'Add a word below, or just open an umbrella.')}
         </span>
         <span className="cfoot-actions">
           {me.userId && me.userId !== story.author_id && !marked && !reported &&
@@ -154,7 +161,7 @@ export default function StoryCard({ story }) {
         </span>
       </div>
 
-      {canNote && !opened && (
+      {canNote && !opened && !isOwn && (
         <div className="respond">
           <div className="respond-lbl">{RESPOND_LABEL[story.intent] || 'Leave a word of support:'}</div>
           <div className="noterow">
