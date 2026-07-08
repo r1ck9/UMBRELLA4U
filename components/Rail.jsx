@@ -9,6 +9,7 @@ export default function Rail() {
   const [stats, setStats] = useState({ stories: null, umbrellas: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
   const [postsLeft, setPostsLeft] = useState(null) // stories left today
+  const [streak, setStreak] = useState(null) // days-in-a-row; null = guest
 
   useEffect(() => {
     if (!supabase) return
@@ -28,12 +29,26 @@ export default function Rail() {
           .select('*', { count: 'exact', head: true })
           .eq('author_id', data.user.id).gte('created_at', start.toISOString())
         setPostsLeft(Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0)))
+        // gentle daily streak — counts "showing up," idempotent per day
+        const { data: sc } = await supabase.rpc('touch_streak')
+        setStreak(typeof sc === 'number' ? sc : 0)
       }
     })()
   }, [])
 
   return (
     <aside className="rail">
+      {streak !== null && streak > 0 && (
+        <div className="panel streak">
+          <h3>Your streak</h3>
+          <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> {streak} day{streak === 1 ? '' : 's'}</div>
+          <p className="streak-msg">
+            {streak === 1
+              ? 'You showed up today. That’s the whole thing — come back tomorrow to keep it going. 🫂'
+              : `${streak} days in a row. Every day you’re here, someone feels a little less alone.`}
+          </p>
+        </div>
+      )}
       <div className="panel">
         <h3>The community</h3>
         <div className="bigcount">

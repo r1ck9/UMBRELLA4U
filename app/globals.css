@@ -575,6 +575,12 @@ a{color:inherit}
 .auth-agree input{margin-top:2px; width:18px; height:18px; accent-color:var(--shelter); flex:0 0 auto}
 .auth-agree a{color:var(--shelter); font-weight:600}
 
+/* streak */
+.panel.streak{background:linear-gradient(135deg, var(--shelter-wash), var(--panel))}
+.streak-n{display:flex; align-items:center; gap:9px; font-family:var(--serif); font-size:28px; font-weight:800; color:var(--shelter-deep); line-height:1}
+.streak-ico{font-size:26px}
+.streak-msg{margin:8px 0 0; font-size:13px; line-height:1.5; color:var(--ink-2)}
+
 /* safety notice */
 .safety-note{display:flex; gap:13px; align-items:flex-start; background:var(--shelter-wash); border:1px solid var(--shelter);
   border-radius:16px; padding:16px 18px; position:relative}
