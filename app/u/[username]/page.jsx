@@ -6,6 +6,7 @@ import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
 import { bannerStyle } from '@/lib/banners'
+import { streakBadge } from '@/lib/badges'
 
 function since(ts) {
   if (!ts) return '—'
@@ -68,7 +69,12 @@ export default function PublicProfile({ params }) {
                 <div className="pf-top">
                   <div className="pf-avatar" style={avStyle}>{isEmoji ? av.slice(6) : (isImg ? '' : initial)}</div>
                   <div className="pf-id">
-                    <div className="pf-name">{prof.display_name || prof.username}</div>
+                    <div className="pf-name">
+                      {prof.display_name || prof.username}
+                      {streakBadge(prof.streak_count || 0) && (
+                        <span className="streak-badge" title={streakBadge(prof.streak_count).label}>{streakBadge(prof.streak_count).icon}</span>
+                      )}
+                    </div>
                     <div className="pf-handle">@{prof.username}{prof.pronouns ? ' · ' + prof.pronouns : ''}</div>
                     {prof.status_weather && <div className="pf-status">{prof.status_weather}</div>}
                   </div>

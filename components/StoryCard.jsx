@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
 import { getMe } from '@/lib/me'
+import { streakBadge } from '@/lib/badges'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -105,6 +106,7 @@ export default function StoryCard({ story }) {
   }
 
   const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
+  const badge = story.anonymous ? null : streakBadge(story.author_streak || 0)
 
   if (removed) return null
 
@@ -116,7 +118,10 @@ export default function StoryCard({ story }) {
           <div className="name">
             {story.anonymous || !story.author_name
               ? <>{who}{story.anonymous && <span className="lock"> · 🔒 hidden</span>}</>
-              : <Link href={`/u/${encodeURIComponent(story.author_name)}`} className="namelink">{who}</Link>}
+              : <>
+                  <Link href={`/u/${encodeURIComponent(story.author_name)}`} className="namelink">{who}</Link>
+                  {badge && <span className="streak-badge" title={badge.label}>{badge.icon}</span>}
+                </>}
           </div>
           <div className="meta">{story.category}</div>
         </div>

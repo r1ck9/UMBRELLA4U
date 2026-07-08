@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
+import { STREAK_MILESTONES } from '@/lib/badges'
 
 export default function Rail() {
   const [stats, setStats] = useState({ stories: null, umbrellas: null })
@@ -32,6 +33,17 @@ export default function Rail() {
         // gentle daily streak — counts "showing up," idempotent per day
         const { data: sc } = await supabase.rpc('touch_streak')
         setStreak(typeof sc === 'number' ? sc : 0)
+        // celebrate a milestone once, the day it's reached
+        if (STREAK_MILESTONES.includes(sc)) {
+          try {
+            if (localStorage.getItem('umb_streak_seen') !== String(sc)) {
+              localStorage.setItem('umb_streak_seen', String(sc))
+              window.dispatchEvent(new CustomEvent('umbrella:burst', {
+                detail: { variant: 'open', message: `${sc} days in a row. You keep showing up for people. ☂` }
+              }))
+            }
+          } catch {}
+        }
       }
     })()
   }, [])
