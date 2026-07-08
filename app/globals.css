@@ -61,8 +61,8 @@ a{color:inherit}
 .tb-avatar:hover{border-color:var(--shelter)}
 
 /* three-column shell */
-.shell{max-width:1160px; margin:0 auto; padding:24px 20px 90px;
-  display:grid; grid-template-columns:190px minmax(0,1fr) 280px; gap:24px; align-items:start}
+.shell{max-width:1280px; margin:0 auto; padding:24px 20px 90px;
+  display:grid; grid-template-columns:168px minmax(0,1fr) 236px; gap:22px; align-items:start}
 .container{max-width:640px; margin:0 auto; padding:26px 20px 80px}
 
 /* left nav */
