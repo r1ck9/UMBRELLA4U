@@ -6,9 +6,23 @@ import TopBar from '@/components/TopBar'
 import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import { GUIDELINES } from '@/lib/guidelines'
+import EmojiPicker from '@/components/EmojiPicker'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
-const PRESETS = ['☂', '🌧', '🌱', '🌊', '🏐', '🎧', '🎨', '🌙']
+const USERNAME_IDEAS = ['rainy_owl', 'quiet_fern', 'soft_static', 'paper_boats', 'moonlit_kid', 'still_water', 'little_lighthouse', 'warm_socks', 'cloud_nine', 'half_asleep', 'tiny_thunder', 'sunday_dust']
+const SUGGESTED_TAGS = ['art', 'music', 'gaming', 'anime', 'books', 'poetry', 'film', 'photography', 'coding', 'sports', 'volleyball', 'skating', 'dance', 'coffee', 'plants', 'baking', 'anxiety', 'mental health', 'lgbtq+', 'newcomer', 'faith', 'languages', 'studying', 'night owl', 'introvert', 'overthinker', 'trying my best']
+const BIO_EXAMPLES = [
+  'Art kid. Overthinker. Trying to be kinder to myself.',
+  'Volleyball, playlists on repeat, still figuring it out. 🌱',
+  'Loves rainy days, bad puns, and my dog. Here to listen.',
+  'Third-culture kid finding where I belong. 🌍',
+  'Books over parties. Anxiety is loud, but so is my hope.',
+  'New school, new city, still me.',
+  'Quiet, but I’ve always got your back.',
+  'Learning guitar badly. Big feelings, small steps.'
+]
+const STATUS_EXAMPLES = ['🌧 heavy but managing', '⛅ better than yesterday', '🌱 slowly growing', '🌊 riding the waves', '☀️ actually okay today', '🌙 tired but hopeful']
+const pick = (a) => a[Math.floor(Math.random() * a.length)]
 
 export default function Onboarding() {
   const router = useRouter()
@@ -23,6 +37,7 @@ export default function Onboarding() {
     accent_color: '#3f6fa3', avatar_url: 'emoji:☂', banner_theme: 'rain', tags: []
   })
   const [tagInput, setTagInput] = useState('')
+  const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES), names: [...USERNAME_IDEAS].sort(() => Math.random() - 0.5).slice(0, 4) }))
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }
@@ -99,7 +114,11 @@ export default function Onboarding() {
             <h1>Pick a name</h1>
             <p className="onb-lead">This is your handle — make it something that isn’t your real name.</p>
             <label>Username<input value={p.username} maxLength={20}
-              onChange={(e) => set('username', e.target.value)} placeholder="rainy_owl" /></label>
+              onChange={(e) => set('username', e.target.value)} placeholder={ph.names[0]} /></label>
+            <div className="onb-suggest">
+              <span>Need ideas?</span>
+              {ph.names.map((n) => <button key={n} type="button" className="sugg" onClick={() => set('username', n)}>{n}</button>)}
+            </div>
             <label>Display name (optional)<input value={p.display_name} maxLength={30}
               onChange={(e) => set('display_name', e.target.value)} placeholder="how you want to appear" /></label>
             <label>Pronouns (optional)<input value={p.pronouns} maxLength={30}
@@ -115,12 +134,7 @@ export default function Onboarding() {
               <div className="pf-avatar" style={{ background: p.accent_color }}>{avInner}</div>
             </div>
             <label>Avatar
-              <div className="swatches avset">
-                {PRESETS.map((e) => (
-                  <button key={e} type="button" className={'sw av' + (p.avatar_url === 'emoji:' + e ? ' on' : '')}
-                    style={{ background: p.accent_color }} onClick={() => set('avatar_url', 'emoji:' + e)}>{e}</button>
-                ))}
-              </div>
+              <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
             </label>
             <label>Accent
               <div className="swatches">
@@ -138,11 +152,11 @@ export default function Onboarding() {
         {step === 3 && (
           <div className="onb-step">
             <h1>A little about you</h1>
-            <p className="onb-lead">All optional — share only what you want.</p>
+            <p className="onb-lead">All optional. Whatever you’re into, there’s a corner here for it — tags help you find your people.</p>
             <label>Today’s weather (status)<input value={p.status_weather} maxLength={60}
-              onChange={(e) => set('status_weather', e.target.value)} placeholder="🌧 heavy but managing" /></label>
+              onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
             <label>About me<textarea value={p.about_me} maxLength={300}
-              onChange={(e) => set('about_me', e.target.value)} placeholder="Volleyball. Still figuring it out." /></label>
+              onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
             <label>Interests / tags
               <div className="tag-edit">
                 {p.tags.map((t) => <span key={t} className="tag rm" onClick={() => set('tags', p.tags.filter((x) => x !== t))}>{t} ✕</span>)}
@@ -150,9 +164,16 @@ export default function Onboarding() {
                   <input className="tag-input" value={tagInput} maxLength={20}
                     onChange={(e) => setTagInput(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
-                    onBlur={addTag} placeholder="+ add a tag (Enter)" />
+                    onBlur={addTag} placeholder="+ type your own (Enter)" />
                 )}
               </div>
+              {p.tags.length < 8 && (
+                <div className="onb-suggest tagsugg">
+                  {SUGGESTED_TAGS.filter((t) => !p.tags.includes(t)).slice(0, 16).map((t) => (
+                    <button key={t} type="button" className="sugg" onClick={() => p.tags.length < 8 && set('tags', [...p.tags, t])}>+ {t}</button>
+                  ))}
+                </div>
+              )}
             </label>
           </div>
         )}

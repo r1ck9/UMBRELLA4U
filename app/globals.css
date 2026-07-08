@@ -458,6 +458,12 @@ a{color:inherit}
 .onb-preview .pf-avatar{position:absolute; left:20px; bottom:-6px; width:70px; height:70px; font-size:30px; display:grid; place-items:center; color:#fff}
 .onb-nav{display:flex; justify-content:space-between; gap:12px; margin-top:22px}
 .onb-nav .btn.prim{margin-left:auto}
+.onb-suggest{display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:-6px 0 14px}
+.onb-suggest > span{font-size:12.5px; color:var(--ink-3); margin-right:2px}
+.onb-suggest.tagsugg{margin-top:8px}
+.sugg{background:var(--rain-1); border:1px solid var(--rain-2); border-radius:999px; padding:6px 12px;
+  font:inherit; font-size:12.5px; color:var(--ink-2); cursor:pointer}
+.sugg:hover{border-color:var(--shelter); color:var(--shelter)}
 
 /* ---------- interactive feed tour ---------- */
 .tour-catch{position:fixed; inset:0; z-index:1000}
