@@ -17,8 +17,8 @@ export default function Rail() {
     if (!supabase) return
     ;(async () => {
       const s = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
-      const u = await supabase.from('umbrellas').select('*', { count: 'exact', head: true })
-      setStats({ stories: s.count ?? 0, umbrellas: u.count ?? 0 })
+      const u = await supabase.rpc('community_umbrellas')   // aggregate count (umbrella rows are private)
+      setStats({ stories: s.count ?? 0, umbrellas: Number(u.data) || 0 })
 
       const { data } = await supabase.auth.getUser()
       if (data.user) {

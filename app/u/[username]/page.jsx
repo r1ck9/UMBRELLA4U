@@ -30,12 +30,11 @@ export default function PublicProfile({ params }) {
       const { data: mine } = await supabase.from('stories')
         .select('umbrella_count').eq('author_id', prof.id).eq('anonymous', false).eq('state', 'live')
       const s = mine || []
-      const { count: opened } = await supabase.from('umbrellas')
-        .select('*', { count: 'exact', head: true }).eq('user_id', prof.id)
+      const { data: opened } = await supabase.rpc('umbrellas_opened_by', { uid: prof.id })
       setStats({
         stories: s.length,
         received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0),
-        opened: opened || 0
+        opened: Number(opened) || 0
       })
       setState({ loading: false, prof })
     })()

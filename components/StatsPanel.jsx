@@ -15,7 +15,6 @@ export default function StatsPanel() {
       if (!me.isModerator) return
       const users = await supabase.from('profiles').select('*', { count: 'exact', head: true })
       const stories = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
-      const umbs = await supabase.from('umbrellas').select('*', { count: 'exact', head: true })
       const v = await supabase.from('site_metrics').select('value').eq('key', 'views').maybeSingle()
       const pa = await supabase.from('stories')
         .select('*', { count: 'exact', head: true }).eq('prompt_id', WEEKLY_PROMPT.key)
@@ -26,10 +25,10 @@ export default function StatsPanel() {
       setStats({
         users: users.count ?? 0,
         stories: stories.count ?? 0,
-        umbs: umbs.count ?? 0,
+        umbs: Number(e?.umbrellas ?? 0),   // from the definer RPC; umbrella rows are private
         views: v.data?.value ?? 0,
         promptAnswers: pa.count ?? 0,
-        eng,
+        eng: e,
         ret: r
       })
     })()
