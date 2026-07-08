@@ -3,24 +3,21 @@ import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-// Counts one visit per browser session (so one person reloading or clicking
-// around doesn't inflate the number). Mounted once in the root layout, so it
-// counts a visit no matter which page someone lands on first.
+// Counts a view on EVERY page load and navigation — reloads and reopens all
+// count, so the shown number keeps climbing. The first view of a browser
+// session is flagged `fresh`, which also bumps the private honest counter
+// (views_real) in the database.
 export default function ViewCounter() {
   const pathname = usePathname()
   useEffect(() => {
     if (!supabase) return
+    let fresh = true
     try {
-      if (sessionStorage.getItem('umb_viewed')) return
+      fresh = !sessionStorage.getItem('umb_viewed')
       sessionStorage.setItem('umb_viewed', '1')
     } catch {}
-    supabase.rpc('bump_view').then(({ error }) => {
-      if (error) {
-        // Don't leave the session flagged as counted if it didn't actually
-        // land — so it retries on the next navigation instead of staying 0.
-        try { sessionStorage.removeItem('umb_viewed') } catch {}
-        console.warn('[views] bump_view failed — did you run supabase/site_metrics.sql?', error.message)
-      }
+    supabase.rpc('bump_view', { fresh }).then(({ error }) => {
+      if (error) console.warn('[views] bump_view failed — did you run supabase/site_metrics.sql + views_repeat.sql?', error.message)
     })
   }, [pathname])
   return null
