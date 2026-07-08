@@ -1,11 +1,9 @@
 import Link from 'next/link'
 import IntroHero from '@/components/IntroHero'
-import ViewCounter from '@/components/ViewCounter'
 
 export default function Landing() {
   return (
     <>
-      <ViewCounter />
       <IntroHero />
       <section className="introabout">
         <h2>What Umbrella is</h2>

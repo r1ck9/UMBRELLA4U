@@ -2,6 +2,7 @@ import './globals.css'
 import Rain from '@/components/Rain'
 import GuidelinesModal from '@/components/GuidelinesModal'
 import UmbrellaBurst from '@/components/UmbrellaBurst'
+import ViewCounter from '@/components/ViewCounter'
 
 export const metadata = {
   title: 'Umbrella — come in from the rain',
@@ -14,7 +15,7 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t)document.documentElement.setAttribute('data-ui-theme',t)}catch(e){}" }} />
       </head>
-      <body><Rain />{children}<GuidelinesModal /><UmbrellaBurst /></body>
+      <body><Rain /><ViewCounter />{children}<GuidelinesModal /><UmbrellaBurst /></body>
     </html>
   )
 }
