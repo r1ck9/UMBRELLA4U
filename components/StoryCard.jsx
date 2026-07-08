@@ -115,6 +115,8 @@ export default function StoryCard({ story }) {
 
   const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
   const badge = story.anonymous ? null : streakBadge(story.author_streak || 0)
+  const noteWords = noteText.trim() ? noteText.trim().split(/\s+/).length : 0
+  const noteOver = noteWords > 300
 
   if (removed) return null
 
@@ -169,11 +171,13 @@ export default function StoryCard({ story }) {
       {canNote && !opened && !isOwn && (
         <div className="respond">
           <div className="respond-lbl">{RESPOND_LABEL[story.intent] || 'Leave a word of support:'}</div>
-          <div className="noterow">
-            <input value={noteText} onChange={(e) => setNoteText(e.target.value)} maxLength={120}
-              placeholder={NOTE_PROMPT[story.intent] || 'a word of support…'} />
-            <button className="btn prim sm" disabled={!noteText.trim()}
-              onClick={() => noteText.trim() && openUmbrella(noteText.trim())}>Send ☂</button>
+          <textarea className="note-box" value={noteText} maxLength={3000} rows={3}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder={NOTE_PROMPT[story.intent] || 'a word of support…'} />
+          <div className="note-foot">
+            <span className={'note-count' + (noteOver ? ' near' : '')}>{noteWords}/300 words</span>
+            <button className="btn prim sm" disabled={!noteText.trim() || noteOver}
+              onClick={() => noteText.trim() && !noteOver && openUmbrella(noteText.trim())}>Send ☂</button>
           </div>
         </div>
       )}

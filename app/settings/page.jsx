@@ -12,7 +12,7 @@ export default function Settings() {
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [prefs, setPrefs] = useState({ discoverable: true, notify_email: false })
+  const [prefs, setPrefs] = useState({ discoverable: true, notify_email: true })
 
   useEffect(() => {
     if (!supabase) { setLoading(false); return }

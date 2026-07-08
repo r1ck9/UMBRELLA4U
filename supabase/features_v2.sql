@@ -11,5 +11,9 @@
 alter table profiles add column if not exists tags text[] not null default '{}';
 alter table profiles add column if not exists banner_theme text not null default 'rain';
 alter table profiles add column if not exists discoverable boolean not null default true;
-alter table profiles add column if not exists notify_email boolean not null default false;
+alter table profiles add column if not exists notify_email boolean not null default true;
+alter table profiles alter column notify_email set default true;   -- on by default (opt-out)
+-- Enable it for everyone who already exists. NOTE: this flips ALL rows on. Before a
+-- real public launch, delete this one line so re-running won't override people who opted out.
+update profiles set notify_email = true;
 alter table profiles add column if not exists onboarded boolean not null default false;

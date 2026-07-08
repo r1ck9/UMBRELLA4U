@@ -251,6 +251,12 @@ a{color:inherit}
 .respond{margin-top:12px; padding:12px 13px; background:var(--shelter-wash); border-radius:12px}
 .respond-lbl{font-size:13px; font-weight:600; color:var(--shelter-deep); margin-bottom:8px}
 .respond .noterow{margin-top:0}
+.note-box{width:100%; min-height:80px; resize:vertical; border:1.5px solid var(--rain-2); background:var(--rain-0);
+  color:var(--ink-1); border-radius:12px; padding:10px 13px; font:inherit; font-size:14px; line-height:1.5}
+.note-box:focus{outline:none; border-color:var(--shelter)}
+.note-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px}
+.note-count{font-size:11.5px; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.note-count.near{color:var(--care); font-weight:600}
 .noterow{display:flex; gap:8px; margin-top:11px}
 .noterow input{flex:1; border:1.5px solid var(--rain-2); background:var(--rain-0); color:var(--ink-1); border-radius:999px; padding:8px 14px; font:inherit; font-size:14px}
 .noterow input:focus{outline:none; border-color:var(--shelter)}
