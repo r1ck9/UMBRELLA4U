@@ -17,6 +17,7 @@ const HARM = (t) => { const n = norm(t); return HARM_EMBEDDED.some((w) => n.incl
 const REJECT_MSG = "This can't be posted — it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
 const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
+const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous — no full names, schools, addresses, or contact info. 💛"
 
 export default function Composer() {
   const router = useRouter()
@@ -66,7 +67,7 @@ export default function Composer() {
         body: JSON.stringify({ text: text.trim() })
       })
       const mod = await res.json()
-      if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(REJECT_MSG); return }
+      if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(mod.reason === 'doxxing' ? DOX_MSG : REJECT_MSG); return }
     } catch { /* network hiccup — fall through; the DB keyword trigger still guards */ }
 
     const { error } = await supabase.from('stories').insert({ text: text.trim(), intent, category, anonymous: anon })

@@ -86,6 +86,9 @@ export default function StoryCard({ story }) {
 
   async function openUmbrella(note) {
     if (opened || isOwn) return
+    if (note && /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(note)) {
+      alert('Please remove the email from your note — keep everyone anonymous. 💛'); return
+    }
     if (!supabase) { setOpened(true); setCount((c) => c + 1); if (note) setSent(note); fireBurst(); return } // sample mode
     const { data } = await supabase.auth.getUser()
     if (!data.user) { router.push('/signup'); return }
@@ -100,6 +103,8 @@ export default function StoryCard({ story }) {
         setOpened(true) // already sheltered this one — the "one umbrella each" rule
       } else if (/self_umbrella/i.test(error.message)) {
         // can't umbrella your own story — just quietly undo (UI already hides this)
+      } else if (/blocked_content|personal_info/i.test(error.message)) {
+        alert('That note can’t be sent — please keep it kind and leave out personal info (names, emails, and the like). 💛')
       } else {
         alert(error.message)
       }
