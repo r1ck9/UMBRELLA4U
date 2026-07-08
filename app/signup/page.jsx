@@ -20,6 +20,12 @@ export default function Signup() {
       options: { emailRedirectTo: `${window.location.origin}/login` }
     })
     if (error) { setMsg(error.message); return }
+    // Existing account: Supabase returns a user with EMPTY identities (and sends
+    // no new email) when the address is already registered. Tell them to log in.
+    if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      setMsg('You already have an account with this email — no need to sign up again. Just log in below. ☂')
+      return
+    }
     // If email confirmation is OFF, a session exists now → go straight to setup.
     if (data.session) { router.push('/onboarding'); return }
     setMsg('Account created! We just emailed you a confirmation link — click it, then log in and we’ll set you up. Don’t see it? Check your spam / junk folder (and mark it “Not spam” so we always land in your inbox). It can take a minute to arrive.')
