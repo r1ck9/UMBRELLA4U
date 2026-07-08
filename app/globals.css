@@ -575,6 +575,15 @@ a{color:inherit}
 .auth-agree input{margin-top:2px; width:18px; height:18px; accent-color:var(--shelter); flex:0 0 auto}
 .auth-agree a{color:var(--shelter); font-weight:600}
 
+/* safety notice */
+.safety-note{display:flex; gap:13px; align-items:flex-start; background:var(--shelter-wash); border:1px solid var(--shelter);
+  border-radius:16px; padding:16px 18px; position:relative}
+.sn-ic{font-size:26px; line-height:1; flex:0 0 auto}
+.sn-body b{display:block; font-size:15.5px; color:var(--ink-1); margin-bottom:3px}
+.sn-body p{margin:0; font-size:13.5px; line-height:1.55; color:var(--ink-2)}
+.sn-x{position:absolute; top:10px; right:12px; background:none; border:none; color:var(--ink-3); font-size:15px; cursor:pointer}
+.sn-x:hover{color:var(--ink-1)}
+
 /* guest wall */
 .guest-wall{text-align:center; background:var(--panel); border:1px solid var(--rain-2); border-radius:18px;
   padding:34px 26px; box-shadow:var(--shadow); margin-top:4px}

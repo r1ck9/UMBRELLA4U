@@ -31,6 +31,13 @@ export default function StoryCard({ story }) {
   const [reported, setReported] = useState(false)
   const [marked, setMarked] = useState(false)
 
+  // Count one view per story per browser session (feeds the ranking algorithm).
+  useEffect(() => {
+    if (!supabase || !story.id) return
+    try { const k = 'umb_v_' + story.id; if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1') } catch { return }
+    supabase.rpc('bump_story_view', { sid: story.id })
+  }, [])
+
   useEffect(() => {
     getMe().then((m) => {
       setMe(m)
