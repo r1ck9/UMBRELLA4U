@@ -6,6 +6,7 @@ import { GUIDELINES } from '@/lib/guidelines'
 import { CATEGORIES } from '@/lib/categories'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { DAILY_STORY_LIMIT } from '@/lib/config'
+import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
 // We normalize first — de-leet + strip non-letters — so "f u c k", "sh1t", "xxfaggotxx" are all caught.
@@ -115,6 +116,7 @@ export default function Composer() {
     }
     setBusy(false)
     setConfirming(false)
+    track('posted')
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
     }))
@@ -124,7 +126,7 @@ export default function Composer() {
   return (
     <>
       {!open ? (
-        <button className="composer-peek" onClick={() => setOpen(true)}>What&apos;s your weather today?</button>
+        <button className="composer-peek" onClick={() => { setOpen(true); track('click_create') }}>What&apos;s your weather today?</button>
       ) : (
         <div className="composer">
           {rejected && <div className="reject-banner">{rejected}</div>}
@@ -145,7 +147,7 @@ export default function Composer() {
               </button>
             </div>
           )}
-          <textarea value={text} onChange={(e) => { setText(e.target.value); if (rejected) setRejected('') }}
+          <textarea value={text} onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) track('compose_start'); if (rejected) setRejected('') }}
             placeholder="You don't have to share your worst moment — just whatever you're carrying right now." />
           <p className="compose-privacy">🔒 Keep it anonymous — please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
           <div className="row">
@@ -213,7 +215,7 @@ export default function Composer() {
           </div>
 
           <div className="row end">
-            <button className="btn ghost sm" onClick={() => { setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']) }}>Cancel</button>
+            <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']) }}>Cancel</button>
             <button className="btn prim sm" onClick={startShare}>☂ Share</button>
           </div>
         </div>

@@ -3,6 +3,7 @@ import Rain from '@/components/Rain'
 import GuidelinesModal from '@/components/GuidelinesModal'
 import UmbrellaBurst from '@/components/UmbrellaBurst'
 import ViewCounter from '@/components/ViewCounter'
+import FunnelTracker from '@/components/FunnelTracker'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata = {
@@ -20,7 +21,7 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t)document.documentElement.setAttribute('data-ui-theme',t)}catch(e){}" }} />
       </head>
-      <body><Rain /><ViewCounter />{children}<GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
+      <body><Rain /><ViewCounter /><FunnelTracker />{children}<GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
     </html>
   )
 }

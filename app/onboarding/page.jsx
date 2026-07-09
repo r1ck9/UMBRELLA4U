@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import { GUIDELINES } from '@/lib/guidelines'
 import EmojiPicker from '@/components/EmojiPicker'
+import { track } from '@/lib/analytics'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
 const USERNAME_IDEAS = ['rainy_owl', 'quiet_fern', 'soft_static', 'paper_boats', 'moonlit_kid', 'still_water', 'little_lighthouse', 'warm_socks', 'cloud_nine', 'half_asleep', 'tiny_thunder', 'sunday_dust']
@@ -79,6 +80,7 @@ export default function Onboarding() {
       else setErr(error.message)
       return
     }
+    track('registered')
     router.push('/feed')
   }
 

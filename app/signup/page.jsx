@@ -1,11 +1,13 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { supabase, isConfigured } from '@/lib/supabase'
+import { track } from '@/lib/analytics'
 
 export default function Signup() {
   const router = useRouter()
+  useEffect(() => { track('click_signup') }, [])
   const [email, setEmail] = useState('')
   const [pw, setPw] = useState('')
   const [agree, setAgree] = useState(false)

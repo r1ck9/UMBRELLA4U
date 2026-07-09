@@ -781,3 +781,22 @@ a{color:inherit}
 .ptr-val{font-size:14px; font-weight:800; color:var(--ink-1); font-variant-numeric:tabular-nums; white-space:nowrap}
 .ptr-avg{font-size:12.5px; font-weight:600; color:var(--ink-3)}
 @media (max-width:560px){ .ptr-row{grid-template-columns:106px 1fr auto; gap:8px} .ptr-label{font-size:12.5px} }
+
+/* ---- signup → first-post funnel ---- */
+.funnel{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px;
+  padding:16px 18px; box-shadow:var(--shadow); margin-top:16px}
+.funnel-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; flex-wrap:wrap}
+.funnel-head h3{margin:0; font-size:16px}
+.funnel-cap{font-size:12.5px; color:var(--ink-3)}
+.funnel-rows{margin-top:12px; display:flex; flex-direction:column; gap:9px}
+.funnel-row{display:grid; grid-template-columns:150px 1fr auto; align-items:center; gap:12px}
+.fn-label{font-size:13.5px; font-weight:600; color:var(--ink-2)}
+.fn-track{background:var(--rain-1); border-radius:8px; height:22px; overflow:hidden}
+.fn-fill{height:100%; background:var(--shelter); border-radius:8px; min-width:2px;
+  transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.funnel-row.worst .fn-fill{background:var(--care, #c0392b)}
+.fn-val{font-size:14px; font-weight:800; color:var(--ink-1); font-variant-numeric:tabular-nums; white-space:nowrap; text-align:right}
+.fn-conv{display:block; font-size:11.5px; font-weight:600; color:var(--ink-3)}
+.funnel-row.worst .fn-conv{color:var(--care, #c0392b)}
+.funnel-note{margin:12px 2px 0; font-size:13px; color:var(--ink-3)}
+@media (max-width:560px){ .funnel-row{grid-template-columns:96px 1fr auto; gap:8px} .fn-label{font-size:12px} }
