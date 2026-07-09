@@ -7,6 +7,7 @@ import FeedList from '@/components/FeedList'
 import FeedTour from '@/components/FeedTour'
 import SafetyNote from '@/components/SafetyNote'
 import SeenBanner from '@/components/SeenBanner'
+import CommunityPulse from '@/components/CommunityPulse'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +31,7 @@ export default async function Feed({ searchParams }) {
           )}
           {cat !== 'all' && <h2 className="feedhead">{CAT_NAMES[cat] || cat}</h2>}
           <SeenBanner />
+          <CommunityPulse />
           <SafetyNote />
           <p className="care-banner">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here — just be kind to yourself, and to everyone else.</p>
           <Composer />
