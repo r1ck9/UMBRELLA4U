@@ -70,7 +70,18 @@ export async function GET(request) {
   if (!sb) return Response.json({ error: 'admin not configured (missing SUPABASE_SERVICE_ROLE_KEY)' }, { status: 500 })
 
   const now = Date.now()
-  const out = { digests: 0, prompts: 0, reengaged: 0, reports: 0 }
+  const out = { digests: 0, prompts: 0, reengaged: 0, reports: 0, sent: 0, failed: 0, skipped: 0 }
+  // Diagnostics so a manual hit tells you what's missing.
+  out.resendConfigured = !!process.env.RESEND_API_KEY
+  out.fromLooksUnset = !process.env.NOTIFY_FROM || /yourdomain\.com/.test(process.env.NOTIFY_FROM)
+  // Count every send attempt's real outcome (skipped = no RESEND key).
+  const send = async (to, subject, html) => {
+    const r = await sendEmail(to, subject, html)
+    if (r.skipped) out.skipped++
+    else if (r.ok) out.sent++
+    else out.failed++
+    return r
+  }
 
   // Has the weekly prompt changed since we last announced it?
   const { data: setting } = await sb.from('app_settings').select('value').eq('key', 'last_prompt_key').maybeSingle()
@@ -104,7 +115,7 @@ export async function GET(request) {
         count = c || 0
       }
       if (count > 0) {
-        await sendEmail(email, `You have ${count > 50 ? '50+' : count} new umbrella${count === 1 ? '' : 's'} ☂`, digestHtml(count > 50 ? '50+' : String(count)))
+        await send(email, `You have ${count > 50 ? '50+' : count} new umbrella${count === 1 ? '' : 's'} ☂`, digestHtml(count > 50 ? '50+' : String(count)))
         await sb.from('profiles').update({ last_notified_at: new Date(now).toISOString() }).eq('id', p.id)
         out.digests++; sent = true
       }
@@ -112,7 +123,7 @@ export async function GET(request) {
 
     // 2) NEW WEEKLY PROMPT — a gentle reason to come back
     if (!sent && promptChanged) {
-      await sendEmail(email, 'A new weekly prompt is up ☂', promptHtml(WEEKLY_PROMPT.text))
+      await send(email, 'A new weekly prompt is up ☂', promptHtml(WEEKLY_PROMPT.text))
       await sb.from('profiles').update({ last_notified_at: new Date(now).toISOString() }).eq('id', p.id)
       out.prompts++; sent = true
     }
@@ -126,7 +137,7 @@ export async function GET(request) {
       const reeng = p.last_reengaged_at ? new Date(p.last_reengaged_at).getTime() : 0
       const reengageOk = !reeng || now - reeng >= REENGAGE_COOLDOWN
       if (accountAge >= INACTIVE && inactiveFor >= INACTIVE && reengageOk) {
-        await sendEmail(email, 'It’s been a while ☂', reengageHtml())
+        await send(email, 'It’s been a while ☂', reengageHtml())
         await sb.from('profiles').update({
           last_reengaged_at: new Date(now).toISOString(),
           last_notified_at: new Date(now).toISOString()
@@ -147,7 +158,7 @@ export async function GET(request) {
   const { data: reps } = await sb.from('reports').select('id')
     .eq('status', 'open').gt('created_at', new Date(lastReport).toISOString())
   if ((reps || []).length) {
-    await sendEmail(MOD_EMAIL, `🛑 ${reps.length} new report${reps.length === 1 ? '' : 's'} on Umbrella`, reportHtml(reps.length))
+    await send(MOD_EMAIL, `🛑 ${reps.length} new report${reps.length === 1 ? '' : 's'} on Umbrella`, reportHtml(reps.length))
     await sb.from('site_metrics').upsert({ key: 'last_report_alert', value: now })
     out.reports = reps.length
   }
