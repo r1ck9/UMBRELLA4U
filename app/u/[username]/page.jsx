@@ -6,7 +6,7 @@ import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
 import { bannerStyle } from '@/lib/banners'
-import { streakBadge } from '@/lib/badges'
+import { earnedBadges } from '@/lib/badges'
 
 function since(ts) {
   if (!ts) return '—'
@@ -70,9 +70,8 @@ export default function PublicProfile({ params }) {
                   <div className="pf-id">
                     <div className="pf-name">
                       {prof.display_name || prof.username}
-                      {streakBadge(prof.streak_count || 0) && (
-                        <span className="streak-badge" title={streakBadge(prof.streak_count).label}>{streakBadge(prof.streak_count).icon}</span>
-                      )}
+                      {earnedBadges({ streak: prof.streak_count || 0, posts: stats.stories, umbrellasSent: stats.opened })
+                        .map((b) => <span key={b.label} className="streak-badge" title={b.label}>{b.icon}</span>)}
                     </div>
                     <div className="pf-handle">@{prof.username}{prof.pronouns ? ' · ' + prof.pronouns : ''}</div>
                     {prof.status_weather && <div className="pf-status">{prof.status_weather}</div>}
@@ -84,6 +83,16 @@ export default function PublicProfile({ params }) {
                   <div><b>{stats.received}</b> received</div>
                   <div><b>{since(prof.created_at)}</b> joined</div>
                 </div>
+                {(() => {
+                  const badges = earnedBadges({ streak: prof.streak_count || 0, posts: stats.stories, umbrellasSent: stats.opened })
+                  return badges.length > 0 && (
+                    <div className="pf-badges">
+                      {badges.map((b) => (
+                        <span key={b.label} className="pf-badge"><span className="pf-badge-ic">{b.icon}</span>{b.label}</span>
+                      ))}
+                    </div>
+                  )
+                })()}
                 {prof.about_me && <p className="pf-about">{prof.about_me}</p>}
                 {prof.tags?.length > 0 && (
                   <div className="pf-tags">{prof.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>

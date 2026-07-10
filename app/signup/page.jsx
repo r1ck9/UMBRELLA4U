@@ -19,7 +19,7 @@ export default function Signup() {
     if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
     const { data, error } = await supabase.auth.signUp({
       email, password: pw,
-      options: { emailRedirectTo: `${window.location.origin}/login` }
+      options: { emailRedirectTo: `${window.location.origin}/auth/confirm` }
     })
     if (error) { setMsg(error.message); return }
     // Existing account: Supabase returns a user with EMPTY identities (and sends

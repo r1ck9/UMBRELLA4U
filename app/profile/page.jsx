@@ -7,7 +7,7 @@ import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
-import { streakBadge } from '@/lib/badges'
+import { earnedBadges } from '@/lib/badges'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
 
@@ -40,7 +40,7 @@ export default function Profile() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saved, setSaved] = useState(false)
-  const [stats, setStats] = useState({ stories: 0, received: 0 })
+  const [stats, setStats] = useState({ stories: 0, received: 0, sent: 0 })
   const [streak, setStreak] = useState(0)
   const [tagInput, setTagInput] = useState('')
   // Fresh example placeholders each time the page mounts.
@@ -66,7 +66,11 @@ export default function Profile() {
       if (prof) setStreak(prof.streak_count || 0)
       const { data: mine } = await supabase.from('stories').select('id,umbrella_count').eq('author_id', data.user.id)
       const s = mine || []
-      setStats({ stories: s.length, received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0) })
+      setStats({
+        stories: s.length,
+        received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0),
+        sent: prof?.umbrellas_sent || 0
+      })
       setLoading(false)
     })()
   }, [])
@@ -104,7 +108,7 @@ export default function Profile() {
   const isImg = /^https?:/.test(p.avatar_url)
   const avStyle = isImg ? { backgroundImage: `url(${p.avatar_url})` } : { background: p.accent_color }
   const avInner = isEmoji ? p.avatar_url.slice(6) : (isImg ? '' : initial)
-  const badge = streakBadge(streak)
+  const badges = earnedBadges({ streak, posts: stats.stories, umbrellasSent: stats.sent })
 
   return (
     <>
@@ -118,7 +122,7 @@ export default function Profile() {
             <div className="pf-top">
               <div className="pf-avatar" style={avStyle}>{avInner}</div>
               <div className="pf-id">
-                <div className="pf-name">{p.display_name || p.username || 'you'}{badge && <span className="streak-badge" title={badge.label}>{badge.icon}</span>}</div>
+                <div className="pf-name">{p.display_name || p.username || 'you'}{badges.map((b) => <span key={b.label} className="streak-badge" title={b.label}>{b.icon}</span>)}</div>
                 <div className="pf-handle">@{p.username}{p.pronouns ? ' · ' + p.pronouns : ''}</div>
                 {p.status_weather && <div className="pf-status">{p.status_weather}</div>}
               </div>
@@ -126,8 +130,16 @@ export default function Profile() {
             <div className="pf-stats">
               <div><b>{stats.stories}</b> stories</div>
               <div><b>{stats.received}</b> umbrellas received</div>
+              <div><b>{stats.sent}</b> umbrellas sent</div>
               <div><b>{streak}</b> day streak</div>
             </div>
+            {badges.length > 0 && (
+              <div className="pf-badges">
+                {badges.map((b) => (
+                  <span key={b.label} className="pf-badge"><span className="pf-badge-ic">{b.icon}</span>{b.label}</span>
+                ))}
+              </div>
+            )}
             {p.about_me && <p className="pf-about">{p.about_me}</p>}
             {p.tags.length > 0 && <div className="pf-tags">{p.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>}
             {p.username && <Link className="pf-viewlink" href={`/u/${encodeURIComponent(p.username)}`}>View my public profile →</Link>}

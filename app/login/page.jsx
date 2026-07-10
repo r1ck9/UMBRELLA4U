@@ -27,6 +27,7 @@ export default function Login() {
         <button className="btn prim" type="submit">Log in</button>
       </form>
       {msg && <p className="msg">{msg}</p>}
+      <p className="alt"><Link href="/forgot">Forgot your password?</Link></p>
       <p className="alt">New here? <Link href="/signup">Sign up</Link></p>
     </main>
   )

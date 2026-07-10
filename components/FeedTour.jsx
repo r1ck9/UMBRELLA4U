@@ -12,6 +12,8 @@ const STEPS = [
     body: 'Filter stories by what they’re about — school, identity, mental health, small wins, venting, and more.' },
   { sel: '.umb', title: 'Open an umbrella',
     body: 'Instead of comments, you open one umbrella to say “I’m standing with you.” One each — no threads, no pile-ons, no arguing.' },
+  { sel: '.hug', title: 'Send a hug 🫂',
+    body: 'A hug is a warmer, lighter “I’m here with you.” Tap it as many times as you like — no daily limit, unlike umbrellas. Opening an umbrella sends a hug too, and the little faces show who’s standing with you.' },
   { sel: '.bell', title: 'Your inbox',
     body: 'When someone opens an umbrella on your story, it lands here. The little number is unread support waiting for you.' },
   { sel: '.tb-search', title: 'Find anything', pad: 4,

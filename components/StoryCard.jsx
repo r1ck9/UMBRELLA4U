@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
 import { getMe, getMyStoryIds } from '@/lib/me'
-import { streakBadge } from '@/lib/badges'
+import { earnedBadges } from '@/lib/badges'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 
 const INTENT = {
@@ -69,7 +69,7 @@ export default function StoryCard({ story }) {
     if (next) {
       const { error } = await supabase.from('hugs').insert({ story_id: story.id, user_id: data.user.id })
       if (error && !/duplicate|unique/i.test(error.message)) { setHugged(false); setHugCount((c) => Math.max(0, c - 1)); return }
-      window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { variant: 'open', message: 'You sent a hug. 🤗' } }))
+      window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { variant: 'open', message: 'You sent a hug. 🫂' } }))
     } else {
       await supabase.from('hugs').delete().eq('story_id', story.id).eq('user_id', data.user.id)
     }
@@ -251,7 +251,11 @@ export default function StoryCard({ story }) {
   }
 
   const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
-  const badge = story.anonymous ? null : streakBadge(story.author_streak || 0)
+  const badges = story.anonymous ? [] : earnedBadges({
+    streak: story.author_streak || 0,
+    posts: story.author_posts || 0,
+    umbrellasSent: story.author_umbrellas_sent || 0
+  })
   const noteWords = noteText.trim() ? noteText.trim().split(/\s+/).length : 0
   const noteOver = noteWords > 300
 
@@ -267,7 +271,7 @@ export default function StoryCard({ story }) {
               ? <>{who}{story.anonymous && <span className="lock"> · 🔒 hidden</span>}</>
               : <>
                   <Link href={`/u/${encodeURIComponent(story.author_name)}`} className="namelink">{who}</Link>
-                  {badge && <span className="streak-badge" title={badge.label}>{badge.icon}</span>}
+                  {badges.map((b) => <span key={b.label} className="streak-badge" title={b.label}>{b.icon}</span>)}
                 </>}
           </div>
           <div className="meta">{story.category}</div>
@@ -320,7 +324,7 @@ export default function StoryCard({ story }) {
         {!isOwn && (
           <button className={'hug' + (hugged ? ' on' : '')} onClick={toggleHug}
             title={hugged ? 'You’re here with them' : 'Send a hug — I’m here with you'}>
-            🤗 <span>{hugCount}</span>
+            🫂 <span>{hugCount}</span>
           </button>
         )}
         <span className="hint">
@@ -339,8 +343,8 @@ export default function StoryCard({ story }) {
           {reported && <span className="reported">Reported ✓</span>}
           {me.isModerator &&
             <button className={'boost' + (boosted ? ' on' : '')} onClick={toggleBoost}
-              title="Boost this story so more people see it — moderators only">
-              ▲ {boosted ? 'Boosted' : 'Boost'}{boostCount > 0 ? ` · ${boostCount}` : ''}
+              title="Promote this story — a boost gives it 25 umbrellas' worth of reach in the feed. Moderators only.">
+              ▲ {boosted ? 'Promoted' : 'Promote'}{boostCount > 0 ? ` · ${boostCount}` : ''}
             </button>}
           {canRemove &&
             <button className="takedown" onClick={handleRemove}>{isOwn ? 'Delete' : '🛑 Take down'}</button>}
