@@ -12,6 +12,16 @@ const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
   similar: '💬 Similar stories', resources: '📎 Resources'
 }
+
+// A hugger's little avatar (emoji / uploaded image / colored initial).
+function HugAvatar({ h }) {
+  const url = h.avatar_url || ''
+  const isEmoji = url.startsWith('emoji:')
+  const isImg = /^https?:/.test(url)
+  const initial = (h.username || '☂').trim().charAt(0).toUpperCase()
+  const style = isImg ? { backgroundImage: `url(${url})` } : { background: h.accent_color || 'var(--shelter)' }
+  return <span className="hug-av" style={style} title={'@' + h.username}>{isEmoji ? url.slice(6) : (isImg ? '' : initial)}</span>
+}
 const NOTE_PROMPT = {
   advice: 'one line of advice…', similar: '“me too” — in a sentence…', resources: 'a link or resource that helped…'
 }
@@ -36,6 +46,35 @@ export default function StoryCard({ story }) {
   const [poll, setPoll] = useState(null)   // null = loading · false = no poll · {options,total,myOption}
   const [boosted, setBoosted] = useState(false)
   const [boostCount, setBoostCount] = useState(story.boost_count ?? 0)
+  const [hugCount, setHugCount] = useState(story.hug_count ?? 0)
+  const [hugged, setHugged] = useState(false)
+  const [huggers, setHuggers] = useState([])     // profile-lite for the faces on the post
+  const [hugExpanded, setHugExpanded] = useState(false)
+
+  // Load the faces of the people who've hugged this story.
+  function refreshHuggers(limit = 20) {
+    if (!supabase || !story.id) return
+    supabase.rpc('story_huggers', { sid: story.id, lim: limit })
+      .then(({ data }) => { if (data) setHuggers(data) })
+  }
+  useEffect(() => { if ((story.hug_count ?? 0) > 0) refreshHuggers(20) }, [])
+
+  // Hug: unlimited, one per post (a toggle). Adds a warm "I'm here with you".
+  async function toggleHug() {
+    if (!supabase) { setHugged((h) => !h); setHugCount((c) => c + (hugged ? -1 : 1)); return }
+    const { data } = await supabase.auth.getUser()
+    if (!data.user) { router.push('/signup'); return }
+    const next = !hugged
+    setHugged(next); setHugCount((c) => Math.max(0, c + (next ? 1 : -1)))
+    if (next) {
+      const { error } = await supabase.from('hugs').insert({ story_id: story.id, user_id: data.user.id })
+      if (error && !/duplicate|unique/i.test(error.message)) { setHugged(false); setHugCount((c) => Math.max(0, c - 1)); return }
+      window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { variant: 'open', message: 'You sent a hug. 🤗' } }))
+    } else {
+      await supabase.from('hugs').delete().eq('story_id', story.id).eq('user_id', data.user.id)
+    }
+    refreshHuggers(hugExpanded ? 500 : 20)
+  }
 
   // Count one view per story per browser session (feeds the ranking algorithm).
   useEffect(() => {
@@ -57,6 +96,9 @@ export default function StoryCard({ story }) {
       if (m.userId) {
         if (m.userId === story.author_id) setMine(true)
         else getMyStoryIds().then((ids) => { if (ids.has(story.id)) setMine(true) })
+        // did I already hug this?
+        supabase.from('hugs').select('id').eq('story_id', story.id).eq('user_id', m.userId).maybeSingle()
+          .then(({ data }) => { if (data) setHugged(true) })
       }
       // Moderators: reflect whether I've boosted this story.
       if (m.isModerator && supabase) {
@@ -199,6 +241,12 @@ export default function StoryCard({ story }) {
       fireBurst()
       // tell the rail to refresh its live counts (umbrellas left today + community total)
       window.dispatchEvent(new CustomEvent('umbrella:opened'))
+      // opening an umbrella also gives them a hug
+      if (!hugged && data.user) {
+        setHugged(true); setHugCount((c) => c + 1)
+        supabase.from('hugs').insert({ story_id: story.id, user_id: data.user.id })
+          .then(() => refreshHuggers(hugExpanded ? 500 : 20))
+      }
     }
   }
 
@@ -269,6 +317,12 @@ export default function StoryCard({ story }) {
               title={opened ? 'Umbrella opened' : 'Open an umbrella'}>
               <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <span>{count}</span>
             </button>}
+        {!isOwn && (
+          <button className={'hug' + (hugged ? ' on' : '')} onClick={toggleHug}
+            title={hugged ? 'You’re here with them' : 'Send a hug — I’m here with you'}>
+            🤗 <span>{hugCount}</span>
+          </button>
+        )}
         <span className="hint">
           {isOwn
             ? 'Your story. Umbrellas people open for you land in your inbox. ☂'
@@ -292,6 +346,18 @@ export default function StoryCard({ story }) {
             <button className="takedown" onClick={handleRemove}>{isOwn ? 'Delete' : '🛑 Take down'}</button>}
         </span>
       </div>
+
+      {hugCount > 0 && (
+        <div className="hug-faces">
+          <div className={'hug-stack' + (hugExpanded ? ' expanded' : '')}>
+            {huggers.map((h) => <HugAvatar key={h.user_id} h={h} />)}
+          </div>
+          <button className="hug-more" onClick={() => { const ex = !hugExpanded; setHugExpanded(ex); refreshHuggers(ex ? 500 : 20) }}>
+            {hugCount.toLocaleString()} {hugCount === 1 ? 'person is' : 'people are'} here
+            {!hugExpanded && hugCount > huggers.length ? ' · see all' : hugExpanded ? ' · show less' : ''}
+          </button>
+        </div>
+      )}
 
       {canNote && !opened && !isOwn && (
         <div className="respond">

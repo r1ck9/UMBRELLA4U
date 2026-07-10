@@ -709,6 +709,24 @@ a{color:inherit}
 .intent-hint{margin:8px 0 0; font-size:13px; color:var(--shelter-deep); background:var(--shelter-wash);
   border-radius:10px; padding:9px 12px}
 
+/* ---- the Hug ---- */
+.hug{display:inline-flex; align-items:center; gap:6px; border:1.5px solid var(--rain-2); color:var(--ink-2);
+  background:var(--panel); border-radius:999px; padding:8px 14px; font-weight:700; font-size:14px; cursor:pointer}
+.hug span{font-variant-numeric:tabular-nums}
+.hug:hover{border-color:var(--shelter)}
+.hug.on{background:color-mix(in srgb,var(--shelter) 16%,var(--panel)); border-color:var(--shelter); color:var(--shelter-deep)}
+.hug-faces{display:flex; align-items:center; gap:10px; margin-top:11px; flex-wrap:wrap}
+.hug-stack{display:flex; align-items:center; max-width:100%; overflow-x:auto; padding:2px 0}
+.hug-stack .hug-av:not(:first-child){margin-left:-9px}
+.hug-stack.expanded{flex-wrap:wrap; overflow:visible; gap:4px 0}
+.hug-stack.expanded .hug-av:not(:first-child){margin-left:-9px}
+.hug-av{flex:none; width:30px; height:30px; border-radius:50%; border:2px solid var(--panel);
+  background-size:cover; background-position:center; display:grid; place-items:center;
+  color:#fff; font-size:13px; font-weight:800}
+.hug-more{background:none; border:none; color:var(--ink-3); font:inherit; font-size:13px; font-weight:600;
+  cursor:pointer; white-space:nowrap}
+.hug-more:hover{color:var(--shelter-deep)}
+
 /* ---- live community pulse ---- */
 .pulse{display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px; margin-bottom:14px;
   background:var(--shelter-wash); border:1px solid color-mix(in srgb,var(--shelter) 22%,var(--panel));
