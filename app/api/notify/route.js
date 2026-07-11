@@ -1,5 +1,6 @@
 import { adminSupabase } from '@/lib/supabaseAdmin'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
+import { sendPush } from '@/lib/push'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,7 +71,23 @@ export async function GET(request) {
   if (!sb) return Response.json({ error: 'admin not configured (missing SUPABASE_SERVICE_ROLE_KEY)' }, { status: 500 })
 
   const now = Date.now()
-  const out = { digests: 0, prompts: 0, reengaged: 0, reports: 0, sent: 0, failed: 0, skipped: 0 }
+  const out = { digests: 0, prompts: 0, reengaged: 0, reports: 0, sent: 0, failed: 0, skipped: 0, pushed: 0 }
+
+  // Push a "new umbrella" alert to a member's registered devices, and prune any
+  // dead tokens FCM reports back. No-ops if FCM isn't configured yet.
+  const pushNewUmbrellas = async (userId, count) => {
+    const { data: toks } = await sb.from('device_tokens').select('token').eq('user_id', userId)
+    const tokens = (toks || []).map((r) => r.token)
+    if (!tokens.length) return
+    const n = count > 50 ? '50+' : String(count)
+    const r = await sendPush(tokens, {
+      title: 'Someone stood with you ☂',
+      body: `You have ${n} new umbrella${count === 1 ? '' : 's'} waiting.`,
+      url: `${SITE}/inbox`
+    })
+    if (r.sent) out.pushed += r.sent
+    if (r.stale?.length) await sb.from('device_tokens').delete().in('token', r.stale)
+  }
   // Diagnostics so a manual hit tells you what's missing.
   out.resendConfigured = !!process.env.RESEND_API_KEY
   out.fromLooksUnset = !process.env.NOTIFY_FROM || /yourdomain\.com/.test(process.env.NOTIFY_FROM)
@@ -116,6 +133,7 @@ export async function GET(request) {
       }
       if (count > 0) {
         await send(email, `You have ${count > 50 ? '50+' : count} new umbrella${count === 1 ? '' : 's'} ☂`, digestHtml(count > 50 ? '50+' : String(count)))
+        await pushNewUmbrellas(p.id, count)
         await sb.from('profiles').update({ last_notified_at: new Date(now).toISOString() }).eq('id', p.id)
         out.digests++; sent = true
       }
