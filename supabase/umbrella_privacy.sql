@@ -22,9 +22,11 @@ create policy "read umbrellas" on umbrellas for select using (
 );
 
 -- public aggregates (counts only — never the rows)
+-- Sum per-story umbrella_count (matches the posts + community_pulse), rather
+-- than counting raw umbrella rows, which diverges when counts are set directly.
 create or replace function community_umbrellas() returns bigint
 language sql security definer set search_path = public stable as $$
-  select count(*) from umbrellas
+  select coalesce(sum(umbrella_count), 0)::bigint from stories where state = 'live'
 $$;
 grant execute on function community_umbrellas() to anon, authenticated;
 
