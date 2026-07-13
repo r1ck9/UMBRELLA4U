@@ -13,6 +13,10 @@ const INTENT = {
   similar: '💬 Similar stories', resources: '📎 Resources'
 }
 
+// The "who's here" hugger-faces row under a post is hidden for now (to be
+// redesigned/re-added later). Flip to true to bring it back.
+const SHOW_HUG_FACES = false
+
 // A hugger's little avatar (emoji / uploaded image / colored initial).
 function HugAvatar({ h }) {
   const url = h.avatar_url || ''
@@ -351,7 +355,7 @@ export default function StoryCard({ story }) {
         </span>
       </div>
 
-      {hugCount > 0 && (
+      {SHOW_HUG_FACES && hugCount > 0 && (
         <div className="hug-faces">
           <div className={'hug-stack' + (hugExpanded ? ' expanded' : '')}>
             {huggers.map((h) => <HugAvatar key={h.user_id} h={h} />)}
