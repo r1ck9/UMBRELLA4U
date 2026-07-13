@@ -43,8 +43,12 @@ alter table stories  add column if not exists hug_count  int default 0;
 -- ============================================================
 --  Persona + post source data (temp tables, dropped at end)
 -- ============================================================
+-- NOTE: regular (not TEMP) tables on purpose. The Supabase SQL Editor runs
+-- statements over a pooled connection, so a TEMP table created in one statement
+-- is gone by the next ("relation _bots does not exist"). Regular tables are
+-- committed and visible across statements; we drop them again at the end.
 drop table if exists _bots;
-create temp table _bots (
+create table _bots (
   email text, username text, display_name text, pronouns text,
   status_weather text, about_me text, accent_color text, signup_days_ago int
 );
@@ -76,7 +80,7 @@ insert into _bots (email, username, display_name, pronouns, status_weather, abou
  ('low_battery_lu@bots.umbrella4u.ca','low_battery_lu','Lu','she/her','light rain','running on 12% most days. still running though.','#6f9bc4',2);
 
 drop table if exists _bot_posts;
-create temp table _bot_posts (username text, text text, intent text, category text, cw boolean);
+create table _bot_posts (username text, text text, intent text, category text, cw boolean);
 
 insert into _bot_posts (username, text, intent, category, cw) values
  ('quiet_september', $$i rewrote a text to my friend like nine times and then just didn't send it. anyone else do this or is it just me$$, 'similar','mind', false),
