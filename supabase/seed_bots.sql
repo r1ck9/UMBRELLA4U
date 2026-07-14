@@ -8,7 +8,11 @@
 --    * 150 ACTIVE bots  — each has a customized per-day behaviour:
 --        bot_posts_per_day (1..3) and bot_umbrellas_per_day (3..8),
 --        played out across a 14-day window (tunable in _cfg below).
---    * 50 LURKER bots   — post nothing; open an umbrella on EVERY live post.
+--    * 50 LURKER bots   — post nothing; they're the heaviest umbrella-givers.
+--
+--  Umbrella counts are SPREAD OUT per post (skewed low, hard cap 60) so they look
+--  natural rather than a flat wall. Givers are sampled from the fleet weighted by
+--  behaviour (lurkers heaviest, then active bots by their per-day rate).
 --
 --  Everything is REAL and row-backed:
 --    - Real auth.users rows (fake @bots.umbrella4u.ca emails) → handle_new_user
@@ -23,7 +27,7 @@
 --
 --  NOTE: because counts are recomputed from real rows, any previously hand-set
 --  fake counts (e.g. the old exact 3000 total / 15-floor) are replaced by the
---  real totals — which are LARGER now (every post gets ~50 lurker umbrellas).
+--  real per-post totals (each spread between 2 and 60).
 --
 --  Performance: triggers on stories/umbrellas are disabled during the bulk load
 --  and re-enabled after; counts are recomputed in a few set-based UPDATEs. If
@@ -274,30 +278,26 @@ cross join generate_series(1, b.posts_per_day) k
 cross join lateral (select text, intent, category, cw from _bot_posts order by random() limit 1) p
 where b.is_lurker = false;
 
--- D) ACTIVE bots open umbrellas_per_day umbrellas each day on OTHER people's posts
+-- D) Umbrellas — give each post its OWN varied number of real umbrellas so the
+--    counts look natural, not a flat wall of 50. Per-post target is skewed toward
+--    lower numbers with a HARD CAP of 60. The givers are sampled from the bot
+--    fleet WEIGHTED by behaviour: lurkers give the most, then active bots by their
+--    bot_umbrellas_per_day. Never the post's own author; no duplicates.
+--    created_at is spread between the post's time and now → umbrellas land across
+--    days (feeds the activity_by_day umbrellas series and today's count).
 insert into umbrellas (story_id, user_id, created_at)
-select s.id, u.id, now() - make_interval(days => d) - (random() * interval '6 hours')
-from _bots b
-join auth.users u on u.email = b.email
-cross join generate_series(0, b.signup_days_ago) d
+select s.id, b.id, s.created_at + random() * (now() - s.created_at)
+from stories s
 cross join lateral (
-  select s.id from stories s
-  where s.state = 'live'
-    and (s.author_id is null or s.author_id <> u.id)          -- never self (trigger is off)
-    and s.created_at <= now() - make_interval(days => d) + interval '1 day'
-  order by random()
-  limit b.umbrellas_per_day
-) s
-where b.is_lurker = false
-on conflict (story_id, user_id) do nothing;
-
--- E) LURKER bots open an umbrella on EVERY live post (and nothing else)
-insert into umbrellas (story_id, user_id, created_at)
-select s.id, u.id, s.created_at + random() * (now() - s.created_at)
-from _bots b
-join auth.users u on u.email = b.email
-cross join stories s
-where b.is_lurker = true and s.state = 'live'
+  select p.id
+  from profiles p
+  where p.is_bot
+    and (s.author_id is null or p.id <> s.author_id)               -- never self (trigger is off)
+  order by power(random(), 1.0 / (case when p.bot_kind = 'lurker'
+                                       then 12 else coalesce(p.bot_umbrellas_per_day, 3) end)) desc
+  limit least(60, 2 + floor(power(random(), 2.0) * 85)::int)       -- 2..60, skewed low, capped at 60
+) b
+where s.state = 'live'
 on conflict (story_id, user_id) do nothing;
 
 -- ============================================================
