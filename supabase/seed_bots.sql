@@ -56,15 +56,24 @@ alter table stories add column if not exists seed       boolean default false;
 alter table stories add column if not exists seed_batch int;
 alter table stories add column if not exists hug_count  int default 0;
 
+-- give the run plenty of headroom (best effort; ignored if the editor caps it)
+set statement_timeout = '600s';
+
 -- ---------- config (TUNE HERE) ----------
+--  window_days = how many days of history to spread posts/umbrellas across.
 drop table if exists _cfg;
 create table _cfg (active int, lurker int, window_days int);
-insert into _cfg values (150, 50, 14);
+insert into _cfg values (150, 50, 30);
 
 -- ============================================================
---  Wipe any previous bot fleet (incl. the old real-name personas)
---  Order matters: child rows first, then the auth users (profiles cascade).
+--  Wipe any previous bot fleet (incl. the old real-name personas).
+--  IMPORTANT: disable triggers on stories/umbrellas FIRST, so deleting a prior
+--  run's rows is a fast bulk delete instead of firing per-row count triggers
+--  (a big previous fleet made this the slow step that timed out).
 -- ============================================================
+alter table stories   disable trigger user;
+alter table umbrellas disable trigger user;
+
 delete from umbrellas u using profiles p where u.user_id = p.id and p.is_bot;
 delete from stories where seed_batch = 3;
 delete from stories s using profiles p where s.author_id = p.id and p.is_bot;
@@ -311,28 +320,46 @@ begin
 end $$;
 
 -- ============================================================
---  Bulk load. Disable ALL user triggers on stories/umbrellas for speed and to
---  avoid side effects (notifications, moderation) + set authors ourselves.
---  Counts are recomputed set-based afterwards, then triggers re-enabled.
+--  Bulk load. (Triggers on stories/umbrellas were already disabled up top for
+--  the fast wipe.) Counts are recomputed set-based afterwards, then re-enabled.
 -- ============================================================
-alter table stories   disable trigger user;
-alter table umbrellas disable trigger user;
 
 -- C) ACTIVE bots post NON-ANONYMOUSLY. Each pool line is used EXACTLY ONCE
---    (no repeated text anywhere in the feed), assigned to a random active bot,
---    posted at a random time within that bot's active window.
+--    (no repeated text in the feed), assigned to a random active bot. Posts are
+--    SPREAD EVENLY across the whole window (with a few hours of jitter) so the
+--    feed reads as a steady drip over time, not a staged dump.
 insert into stories (author_id, author_name, anonymous, text, intent, category,
                      content_warning, umbrella_count, state, seed, seed_batch, created_at)
-select a.id, a.username, false, bp.text, bp.intent, bp.category, bp.cw,
+select a.id, a.username, false, q.text, q.intent, q.category, q.cw,
        0, 'live', true, 3,
-       now() - make_interval(days => a.sd) + (random() * make_interval(days => a.sd)) - interval '1 hour'
-from _bot_posts bp
+       least(
+         now() - interval '5 minutes',
+         now() - make_interval(days => cfg.window_days)
+              + (q.rn::float / q.tot) * make_interval(days => cfg.window_days)
+              + (random() - 0.5) * interval '10 hours'
+       )
+from (
+  select bp.*, row_number() over (order by random()) as rn, count(*) over () as tot
+  from _bot_posts bp
+) q
+cross join _cfg cfg
 cross join lateral (
-  select u.id, b.username, greatest(b.signup_days_ago, 1) as sd
+  select u.id, b.username
   from _bots b join auth.users u on u.email = b.email
   where b.is_lurker = false
   order by random() limit 1
 ) a;
+
+-- Signups over time: each posting bot joined 1–4 days before its first post;
+-- non-posting bots (lurkers etc.) joined at a random point in the window. This
+-- spreads registrations naturally and guarantees nobody posts before they joined.
+update profiles p set created_at = s.first_post - (interval '1 day' + random() * interval '3 days')
+from (select author_id, min(created_at) first_post from stories where seed_batch = 3 group by author_id) s
+where p.id = s.author_id;
+
+update profiles p set created_at = now() - (random() * make_interval(days => (select window_days from _cfg)))
+where p.is_bot
+  and not exists (select 1 from stories s where s.author_id = p.id and s.seed_batch = 3);
 
 -- D) Umbrellas — give each post its OWN varied number of real umbrellas so the
 --    counts look natural, not a flat wall. Each story gets a target that's skewed
@@ -369,20 +396,20 @@ on conflict (story_id, user_id) do nothing;
 update stories s set umbrella_count = coalesce(c.n, 0), hug_count = coalesce(c.n, 0)
 from (select story_id, count(*) n from umbrellas group by story_id) c
 where s.id = c.story_id;
-update stories set umbrella_count = 0, hug_count = 0
-where id not in (select story_id from umbrellas);
+update stories s set umbrella_count = 0, hug_count = 0
+where not exists (select 1 from umbrellas u where u.story_id = s.id);
 
 update profiles p set umbrellas_sent = coalesce(c.n, 0)
 from (select user_id, count(*) n from umbrellas group by user_id) c
 where p.id = c.user_id;
-update profiles set umbrellas_sent = 0
-where id not in (select user_id from umbrellas);
+update profiles p set umbrellas_sent = 0
+where not exists (select 1 from umbrellas u where u.user_id = p.id);
 
 update profiles p set post_count = coalesce(c.n, 0)
 from (select author_id, count(*) n from stories where author_id is not null group by author_id) c
 where p.id = c.author_id;
-update profiles set post_count = 0
-where id not in (select author_id from stories where author_id is not null);
+update profiles p set post_count = 0
+where not exists (select 1 from stories s where s.author_id = p.id);
 
 -- re-enable triggers
 alter table stories   enable trigger user;
