@@ -5,12 +5,15 @@
 --  SQL Editor. Safe + idempotent (wipes and rebuilds all bot data each run).
 --
 --  Fleet:
---    * 150 ACTIVE bots  — each has a customized per-day behaviour:
---        bot_posts_per_day (1..3) and bot_umbrellas_per_day (3..8),
---        played out across a 14-day window (tunable in _cfg below).
+--    * 150 ACTIVE bots  — authors of the posts; each also carries a behaviour
+--        weight (bot_umbrellas_per_day 3..8) that controls how often it umbrellas.
 --    * 50 LURKER bots   — post nothing; they're the heaviest umbrella-givers.
 --
---  Umbrella counts are SPREAD OUT per post (skewed low, hard cap 60) so they look
+--  Posts: every line in the content pool is used EXACTLY ONCE (no repeated text
+--  anywhere in the feed), each assigned to a random active bot. To add more posts,
+--  just add more lines to the _bot_posts pool below.
+--
+--  Umbrella counts are SPREAD OUT per post (skewed low, HARD CAP 60) so they look
 --  natural rather than a flat wall. Givers are sampled from the fleet weighted by
 --  behaviour (lurkers heaviest, then active bots by their per-day rate).
 --
@@ -207,7 +210,37 @@ insert into _bot_posts (text, intent, category, cw) values
  ($$been waking up early to watch the sunrise. it's the only quiet i get all day$$,'similar','mind',false),
  ($$anyone else rehearse phone calls before making them$$,'similar','mind',false),
  ($$forgave someone today, not for them, for me. weird how heavy that was to put down$$,'similar','wins',false),
- ($$staying in on a friday. i used to feel bad about it but tonight it just feels like rest$$,'similar','mind',false);
+ ($$staying in on a friday. i used to feel bad about it but tonight it just feels like rest$$,'similar','mind',false),
+ ($$finally told my counselor the real reason i've been off and didn't downplay it. felt like setting down a backpack$$,'similar','mind',true),
+ ($$my mom hugged me for no reason today and i had to pretend i had something in my eye$$,'similar','wins',false),
+ ($$how do you get over the fear that everyone secretly finds you annoying$$,'advice','mind',false),
+ ($$spent my whole allowance on books instead of clothes again. no regrets, my shelf is my happy place$$,'similar','wins',false),
+ ($$got left on read by someone i really like and now i'm composing entire novels in my head$$,'listen','vent',false),
+ ($$my little sister drew our family and put me in the middle. didn't know i mattered that much to her$$,'similar','wins',false),
+ ($$anyone else clean their room only when avoiding a bigger problem. it's spotless. that's a bad sign$$,'similar','mind',false),
+ ($$i've been the "funny one" so long i don't know how to just be sad in front of people$$,'listen','mind',true),
+ ($$tried a new hobby and was terrible at it and had the best time. forgot being bad at things could be fun$$,'similar','wins',false),
+ ($$how do you tell your friend group you're drifting without it turning into a whole thing$$,'advice','vent',false),
+ ($$got a B on a test i thought i bombed and i've been grinning like an idiot all afternoon$$,'similar','wins',false),
+ ($$my dad and i don't talk much but he fixed my bike without me asking. that's kind of his love language$$,'similar','culture',false),
+ ($$does anyone else feel homesick for a place that doesn't exist anymore$$,'similar','culture',false),
+ ($$wore something bright today instead of hiding in black and two people said i looked happy. maybe i am$$,'similar','wins',false),
+ ($$how do you stop replaying an argument you already lost days ago$$,'advice','mind',false),
+ ($$beat my own time on the track. no one was watching but me and that felt right$$,'similar','wins',false),
+ ($$my grandma keeps asking when i'll "find someone" and i can't tell her i'm still finding me$$,'listen','identity',false),
+ ($$skipped lunch to study and my friend silently slid half their sandwich over. didn't say a word. almost lost it$$,'similar','wins',false),
+ ($$anyone know how to actually start journaling without feeling stupid writing to yourself$$,'resources','mind',false),
+ ($$said "i'm proud of you" to myself in the mirror and felt ridiculous and then kind of not$$,'similar','wins',false),
+ ($$everyone in class laughed at a joke i made and for a second i felt like i belonged there$$,'similar','school',false),
+ ($$how do you deal with a friend who competes with you over everything, even bad days$$,'advice','vent',false),
+ ($$got my braces off and i can't stop smiling which is convenient$$,'similar','wins',false),
+ ($$my parents are proud of my grades but never ask if i'm okay and i don't know how to bring it up$$,'listen','mind',true),
+ ($$spent an hour helping a stranger find the right bus and it weirdly fixed my whole mood$$,'similar','wins',false),
+ ($$does the sunday night dread ever go away or do we all just live with it$$,'similar','mind',false),
+ ($$raised my hand even though i wasn't 100% sure. got it wrong. world didn't end$$,'similar','school',false),
+ ($$my best friend remembered my coffee order after i mentioned it once. small stuff like that keeps me going$$,'similar','wins',false),
+ ($$how do you forgive yourself for stuff you did when you were younger and didn't know better$$,'advice','mind',true),
+ ($$planted some seeds in a cup on my windowsill. checking them every morning like they'll talk back$$,'similar','wins',false);
 
 -- ============================================================
 --  A) Real auth.users accounts. handle_new_user() auto-creates profiles.
@@ -265,39 +298,49 @@ end $$;
 alter table stories   disable trigger user;
 alter table umbrellas disable trigger user;
 
--- C) ACTIVE bots post NON-ANONYMOUSLY: posts_per_day posts on each day since signup
+-- C) ACTIVE bots post NON-ANONYMOUSLY. Each pool line is used EXACTLY ONCE
+--    (no repeated text anywhere in the feed), assigned to a random active bot,
+--    posted at a random time within that bot's active window.
 insert into stories (author_id, author_name, anonymous, text, intent, category,
                      content_warning, umbrella_count, state, seed, seed_batch, created_at)
-select u.id, b.username, false, p.text, p.intent, p.category, p.cw,
+select a.id, a.username, false, bp.text, bp.intent, bp.category, bp.cw,
        0, 'live', true, 3,
-       now() - make_interval(days => d) - (random() * interval '13 hours')
-from _bots b
-join auth.users u on u.email = b.email
-cross join generate_series(0, b.signup_days_ago) d
-cross join generate_series(1, b.posts_per_day) k
-cross join lateral (select text, intent, category, cw from _bot_posts order by random() limit 1) p
-where b.is_lurker = false;
+       now() - make_interval(days => a.sd) + (random() * make_interval(days => a.sd)) - interval '1 hour'
+from _bot_posts bp
+cross join lateral (
+  select u.id, b.username, greatest(b.signup_days_ago, 1) as sd
+  from _bots b join auth.users u on u.email = b.email
+  where b.is_lurker = false
+  order by random() limit 1
+) a;
 
 -- D) Umbrellas — give each post its OWN varied number of real umbrellas so the
---    counts look natural, not a flat wall of 50. Per-post target is skewed toward
---    lower numbers with a HARD CAP of 60. The givers are sampled from the bot
---    fleet WEIGHTED by behaviour: lurkers give the most, then active bots by their
---    bot_umbrellas_per_day. Never the post's own author; no duplicates.
---    created_at is spread between the post's time and now → umbrellas land across
---    days (feeds the activity_by_day umbrellas series and today's count).
+--    counts look natural, not a flat wall. Each story gets a target that's skewed
+--    toward lower numbers with a HARD CAP of 60 (computed per-row in the SELECT
+--    list, so it genuinely varies — a random() in LIMIT is evaluated only once
+--    per query and would make every post identical). Givers are sampled from the
+--    fleet WEIGHTED by behaviour: lurkers heaviest, then actives by their rate.
+with tgt as (
+  select s.id as story_id, s.author_id, s.created_at,
+         least(60, 2 + floor(power(random(), 2.0) * 85)::int) as target   -- 2..60, skewed low
+  from stories s
+  where s.state = 'live'
+),
+ranked as (
+  select t.story_id, t.created_at, t.target, p.id as user_id,
+         row_number() over (
+           partition by t.story_id
+           order by power(random(), 1.0 / (case when p.bot_kind = 'lurker'
+                                                then 12 else coalesce(p.bot_umbrellas_per_day, 3) end)) desc
+         ) as rn
+  from tgt t
+  join profiles p
+    on p.is_bot and (t.author_id is null or p.id <> t.author_id)   -- never self (trigger is off)
+)
 insert into umbrellas (story_id, user_id, created_at)
-select s.id, b.id, s.created_at + random() * (now() - s.created_at)
-from stories s
-cross join lateral (
-  select p.id
-  from profiles p
-  where p.is_bot
-    and (s.author_id is null or p.id <> s.author_id)               -- never self (trigger is off)
-  order by power(random(), 1.0 / (case when p.bot_kind = 'lurker'
-                                       then 12 else coalesce(p.bot_umbrellas_per_day, 3) end)) desc
-  limit least(60, 2 + floor(power(random(), 2.0) * 85)::int)       -- 2..60, skewed low, capped at 60
-) b
-where s.state = 'live'
+select story_id, user_id, created_at + random() * (now() - created_at)
+from ranked
+where rn <= target
 on conflict (story_id, user_id) do nothing;
 
 -- ============================================================
