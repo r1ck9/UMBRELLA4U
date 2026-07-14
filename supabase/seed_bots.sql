@@ -329,30 +329,34 @@ end $$;
 --    real anonymous-support platform rather than 100% named accounts. Either way
 --    author_id is kept, so every post still counts toward that bot's stats.
 --    Posts are SPREAD EVENLY across the window (with jitter) — a steady drip.
+with active_bots as (   -- shuffled, numbered active bots
+  select u.id, b.username, row_number() over (order by random()) as brn
+  from _bots b join auth.users u on u.email = b.email
+  where b.is_lurker = false
+),
+posts as (              -- shuffled, numbered posts (+ per-post anonymity roll)
+  select bp.text, bp.intent, bp.category, bp.cw,
+         row_number() over (order by random()) as rn,
+         count(*) over () as tot,
+         (random() < 0.25) as anon        -- ~25% anonymous, ~75% show their name
+  from _bot_posts bp
+)
 insert into stories (author_id, author_name, anonymous, text, intent, category,
                      content_warning, umbrella_count, state, seed, seed_batch, created_at)
-select a.id,
-       case when q.anon then null else a.username end,   -- name hidden when anonymous
-       q.anon,
-       q.text, q.intent, q.category, q.cw,
+select act.id,
+       case when p.anon then null else act.username end,   -- name hidden when anonymous
+       p.anon,
+       p.text, p.intent, p.category, p.cw,
        0, 'live', true, 3,
        least(
          now() - interval '5 minutes',
          now() - make_interval(days => 30)
-              + (q.rn::float / q.tot) * make_interval(days => 30)
+              + (p.rn::float / p.tot) * make_interval(days => 30)
               + (random() - 0.5) * interval '10 hours'
        )
-from (
-  select bp.*, row_number() over (order by random()) as rn, count(*) over () as tot,
-         (random() < 0.25) as anon        -- ~25% anonymous, ~75% show their name
-  from _bot_posts bp
-) q
-cross join lateral (
-  select u.id, b.username
-  from _bots b join auth.users u on u.email = b.email
-  where b.is_lurker = false
-  order by random() limit 1
-) a;
+from posts p
+-- each post → a DIFFERENT bot (distinct while #posts ≤ #active bots; wraps beyond)
+join active_bots act on act.brn = 1 + ((p.rn - 1) % (select count(*) from active_bots));
 
 -- Signups over time: each posting bot joined 1–4 days before its first post;
 -- non-posting bots (lurkers etc.) joined at a random point in the window. This
