@@ -343,6 +343,7 @@ end $$;
 -- ============================================================
 --  Measurement view (backed by real rows → agrees with the site)
 -- ============================================================
+drop view if exists bot_metrics;   -- prior version had different columns; recreate cleanly
 create or replace view bot_metrics as
 select
   p.id, p.username, p.display_name, p.bot_kind,
