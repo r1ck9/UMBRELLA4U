@@ -21,7 +21,8 @@
 --    - Real auth.users rows (fake @bots.umbrella4u.ca emails) → handle_new_user
 --      auto-creates their profiles → they count in registration analytics.
 --    - Fake handle-style names (e.g. "Quiet Harbor"), NOT real personal names.
---    - Posts are NON-ANONYMOUS (author_id + author_name set, anonymous=false).
+--    - MOST posts are non-anonymous (name shown); ~25% are anonymous (name
+--      hidden) for realism. author_id is kept either way, so all posts count.
 --    - Umbrellas are REAL rows in the umbrellas table.
 --    - umbrella_count / hug_count / umbrellas_sent / post_count are RECOMPUTED
 --      from the actual rows for every story & profile, so every count surface
@@ -322,13 +323,18 @@ end $$;
 --  the fast wipe.) Counts are recomputed set-based afterwards, then re-enabled.
 -- ============================================================
 
--- C) ACTIVE bots post NON-ANONYMOUSLY. Each pool line is used EXACTLY ONCE
---    (no repeated text in the feed), assigned to a random active bot. Posts are
---    SPREAD EVENLY across the whole window (with a few hours of jitter) so the
---    feed reads as a steady drip over time, not a staged dump.
+-- C) ACTIVE bots post. Each pool line is used EXACTLY ONCE (no repeated text in
+--    the feed), assigned to a random active bot. MOST posts show the bot's name
+--    (non-anonymous); ~25% are anonymous (name hidden) so the feed looks like a
+--    real anonymous-support platform rather than 100% named accounts. Either way
+--    author_id is kept, so every post still counts toward that bot's stats.
+--    Posts are SPREAD EVENLY across the window (with jitter) — a steady drip.
 insert into stories (author_id, author_name, anonymous, text, intent, category,
                      content_warning, umbrella_count, state, seed, seed_batch, created_at)
-select a.id, a.username, false, q.text, q.intent, q.category, q.cw,
+select a.id,
+       case when q.anon then null else a.username end,   -- name hidden when anonymous
+       q.anon,
+       q.text, q.intent, q.category, q.cw,
        0, 'live', true, 3,
        least(
          now() - interval '5 minutes',
@@ -337,7 +343,8 @@ select a.id, a.username, false, q.text, q.intent, q.category, q.cw,
               + (random() - 0.5) * interval '10 hours'
        )
 from (
-  select bp.*, row_number() over (order by random()) as rn, count(*) over () as tot
+  select bp.*, row_number() over (order by random()) as rn, count(*) over () as tot,
+         (random() < 0.25) as anon        -- ~25% anonymous, ~75% show their name
   from _bot_posts bp
 ) q
 cross join lateral (
@@ -453,7 +460,8 @@ drop table if exists _bot_posts;
 select 'bots total'            as metric, count(*)::bigint as value from profiles where is_bot
 union all select 'active bots',  count(*) from profiles where bot_kind='active'
 union all select 'lurker bots',  count(*) from profiles where bot_kind='lurker'
-union all select 'bot posts (non-anon)', count(*) from stories where seed_batch=3 and anonymous=false and author_name is not null
+union all select 'bot posts (named)',     count(*) from stories where seed_batch=3 and anonymous=false and author_name is not null
+union all select 'bot posts (anonymous)', count(*) from stories where seed_batch=3 and anonymous=true
 union all select 'umbrella ROWS by bots', (select count(*) from umbrellas u join profiles p on p.id=u.user_id where p.is_bot)
 union all select 'umbrella ROWS total',   (select count(*) from umbrellas)
 union all select 'community umbrella total (sum umbrella_count)',
