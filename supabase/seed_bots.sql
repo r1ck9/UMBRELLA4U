@@ -82,17 +82,21 @@ create table _bots (
   signup_days_ago int, is_lurker boolean, posts_per_day int, umbrellas_per_day int
 );
 
+--  Usernames come in MANY styles (dotted, hyphenated, concatenated, gamer xx_..,
+--  number suffixes/prefixes, the_..) so the fleet doesn't look templated.
+--  Uniqueness is guaranteed: number-free styles use a bijection on i (distinct
+--  word pairs), numbered styles embed the unique value (100+i).
 insert into _bots (n, email, username, display_name, pronouns, status_weather,
                    about_me, accent_color, signup_days_ago, is_lurker, posts_per_day, umbrellas_per_day)
 select
   i,
-  lower(adj[1+(i*3)%40] || '_' || nn[1+(i*7)%40] || '_' || i) || '@bots.umbrella4u.ca',
-  lower(adj[1+(i*3)%40] || '_' || nn[1+(i*7)%40] || '_' || i),
-  initcap(adj[1+(i*3)%40]) || ' ' || initcap(nn[1+(i*7)%40]),
-  pr[1+i%4],
-  wx[1+i%6],
-  bio[1+i%8],
-  col[1+i%10],
+  h.handle || '@bots.umbrella4u.ca',
+  h.handle,
+  h.disp,
+  arr.pr[1+i%4],
+  arr.wx[1+i%6],
+  arr.bio[1+i%8],
+  arr.col[1+i%10],
   (i*5) % cfg.window_days,
   (i > cfg.active),
   case when i > cfg.active then 0 else 1 + i%3 end,
@@ -114,7 +118,23 @@ cross join (select
         'night owl, bad texter.','trying to be kinder to myself.','new here, saying hi.',
         'quiet but i read everything.','one day at a time.'] bio,
   array['#e8913c','#7c9cbf','#c96f8f','#5aa88a','#8a7bc8','#4f9d9d','#b98b52','#d98b4a','#6b8fb5','#cf7b6b'] col
-) arr;
+) arr
+cross join lateral (
+  select
+    lower(case i % 8
+      -- numbered styles: unique via (100+i); words can repeat
+      when 0 then arr.adj[1+((i-1)*3)%40] || arr.nn[1+((i-1)*7)%40] || (100+i)::text  -- sleepyfox142
+      when 4 then arr.adj[1+((i-1)*3)%40] || (100+i)::text                            -- willow142
+      when 6 then arr.adj[1+((i-1)*3)%40] || '_' || (100+i)::text                     -- fox_142
+      when 7 then (100+i)::text || arr.adj[1+((i-1)*3)%40]                            -- 142willow
+      -- number-free styles: unique via bijection (i-1)%40 , (i-1)/40
+      when 1 then arr.adj[1+(i-1)%40] || '_' || arr.nn[1+(i-1)/40]                    -- quiet_harbor
+      when 2 then arr.adj[1+(i-1)%40] || '.' || arr.nn[1+(i-1)/40]                    -- late.willow
+      when 3 then 'xx_' || arr.adj[1+(i-1)%40] || '_' || arr.nn[1+(i-1)/40] || '_xx'  -- xx_ember_fox_xx
+      else 'the_' || arr.adj[1+(i-1)%40] || '_' || arr.nn[1+(i-1)/40]                 -- the_quiet_harbor (s=5)
+    end) as handle,
+    initcap(arr.adj[1+(i-1)%40]) || ' ' || initcap(arr.nn[1+(i-1)/40]) as disp
+) h;
 
 -- ============================================================
 --  Content pool (drawn from at random for active bots' posts).
