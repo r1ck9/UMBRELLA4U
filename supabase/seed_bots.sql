@@ -34,7 +34,7 @@
 --
 --  Performance: triggers on stories/umbrellas are disabled during the bulk load
 --  and re-enabled after; counts are recomputed in a few set-based UPDATEs. If
---  the SQL editor times out, lower window_days in _cfg and re-run.
+--  the SQL editor times out, lower the inlined window/fleet numbers and re-run.
 --
 --  Undo everything:
 --    delete from umbrellas u using profiles p where u.user_id=p.id and p.is_bot;
@@ -56,14 +56,13 @@ alter table stories add column if not exists seed       boolean default false;
 alter table stories add column if not exists seed_batch int;
 alter table stories add column if not exists hug_count  int default 0;
 
--- give the run plenty of headroom (best effort; ignored if the editor caps it)
-set statement_timeout = '600s';
-
 -- ---------- config (TUNE HERE) ----------
---  window_days = how many days of history to spread posts/umbrellas across.
-drop table if exists _cfg;
-create table _cfg (active int, lurker int, window_days int);
-insert into _cfg values (150, 50, 30);
+--  These three numbers are inlined below (search to change them):
+--    * 150  = active bots
+--    * 50   = lurker bots        (fleet total = 150 + 50 = 200)
+--    * 30   = window_days  (how many days of history to spread activity across)
+--  (kept as literals, not a config table, because the SQL editor doesn't reliably
+--   carry a helper table between statements.)
 
 -- ============================================================
 --  Wipe any previous bot fleet (incl. the old real-name personas).
@@ -106,12 +105,11 @@ select
   arr.wx[1+i%6],
   arr.bio[1+i%8],
   arr.col[1+i%10],
-  (i*5) % cfg.window_days,
-  (i > cfg.active),
-  case when i > cfg.active then 0 else 1 + i%3 end,
-  case when i > cfg.active then 0 else 3 + i%6 end
-from _cfg cfg
-cross join generate_series(1, cfg.active + cfg.lurker) i
+  (i*5) % 30,                       -- signup spread over the window (overridden later)
+  (i > 150),                        -- bots 151..200 are lurkers
+  case when i > 150 then 0 else 1 + i%3 end,
+  case when i > 150 then 0 else 3 + i%6 end
+from generate_series(1, 150 + 50) i
 cross join (select
   array['quiet','soft','late','half','low','spare','tired','breezy','foggy','stormy',
         'pocket','paper','velvet','amber','hollow','copper','silver','rusty','misty','crimson',
@@ -334,15 +332,14 @@ select a.id, a.username, false, q.text, q.intent, q.category, q.cw,
        0, 'live', true, 3,
        least(
          now() - interval '5 minutes',
-         now() - make_interval(days => cfg.window_days)
-              + (q.rn::float / q.tot) * make_interval(days => cfg.window_days)
+         now() - make_interval(days => 30)
+              + (q.rn::float / q.tot) * make_interval(days => 30)
               + (random() - 0.5) * interval '10 hours'
        )
 from (
   select bp.*, row_number() over (order by random()) as rn, count(*) over () as tot
   from _bot_posts bp
 ) q
-cross join _cfg cfg
 cross join lateral (
   select u.id, b.username
   from _bots b join auth.users u on u.email = b.email
@@ -357,7 +354,7 @@ update profiles p set created_at = s.first_post - (interval '1 day' + random() *
 from (select author_id, min(created_at) first_post from stories where seed_batch = 3 group by author_id) s
 where p.id = s.author_id;
 
-update profiles p set created_at = now() - (random() * make_interval(days => (select window_days from _cfg)))
+update profiles p set created_at = now() - (random() * make_interval(days => 30))
 where p.is_bot
   and not exists (select 1 from stories s where s.author_id = p.id and s.seed_batch = 3);
 
@@ -449,7 +446,6 @@ grant select on bot_metrics to authenticated;
 
 drop table if exists _bots;
 drop table if exists _bot_posts;
-drop table if exists _cfg;
 
 -- ============================================================
 --  VERIFY
