@@ -1,141 +1,213 @@
 -- ============================================================
---  Umbrella — SEED BOTS (real, measurable, non-anonymous accounts)
+--  Umbrella — SEED BOTS v2 (200 measurable, non-anonymous accounts)
 --
---  SOCIAL-EXPERIMENT SEED. Per CLAUDE.md: this project is a private social
---  experiment, not public-facing, and bot-generated data is an intended part
---  of it. Everything here is scoped strictly to this project.
+--  Private seed/simulation data for this project only. Run ONCE in the Supabase
+--  SQL Editor. Safe + idempotent (wipes and rebuilds all bot data each run).
 --
---  What this does (run ONCE in the Supabase SQL Editor — safe to re-run):
---    0. Adds is_bot on profiles + a bot_metrics view  → the MEASUREMENT layer.
---    A. Creates real auth.users bot accounts (fake emails). The handle_new_user
---       trigger auto-creates their profiles row, so they DO count in the
---       registration analytics (profiles / activity_by_day registrations).
---    B. Gives each bot a real profile (username, display name, bio) and posts
---       Stories NON-ANONYMOUSLY (author_id + author_name set, anonymous=false),
---       so their name shows on every post and on their /u/<username> page.
---    C. Bots open umbrellas on each other's + the existing seed posts. These are
---       REAL rows in the umbrellas table, so the triggers bump:
---         - stories.umbrella_count      (→ community_umbrellas() grand total)
---         - profiles.umbrellas_sent     (per-bot "umbrellas given")
---       and the rows feed community_pulse (umbrellas_today), engagement_stats,
---       and activity_by_day. Counts are backed by real rows in EVERY surface.
---    D. Aligns hug_count = umbrella_count (project invariant: an umbrella is a hug).
---    E. Backfills user_activity so bots also register as ACTIVE users (if that
---       table exists).
+--  Fleet:
+--    * 150 ACTIVE bots  — each has a customized per-day behaviour:
+--        bot_posts_per_day (1..3) and bot_umbrellas_per_day (3..8),
+--        played out across a 14-day window (tunable in _cfg below).
+--    * 50 LURKER bots   — post nothing; open an umbrella on EVERY live post.
 --
---  Undo everything this created:
+--  Everything is REAL and row-backed:
+--    - Real auth.users rows (fake @bots.umbrella4u.ca emails) → handle_new_user
+--      auto-creates their profiles → they count in registration analytics.
+--    - Fake handle-style names (e.g. "Quiet Harbor"), NOT real personal names.
+--    - Posts are NON-ANONYMOUS (author_id + author_name set, anonymous=false).
+--    - Umbrellas are REAL rows in the umbrellas table.
+--    - umbrella_count / hug_count / umbrellas_sent / post_count are RECOMPUTED
+--      from the actual rows for every story & profile, so every count surface
+--      (community_umbrellas, community_pulse, engagement_stats, activity_by_day,
+--      profile stats) agrees and is backed by real rows.
+--
+--  NOTE: because counts are recomputed from real rows, any previously hand-set
+--  fake counts (e.g. the old exact 3000 total / 15-floor) are replaced by the
+--  real totals — which are LARGER now (every post gets ~50 lurker umbrellas).
+--
+--  Performance: triggers on stories/umbrellas are disabled during the bulk load
+--  and re-enabled after; counts are recomputed in a few set-based UPDATEs. If
+--  the SQL editor times out, lower window_days in _cfg and re-run.
+--
+--  Undo everything:
 --    delete from umbrellas u using profiles p where u.user_id=p.id and p.is_bot;
 --    delete from stories where seed_batch = 3;
---    delete from auth.users where email like '%@bots.umbrella4u.ca';
+--    delete from auth.users u using profiles p where p.id=u.id and p.is_bot;
+--  (then optionally re-run the count recompute block at the bottom manually)
 -- ============================================================
 
--- ---------- 0) MEASUREMENT: is_bot flag (keeps bots inside registration data) ----------
-alter table profiles add column if not exists is_bot boolean default false;
+-- ---------- measurement / behaviour columns ----------
+alter table profiles add column if not exists is_bot                boolean default false;
+alter table profiles add column if not exists bot_kind              text;     -- 'active' | 'lurker'
+alter table profiles add column if not exists bot_posts_per_day     int;
+alter table profiles add column if not exists bot_umbrellas_per_day int;
 comment on column profiles.is_bot is
-  'Social-experiment marker. TRUE = seeded bot account. Bots are otherwise real users (real auth row, real profile, real posts/umbrellas) so they still count in every metric; this flag lets you segment them out.';
+  'Seed marker. TRUE = simulated bot account. Bots are otherwise real users so they still count in every metric; this flag lets you segment them out.';
 create index if not exists idx_profiles_is_bot on profiles(is_bot) where is_bot;
 
--- guard columns that other migrations may not have installed yet
-alter table stories  add column if not exists seed       boolean default false;
-alter table stories  add column if not exists seed_batch int;
-alter table stories  add column if not exists hug_count  int default 0;
+alter table stories add column if not exists seed       boolean default false;
+alter table stories add column if not exists seed_batch int;
+alter table stories add column if not exists hug_count  int default 0;
+
+-- ---------- config (TUNE HERE) ----------
+drop table if exists _cfg;
+create table _cfg (active int, lurker int, window_days int);
+insert into _cfg values (150, 50, 14);
 
 -- ============================================================
---  Persona + post source data (temp tables, dropped at end)
+--  Wipe any previous bot fleet (incl. the old real-name personas)
+--  Order matters: child rows first, then the auth users (profiles cascade).
 -- ============================================================
--- NOTE: regular (not TEMP) tables on purpose. The Supabase SQL Editor runs
--- statements over a pooled connection, so a TEMP table created in one statement
--- is gone by the next ("relation _bots does not exist"). Regular tables are
--- committed and visible across statements; we drop them again at the end.
+delete from umbrellas u using profiles p where u.user_id = p.id and p.is_bot;
+delete from stories where seed_batch = 3;
+delete from stories s using profiles p where s.author_id = p.id and p.is_bot;
+delete from auth.users u using profiles p where p.id = u.id and p.is_bot;
+delete from auth.users where email like '%@bots.umbrella4u.ca';
+
+-- ============================================================
+--  Generate 200 bot identities with FAKE handle-style names.
+--  username = adjective_noun_<n> (unique via n); display_name = "Adjective Noun".
+-- ============================================================
 drop table if exists _bots;
 create table _bots (
-  email text, username text, display_name text, pronouns text,
-  status_weather text, about_me text, accent_color text, signup_days_ago int
+  n int, email text, username text, display_name text, pronouns text,
+  status_weather text, about_me text, accent_color text,
+  signup_days_ago int, is_lurker boolean, posts_per_day int, umbrellas_per_day int
 );
 
-insert into _bots (email, username, display_name, pronouns, status_weather, about_me, accent_color, signup_days_ago) values
- ('quiet_september@bots.umbrella4u.ca','quiet_september','Quiet September','she/her','partly cloudy','grade 11. i overthink texts for like an hour before sending them.','#7c9cbf',28),
- ('mattie_draws@bots.umbrella4u.ca','mattie_draws','Mattie','they/them','clearing up','draws on everything including my hands. bad at math, worse at feelings.','#c96f8f',27),
- ('notthatdeep@bots.umbrella4u.ca','notthatdeep','Ash','he/him','foggy','saying it out loud is the hard part so i type it instead.','#5aa88a',26),
- ('sam_afterdark@bots.umbrella4u.ca','sam_afterdark','Sam','she/they','stormy','night owl. everything feels bigger at 2am and i know it.','#8a7bc8',25),
- ('leaf_on_water@bots.umbrella4u.ca','leaf_on_water','Rue','she/her','drizzle','trying to float instead of sink this year.','#4f9d9d',24),
- ('tired_but_here@bots.umbrella4u.ca','tired_but_here','Devon','he/him','overcast','showing up counts even when it is barely.','#b98b52',23),
- ('juno_maps@bots.umbrella4u.ca','juno_maps','Juno','she/her','sunny','collect bus routes and playlists. moved cities twice.','#d98b4a',22),
- ('the_backrow_kid@bots.umbrella4u.ca','the_backrow_kid','Theo','he/him','partly cloudy','sit in the back so nobody calls on me. hi anyway.','#6b8fb5',21),
- ('raincheck_ren@bots.umbrella4u.ca','raincheck_ren','Ren','they/them','light rain','cancel plans then feel bad about it. working on it.','#a879b8',20),
- ('okay_ish@bots.umbrella4u.ca','okay_ish','Priya','she/her','clearing up','fine is a whole personality and i am tired of it.','#cf7b6b',19),
- ('half_moon_noor@bots.umbrella4u.ca','half_moon_noor','Noor','she/her','breezy','two homes, two languages, one very confused brain.','#5a9bd4',18),
- ('dev_null_kid@bots.umbrella4u.ca','dev_null_kid','Marcus','he/him','clear','codes when i cant sleep. talking to people is the real bug.','#4fae7a',17),
- ('pocket_sun@bots.umbrella4u.ca','pocket_sun','Lily','she/her','sunny','small wins person. i will celebrate literally anything.','#e0a13c',16),
- ('late_bus_liv@bots.umbrella4u.ca','late_bus_liv','Liv','she/her','windy','always running for the bus. always missing it.','#c86f9e',15),
- ('chess_club_dropout@bots.umbrella4u.ca','chess_club_dropout','Omar','he/him','overcast','quit the thing i was good at because it stopped being fun.','#7a8bbf',14),
- ('soft_launch_kai@bots.umbrella4u.ca','soft_launch_kai','Kai','he/they','partly cloudy','testing out being more myself in small doses.','#6fb0a0',13),
- ('two_languages@bots.umbrella4u.ca','two_languages','Elif','she/her','clearing up','i think in one language and dream in another.','#4f9dc4',12),
- ('the_understudy@bots.umbrella4u.ca','the_understudy','Grace','she/her','drizzle','always second choice. practising being okay with that.','#b57bb0',11),
- ('practically_nocturnal@bots.umbrella4u.ca','practically_nocturnal','Zeke','he/him','stormy','sleep schedule is a rumor at this point.','#7b6fc4',10),
- ('min_or_maj@bots.umbrella4u.ca','min_or_maj','Cass','they/them','breezy','music kid. everything reminds me of a song.','#5aa8a0',9),
- ('hallway_ghost@bots.umbrella4u.ca','hallway_ghost','Wren','she/they','foggy','people look through me a lot. maybe thats a superpower.','#8f8fb5',8),
- ('not_a_morning_person@bots.umbrella4u.ca','not_a_morning_person','Jonah','he/him','overcast','7am first period should be illegal.','#c98b52',5),
- ('spare_key_ella@bots.umbrella4u.ca','spare_key_ella','Ella','she/her','clearing up','the friend everyone vents to. nobody asks me back.','#d97b8a',3),
- ('low_battery_lu@bots.umbrella4u.ca','low_battery_lu','Lu','she/her','light rain','running on 12% most days. still running though.','#6f9bc4',2);
-
-drop table if exists _bot_posts;
-create table _bot_posts (username text, text text, intent text, category text, cw boolean);
-
-insert into _bot_posts (username, text, intent, category, cw) values
- ('quiet_september', $$i rewrote a text to my friend like nine times and then just didn't send it. anyone else do this or is it just me$$, 'similar','mind', false),
- ('quiet_september', $$got picked last in gym again. i'm 16 and it still does something to me i can't explain.$$, 'listen','school', false),
- ('mattie_draws', $$my art teacher held up my sketch to the class as a good example and i wanted to disappear AND live forever at the same time$$, 'similar','wins', false),
- ('mattie_draws', $$how do you tell your parents you want to do something creative when they only see it as a hobby$$, 'advice','culture', false),
- ('notthatdeep', $$told my brother i was struggling and he said "just don't think about it." cool. fixed. thanks.$$, 'listen','vent', false),
- ('notthatdeep', $$anyone got a way to actually fall asleep when your brain starts replaying every dumb thing you've ever done$$, 'advice','mind', true),
- ('sam_afterdark', $$it's 2am and everything feels like the end of the world and i KNOW it won't in the morning but right now it's real$$, 'similar','mind', true),
- ('sam_afterdark', $$made it through a whole week without a 2am spiral. posting so future me remembers it's possible.$$, 'similar','wins', false),
- ('leaf_on_water', $$i said no to a party i didn't want to go to and didn't make up a fake excuse. just no. felt huge.$$, 'similar','wins', false),
- ('leaf_on_water', $$does anyone else feel like they're the side character in their own friend group$$, 'similar','mind', false),
- ('tired_but_here', $$didn't do anything impressive today. got up, went to school, came home. counting it as a win anyway.$$, 'similar','wins', false),
- ('tired_but_here', $$how do you keep going when you're not failing exactly but nothing feels like it matters$$, 'advice','mind', true),
- ('juno_maps', $$moved schools mid-year again. i've gotten really good at the "new kid" walk and i hate that i'm good at it.$$, 'listen','culture', false),
- ('juno_maps', $$made an actual friend today. we bonded over hating the same song on the radio. small but it's something.$$, 'similar','wins', false),
- ('the_backrow_kid', $$the teacher called on me and my mind went completely blank even though i knew it. now i'm replaying it forever.$$, 'similar','school', false),
- ('the_backrow_kid', $$any tips for talking in class without your voice going all shaky$$, 'advice','school', false),
- ('raincheck_ren', $$i cancelled on my friends again and now i feel guilty AND relieved and i don't know what that says about me$$, 'listen','mind', false),
- ('raincheck_ren', $$how do you explain to people that you like them but also need to be alone a lot without them taking it personally$$, 'advice','identity', false),
- ('okay_ish', $$someone asked how i was and i said "good" so fast it scared me. when did that become automatic$$, 'listen','mind', true),
- ('okay_ish', $$i got my chem grade up from a fail to a pass and nobody at home noticed but i'm proud so i'm telling you guys$$, 'similar','wins', false),
- ('half_moon_noor', $$i translate for my mom at every doctor and bank appointment. i'm 15. sometimes i just want to be the kid.$$, 'listen','culture', false),
- ('half_moon_noor', $$anyone else feel not enough of either culture you're from. like you're standing in a doorway.$$, 'similar','identity', false),
- ('dev_null_kid', $$i can build a whole app but i can't send a text to a girl. explain that.$$, 'similar','identity', false),
- ('dev_null_kid', $$stayed up til 4 fixing one bug and it was a missing comma. i wanted to throw my laptop into the sea.$$, 'listen','vent', false),
- ('pocket_sun', $$i watered my plant and it didn't die and honestly that's the highlight of my week and i'm okay with that$$, 'similar','wins', false),
- ('pocket_sun', $$reminder to whoever needs it: you're allowed to be proud of stuff that seems small to everyone else$$, 'listen','mind', false),
- ('late_bus_liv', $$missed the bus, got soaked, showed up late, and the teacher made a comment in front of everyone. cool day.$$, 'listen','vent', false),
- ('late_bus_liv', $$how do you stop caring so much what people think when your whole brain is wired to care$$, 'advice','mind', false),
- ('chess_club_dropout', $$i quit the one thing i was actually good at because it stopped being fun and now people keep asking why$$, 'listen','identity', false),
- ('chess_club_dropout', $$is it normal to feel relieved and sad about the same decision at the same time$$, 'similar','mind', false),
- ('soft_launch_kai', $$asked one friend to use a different name for me and they just... did it. no big deal to them, huge to me.$$, 'similar','identity', true),
- ('soft_launch_kai', $$trying to be more myself but in small doses so it's less scary. baby steps are still steps right$$, 'similar','wins', false),
- ('two_languages', $$i said a word wrong in english today and someone laughed and i've thought about it approximately 400 times since$$, 'listen','culture', false),
- ('two_languages', $$found one other person at school who speaks my first language and we just lit up. missed that sound so much.$$, 'similar','wins', false),
- ('the_understudy', $$i'm always the backup plan. the second call. i know i shouldn't take it personal but it's wearing me down.$$, 'listen','mind', true),
- ('the_understudy', $$how do you actually believe you matter when the evidence keeps saying you're everyone's plan B$$, 'advice','mind', true),
- ('practically_nocturnal', $$my sleep schedule is completely destroyed and every adult acts like i can just "fix" it by wanting to$$, 'listen','vent', false),
- ('practically_nocturnal', $$anyone got things that actually help wind down at night. my brain treats bedtime as brainstorm time.$$, 'resources','mind', false),
- ('min_or_maj', $$put my headphones in and a song came on that felt like it knew exactly what today was. music is unreal sometimes.$$, 'similar','mind', false),
- ('min_or_maj', $$played a song i wrote for one person and they liked it. i've never been that scared and that happy.$$, 'similar','wins', false),
- ('hallway_ghost', $$people talk over me constantly and i've started to wonder if i'd have to yell to be noticed at all$$, 'listen','mind', false),
- ('hallway_ghost', $$does being invisible ever flip into feeling free instead of lonely for anyone or is that just a cope$$, 'similar','identity', false),
- ('not_a_morning_person', $$first period at 7am is a crime and my brain doesn't switch on til lunch. anyone else just surviving mornings$$, 'similar','school', false),
- ('spare_key_ella', $$i'm the one everyone vents to. today i needed someone and realized i don't really have a person for that.$$, 'listen','mind', true),
- ('spare_key_ella', $$how do you ask for support when you've always been the "strong friend" and people assume you're fine$$, 'advice','mind', false),
- ('low_battery_lu', $$running on empty but i still made it to the end of the day. that's the whole update. still here.$$, 'similar','wins', true),
- ('low_battery_lu', $$is it burnout if you're 16. asking because i feel it in my bones and everyone says i'm too young for that.$$, 'advice','mind', true);
+insert into _bots (n, email, username, display_name, pronouns, status_weather,
+                   about_me, accent_color, signup_days_ago, is_lurker, posts_per_day, umbrellas_per_day)
+select
+  i,
+  lower(adj[1+(i*3)%40] || '_' || nn[1+(i*7)%40] || '_' || i) || '@bots.umbrella4u.ca',
+  lower(adj[1+(i*3)%40] || '_' || nn[1+(i*7)%40] || '_' || i),
+  initcap(adj[1+(i*3)%40]) || ' ' || initcap(nn[1+(i*7)%40]),
+  pr[1+i%4],
+  wx[1+i%6],
+  bio[1+i%8],
+  col[1+i%10],
+  (i*5) % cfg.window_days,
+  (i > cfg.active),
+  case when i > cfg.active then 0 else 1 + i%3 end,
+  case when i > cfg.active then 0 else 3 + i%6 end
+from _cfg cfg
+cross join generate_series(1, cfg.active + cfg.lurker) i
+cross join (select
+  array['quiet','soft','late','half','low','spare','tired','breezy','foggy','stormy',
+        'pocket','paper','velvet','amber','hollow','copper','silver','rusty','misty','crimson',
+        'dusty','golden','frosted','shy','wander','drift','restless','sleepy','electric','neon',
+        'muted','faded','distant','hidden','folded','autumn','winter','summer','ember','still'] adj,
+  array['harbor','ember','willow','sparrow','comet','pebble','lantern','meadow','river','fox',
+        'moth','tide','fern','cedar','finch','maple','robin','otter','heron','birch',
+        'wren','clover','marsh','dune','reef','vale','glen','brook','frost','haze',
+        'signal','echo','orbit','pixel','lark','sage','wisp','cove','ridge','stone'] nn,
+  array['she/her','he/him','they/them','she/they'] pr,
+  array['sunny','partly cloudy','overcast','light rain','foggy','clearing up'] wx,
+  array['just here to listen mostly.','small wins person.','overthinker in training.',
+        'night owl, bad texter.','trying to be kinder to myself.','new here, saying hi.',
+        'quiet but i read everything.','one day at a time.'] bio,
+  array['#e8913c','#7c9cbf','#c96f8f','#5aa88a','#8a7bc8','#4f9d9d','#b98b52','#d98b4a','#6b8fb5','#cf7b6b'] col
+) arr;
 
 -- ============================================================
---  A) Create the real auth.users accounts (fake emails)
---     handle_new_user() fires → a profiles row is created automatically.
---     Only inserts emails that don't already exist → safe to re-run.
---     Fixed dummy bcrypt hash: bots never log in, so no pgcrypto dependency.
+--  Content pool (drawn from at random for active bots' posts).
+-- ============================================================
+drop table if exists _bot_posts;
+create table _bot_posts (text text, intent text, category text, cw boolean);
+insert into _bot_posts (text, intent, category, cw) values
+ ($$i rewrote a text to my friend like nine times and then just didn't send it. anyone else do this$$,'similar','mind',false),
+ ($$got picked last in gym again. i'm 16 and it still does something to me i can't explain.$$,'listen','school',false),
+ ($$my art teacher held up my sketch as a good example and i wanted to disappear AND live forever$$,'similar','wins',false),
+ ($$how do you tell your parents you want to do something creative when they only see it as a hobby$$,'advice','culture',false),
+ ($$told my brother i was struggling and he said "just don't think about it." cool. fixed. thanks.$$,'listen','vent',false),
+ ($$anyone got a way to fall asleep when your brain replays every dumb thing you've ever done$$,'advice','mind',true),
+ ($$it's 2am and everything feels like the end of the world and i KNOW it won't be by morning$$,'similar','mind',true),
+ ($$made it a whole week without a 2am spiral. posting so future me remembers it's possible.$$,'similar','wins',false),
+ ($$i said no to a party i didn't want to go to and didn't make a fake excuse. just no. felt huge.$$,'similar','wins',false),
+ ($$does anyone else feel like they're the side character in their own friend group$$,'similar','mind',false),
+ ($$didn't do anything impressive today. got up, went to school, came home. counting it as a win.$$,'similar','wins',false),
+ ($$how do you keep going when nothing feels like it matters but you're not failing exactly$$,'advice','mind',true),
+ ($$moved schools mid-year again. i've gotten too good at the "new kid" walk and i hate that.$$,'listen','culture',false),
+ ($$made an actual friend today. we bonded over hating the same song. small but it's something.$$,'similar','wins',false),
+ ($$teacher called on me and my mind went blank even though i knew it. replaying it forever now.$$,'similar','school',false),
+ ($$any tips for talking in class without your voice going all shaky$$,'advice','school',false),
+ ($$cancelled on my friends again and now i feel guilty AND relieved and idk what that says$$,'listen','mind',false),
+ ($$how do you explain you like someone but need to be alone a lot without them taking it personally$$,'advice','identity',false),
+ ($$someone asked how i was and i said "good" so fast it scared me. when did that get automatic$$,'listen','mind',true),
+ ($$got my chem grade from a fail to a pass. nobody at home noticed but i'm proud so i'm telling you$$,'similar','wins',false),
+ ($$i translate for my mom at every appointment. i'm 15. sometimes i just want to be the kid.$$,'listen','culture',false),
+ ($$anyone else feel not enough of either culture you're from. like you're standing in a doorway.$$,'similar','identity',false),
+ ($$i can build a whole app but can't send a text to a girl. explain that.$$,'similar','identity',false),
+ ($$stayed up til 4 fixing a bug and it was a missing comma. wanted to throw my laptop into the sea.$$,'listen','vent',false),
+ ($$i watered my plant and it didn't die and that's the highlight of my week and i'm okay with that$$,'similar','wins',false),
+ ($$reminder: you're allowed to be proud of stuff that seems small to everyone else$$,'listen','mind',false),
+ ($$missed the bus, got soaked, showed up late, teacher made a comment in front of everyone. cool day.$$,'listen','vent',false),
+ ($$how do you stop caring what people think when your whole brain is wired to care$$,'advice','mind',false),
+ ($$quit the one thing i was good at because it stopped being fun and now people keep asking why$$,'listen','identity',false),
+ ($$is it normal to feel relieved and sad about the same decision at the same time$$,'similar','mind',false),
+ ($$asked one friend to use a different name for me and they just did it. huge to me.$$,'similar','identity',true),
+ ($$trying to be more myself but in small doses so it's less scary. baby steps are still steps right$$,'similar','wins',false),
+ ($$said a word wrong in english today, someone laughed, and i've replayed it about 400 times since$$,'listen','culture',false),
+ ($$found one other person at school who speaks my first language and we lit up. missed that sound.$$,'similar','wins',false),
+ ($$i'm always the backup plan. the second call. it's wearing me down more than i let on.$$,'listen','mind',true),
+ ($$how do you believe you matter when the evidence keeps saying you're everyone's plan B$$,'advice','mind',true),
+ ($$my sleep schedule is destroyed and adults act like i can just "fix" it by wanting to$$,'listen','vent',false),
+ ($$anyone got things that actually help wind down at night. my brain treats bedtime as brainstorm time$$,'resources','mind',false),
+ ($$put my headphones in and a song came on that felt like it knew exactly what today was$$,'similar','mind',false),
+ ($$played a song i wrote for one person and they liked it. never been that scared and that happy.$$,'similar','wins',false),
+ ($$people talk over me constantly and i've started wondering if i'd have to yell to be noticed$$,'listen','mind',false),
+ ($$does being invisible ever flip into feeling free instead of lonely or is that just a cope$$,'similar','identity',false),
+ ($$first period at 7am is a crime and my brain doesn't switch on til lunch$$,'similar','school',false),
+ ($$i'm the one everyone vents to. today i needed someone and realized i don't have a person for that.$$,'listen','mind',true),
+ ($$how do you ask for support when you've always been the "strong friend"$$,'advice','mind',false),
+ ($$running on empty but i made it to the end of the day. that's the whole update. still here.$$,'similar','wins',true),
+ ($$is it burnout if you're 16. everyone says i'm too young but i feel it in my bones.$$,'advice','mind',true),
+ ($$how do i stop reading into every little thing my friends say. i replay conversations for days$$,'advice','mind',false),
+ ($$got my report card and it was better than last term. nobody clapped so i'm clapping for myself$$,'similar','wins',false),
+ ($$my parents fight in the next room and i just put my headphones in and pretend. anyone else$$,'listen','vent',false),
+ ($$tried out for a solo in choir. didn't get it. cried in the bathroom then got a slushie. balance$$,'similar','mind',false),
+ ($$how do you make yourself do homework when your brain just refuses to cooperate$$,'advice','school',false),
+ ($$someone sat with me at lunch today without me asking. i almost cried into my sandwich$$,'similar','wins',false),
+ ($$deleted the app that makes me feel bad about myself. day one. wish me luck$$,'similar','wins',false),
+ ($$does anyone else feel like they're just waiting for their life to start$$,'similar','mind',false),
+ ($$told my mom i was sad and she asked what i had to be sad about. i don't have an answer she'd accept$$,'listen','mind',true),
+ ($$finished a whole assignment a day early for once. who even am i$$,'similar','wins',false),
+ ($$i keep saying yes to things i don't want to do because no feels impossible. tips?$$,'advice','identity',false),
+ ($$my dog is the only one who doesn't want anything from me and that's why i love him$$,'listen','mind',false),
+ ($$everyone's getting into relationships and i've never even held hands and i feel behind$$,'similar','identity',false),
+ ($$got complimented on something i was insecure about and i've been floating all day$$,'similar','wins',false),
+ ($$how do you deal with a parent who reads your texts and calls it "keeping you safe"$$,'advice','vent',false),
+ ($$i laughed for real today for the first time in a while. forgot what that felt like$$,'similar','mind',false),
+ ($$tired of being the "smart one" like that's my whole personality and if i slip everyone panics$$,'listen','school',false),
+ ($$moved somewhere new where i don't know the slang and i feel like i'm learning a whole language$$,'listen','culture',false),
+ ($$anyone know how to stop biting your nails when you're stressed. it's bad$$,'resources','mind',false),
+ ($$wrote in a journal a week straight. small but the longest i've stuck to anything$$,'similar','wins',false),
+ ($$my best friend has a new best friend and i'm trying to be normal about it and failing$$,'listen','mind',false),
+ ($$what do you do when you're proud of yourself but there's nobody to tell$$,'similar','mind',false),
+ ($$faked being sick to skip a presentation and now i have to do it monday anyway. genius$$,'listen','school',false),
+ ($$someone remembered a small thing i mentioned once and it made my whole week$$,'similar','wins',false),
+ ($$how do you know if you actually need help or if you're just being dramatic$$,'advice','mind',true),
+ ($$cleaned my closet and found a shirt from when i was little and just sat there for a while$$,'listen','mind',false),
+ ($$tired of pretending i don't care when i very much do care$$,'listen','vent',false),
+ ($$got through a panic attack at school by myself in the bathroom. still shaking but i did it$$,'similar','mind',true),
+ ($$does it get easier or do you just get used to it$$,'similar','mind',true),
+ ($$my little cousin thinks i'm the coolest person alive and honestly that's keeping me going$$,'similar','wins',false),
+ ($$how do you make friends as a teen when everyone already has their groups locked in$$,'advice','school',false),
+ ($$said what i actually thought in class instead of the safe answer. felt dangerous and good$$,'similar','school',false),
+ ($$everyone keeps saying these are the best years of my life and that's kind of terrifying$$,'listen','mind',false),
+ ($$found a song that made me feel understood and played it 40 times. counts as therapy right$$,'similar','mind',false),
+ ($$scared to grow up and scared to stay the same and that's a fun combo$$,'listen','identity',false),
+ ($$told my crush i liked their jacket. that's the whole interaction. counting it as brave$$,'similar','wins',false),
+ ($$how do you stop comparing your behind-the-scenes to everyone else's highlight reel$$,'advice','mind',false),
+ ($$grades slipped and instead of yelling my teacher asked if i was okay. wasn't ready for that$$,'listen','school',false),
+ ($$been waking up early to watch the sunrise. it's the only quiet i get all day$$,'similar','mind',false),
+ ($$anyone else rehearse phone calls before making them$$,'similar','mind',false),
+ ($$forgave someone today, not for them, for me. weird how heavy that was to put down$$,'similar','wins',false),
+ ($$staying in on a friday. i used to feel bad about it but tonight it just feels like rest$$,'similar','mind',false);
+
+-- ============================================================
+--  A) Real auth.users accounts. handle_new_user() auto-creates profiles.
+--     Fixed dummy bcrypt hash: bots never log in (no pgcrypto dependency).
 -- ============================================================
 insert into auth.users (
   id, instance_id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -143,115 +215,117 @@ insert into auth.users (
   confirmation_token, recovery_token, email_change_token_new, email_change
 )
 select
-  gen_random_uuid(),
-  '00000000-0000-0000-0000-000000000000',
-  'authenticated', 'authenticated',
-  b.email,
+  gen_random_uuid(), '00000000-0000-0000-0000-000000000000',
+  'authenticated', 'authenticated', b.email,
   '$2a$10$C6UzMDM.H6dfI/f/IKcEeO3.q0G9y4Qb0m0oK7Z3sJ8b0Xw5m5s2',
-  now() - (b.signup_days_ago || ' days')::interval,
-  now() - (b.signup_days_ago || ' days')::interval,
-  now() - (b.signup_days_ago || ' days')::interval,
+  now() - make_interval(days => b.signup_days_ago),
+  now() - make_interval(days => b.signup_days_ago),
+  now() - make_interval(days => b.signup_days_ago),
   '{"provider":"email","providers":["email"]}'::jsonb,
   jsonb_build_object('username', b.username, 'is_bot', true),
   '', '', '', ''
 from _bots b
 where not exists (select 1 from auth.users u where u.email = b.email);
 
--- ============================================================
---  B) Fill in each bot's profile (real identity, marked is_bot).
---     Spread profiles.created_at across signup dates so the per-day
---     REGISTRATIONS series in activity_by_day() shows a real curve.
--- ============================================================
+-- B) Fill in each bot's real profile (identity + behaviour + spread signup date)
 update profiles p set
-  is_bot         = true,
+  is_bot                = true,
+  bot_kind              = case when b.is_lurker then 'lurker' else 'active' end,
+  bot_posts_per_day     = b.posts_per_day,
+  bot_umbrellas_per_day = b.umbrellas_per_day,
   username       = b.username,
   display_name   = b.display_name,
   pronouns       = b.pronouns,
   status_weather = b.status_weather,
   about_me       = b.about_me,
   accent_color   = b.accent_color,
-  created_at     = now() - (b.signup_days_ago || ' days')::interval
-from _bots b
-join auth.users u on u.email = b.email
+  created_at     = now() - make_interval(days => b.signup_days_ago)
+from _bots b join auth.users u on u.email = b.email
 where p.id = u.id;
 
--- onboarded / discoverable are optional columns in some installs — set if present
 do $$
 begin
-  if exists (select 1 from information_schema.columns
-             where table_name='profiles' and column_name='onboarded') then
-    update profiles p set onboarded = true from _bots b
-    join auth.users u on u.email=b.email where p.id=u.id;
+  if exists (select 1 from information_schema.columns where table_name='profiles' and column_name='onboarded') then
+    update profiles set onboarded = true where is_bot;
   end if;
-  if exists (select 1 from information_schema.columns
-             where table_name='profiles' and column_name='discoverable') then
-    update profiles p set discoverable = true from _bots b
-    join auth.users u on u.email=b.email where p.id=u.id;
+  if exists (select 1 from information_schema.columns where table_name='profiles' and column_name='discoverable') then
+    update profiles set discoverable = true where is_bot;
   end if;
 end $$;
 
 -- ============================================================
---  C) Bot Stories — posted NON-ANONYMOUSLY.
---     Disable trg_story_author (it forces author_id := auth.uid(), which is NULL
---     in the SQL editor) so we can set the real author + name ourselves.
---     Idempotent: clear this batch (and bot-given umbrellas) first.
+--  Bulk load. Disable ALL user triggers on stories/umbrellas for speed and to
+--  avoid side effects (notifications, moderation) + set authors ourselves.
+--  Counts are recomputed set-based afterwards, then triggers re-enabled.
 -- ============================================================
-delete from umbrellas u using profiles p where u.user_id = p.id and p.is_bot;  -- clear prior bot umbrellas
-delete from stories where seed_batch = 3;                                       -- clear prior bot posts
+alter table stories   disable trigger user;
+alter table umbrellas disable trigger user;
 
-alter table stories disable trigger trg_story_author;
-
+-- C) ACTIVE bots post NON-ANONYMOUSLY: posts_per_day posts on each day since signup
 insert into stories (author_id, author_name, anonymous, text, intent, category,
                      content_warning, umbrella_count, state, seed, seed_batch, created_at)
-select
-  u.id,
-  bp.username,                      -- name shows → NOT anonymous
-  false,                            -- explicitly un-anonymous
-  bp.text, bp.intent, bp.category, bp.cw,
-  0,                                -- real umbrella rows (Part D) drive the count
-  'live', true, 3,
-  -- posted at some point between signup and now
-  (now() - (b.signup_days_ago || ' days')::interval)
-    + random() * (now() - (now() - (b.signup_days_ago || ' days')::interval))
-from _bot_posts bp
-join _bots b       on b.username = bp.username
-join auth.users u  on u.email   = b.email;
+select u.id, b.username, false, p.text, p.intent, p.category, p.cw,
+       0, 'live', true, 3,
+       now() - make_interval(days => d) - (random() * interval '13 hours')
+from _bots b
+join auth.users u on u.email = b.email
+cross join generate_series(0, b.signup_days_ago) d
+cross join generate_series(1, b.posts_per_day) k
+cross join lateral (select text, intent, category, cw from _bot_posts order by random() limit 1) p
+where b.is_lurker = false;
 
-alter table stories enable trigger trg_story_author;
-
--- ============================================================
---  D) Bots open umbrellas — REAL rows in the umbrellas table.
---     Each bot umbrellas a random spread of OTHER people's live posts (bot posts
---     + the existing anonymous seed posts). Never their own (trg_no_self_umbrella),
---     never a dup (unique story_id,user_id).
---     Triggers then bump: stories.umbrella_count, profiles.umbrellas_sent.
---     created_at spread over the last 10 days so some land TODAY → they also
---     show up in community_pulse.umbrellas_today.
--- ============================================================
+-- D) ACTIVE bots open umbrellas_per_day umbrellas each day on OTHER people's posts
 insert into umbrellas (story_id, user_id, created_at)
-select s.id, botp.id,
-       greatest(s.created_at, now() - interval '10 days')
-         + random() * (now() - greatest(s.created_at, now() - interval '10 days'))
-from (select p.id from profiles p where p.is_bot) botp
+select s.id, u.id, now() - make_interval(days => d) - (random() * interval '6 hours')
+from _bots b
+join auth.users u on u.email = b.email
+cross join generate_series(0, b.signup_days_ago) d
 cross join lateral (
-  select s.id, s.created_at
-  from stories s
+  select s.id from stories s
   where s.state = 'live'
-    and (s.author_id is null or s.author_id <> botp.id)   -- never self-umbrella
+    and (s.author_id is null or s.author_id <> u.id)          -- never self (trigger is off)
+    and s.created_at <= now() - make_interval(days => d) + interval '1 day'
   order by random()
-  limit (14 + floor(random() * 24)::int)                  -- each bot: ~14–37 umbrellas
+  limit b.umbrellas_per_day
 ) s
+where b.is_lurker = false
+on conflict (story_id, user_id) do nothing;
+
+-- E) LURKER bots open an umbrella on EVERY live post (and nothing else)
+insert into umbrellas (story_id, user_id, created_at)
+select s.id, u.id, s.created_at + random() * (now() - s.created_at)
+from _bots b
+join auth.users u on u.email = b.email
+cross join stories s
+where b.is_lurker = true and s.state = 'live'
 on conflict (story_id, user_id) do nothing;
 
 -- ============================================================
---  E) Keep the invariant: an umbrella is a hug → hug_count = umbrella_count
+--  Recompute EVERY denormalized count from the real rows (row-backed truth).
 -- ============================================================
-update stories set hug_count = umbrella_count where hug_count is distinct from umbrella_count;
+update stories s set umbrella_count = coalesce(c.n, 0), hug_count = coalesce(c.n, 0)
+from (select story_id, count(*) n from umbrellas group by story_id) c
+where s.id = c.story_id;
+update stories set umbrella_count = 0, hug_count = 0
+where id not in (select story_id from umbrellas);
 
--- ============================================================
---  F) Register bots as ACTIVE users too (only if user_activity exists).
---     Mirrors analytics_active_and_registrations.sql's backfill for bot rows.
--- ============================================================
+update profiles p set umbrellas_sent = coalesce(c.n, 0)
+from (select user_id, count(*) n from umbrellas group by user_id) c
+where p.id = c.user_id;
+update profiles set umbrellas_sent = 0
+where id not in (select user_id from umbrellas);
+
+update profiles p set post_count = coalesce(c.n, 0)
+from (select author_id, count(*) n from stories where author_id is not null group by author_id) c
+where p.id = c.author_id;
+update profiles set post_count = 0
+where id not in (select author_id from stories where author_id is not null);
+
+-- re-enable triggers
+alter table stories   enable trigger user;
+alter table umbrellas enable trigger user;
+
+-- F) Register bots as ACTIVE users too (only if user_activity exists)
 do $$
 begin
   if to_regclass('public.user_activity') is not null then
@@ -267,42 +341,40 @@ begin
 end $$;
 
 -- ============================================================
---  0b) MEASUREMENT: per-bot metrics view (for the assignment)
---      Everything here is backed by real rows, so it agrees with the site.
+--  Measurement view (backed by real rows → agrees with the site)
 -- ============================================================
 create or replace view bot_metrics as
 select
-  p.id,
-  p.username,
-  p.display_name,
-  p.created_at                                                              as joined_at,
-  coalesce((select count(*) from stories s
-              where s.author_id = p.id and s.state = 'live'), 0)            as posts,
-  coalesce((select count(*) from umbrellas u where u.user_id = p.id), 0)    as umbrellas_given,
-  coalesce((select sum(s.umbrella_count) from stories s
-              where s.author_id = p.id), 0)                                 as umbrellas_received
+  p.id, p.username, p.display_name, p.bot_kind,
+  p.bot_posts_per_day, p.bot_umbrellas_per_day,
+  p.created_at as joined_at,
+  coalesce((select count(*) from stories s where s.author_id = p.id and s.state='live'), 0) as posts,
+  coalesce((select count(*) from umbrellas u where u.user_id = p.id), 0)                    as umbrellas_given,
+  coalesce((select sum(s.umbrella_count) from stories s where s.author_id = p.id), 0)       as umbrellas_received
 from profiles p
 where p.is_bot
-order by p.created_at;
+order by p.bot_kind, p.username;
 grant select on bot_metrics to authenticated;
 
 drop table if exists _bots;
 drop table if exists _bot_posts;
+drop table if exists _cfg;
 
 -- ============================================================
---  VERIFY — confirm the seed landed and every count is real-row-backed
+--  VERIFY
 -- ============================================================
-select 'bots'                as metric, count(*)::bigint as value from profiles where is_bot
-union all
-select 'bot posts',            count(*)          from stories   where seed_batch = 3
-union all
-select 'bot posts (non-anon)', count(*)          from stories   where seed_batch = 3 and anonymous = false and author_name is not null
-union all
-select 'umbrella ROWS by bots',count(*)          from umbrellas u join profiles p on p.id=u.user_id where p.is_bot
-union all
-select 'community_umbrellas()',community_umbrellas()
-union all
-select 'umbrellas_today (pulse)', (select umbrellas_today from community_pulse());
+select 'bots total'            as metric, count(*)::bigint as value from profiles where is_bot
+union all select 'active bots',  count(*) from profiles where bot_kind='active'
+union all select 'lurker bots',  count(*) from profiles where bot_kind='lurker'
+union all select 'bot posts (non-anon)', count(*) from stories where seed_batch=3 and anonymous=false and author_name is not null
+union all select 'umbrella ROWS by bots', (select count(*) from umbrellas u join profiles p on p.id=u.user_id where p.is_bot)
+union all select 'umbrella ROWS total',   (select count(*) from umbrellas)
+union all select 'community umbrella total (sum umbrella_count)',
+                                           (select coalesce(sum(umbrella_count),0) from stories where state='live')
+union all select 'umbrellas today',
+                                           (select count(*) from umbrellas
+                                            where (created_at at time zone 'America/Vancouver')::date
+                                                = (now() at time zone 'America/Vancouver')::date);
 
--- Per-bot breakdown:
-select * from bot_metrics;
+select bot_kind, count(*) bots, sum(posts) posts, sum(umbrellas_given) umbrellas_given
+from bot_metrics group by bot_kind;
