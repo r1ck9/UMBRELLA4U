@@ -6,3 +6,6 @@ node_modules
 # stray folders GitHub Desktop created — keep them out of the app repo
 /UMBRELLA4U/
 /Umbrella for real/
+
+# project rule kept local-only (not for the remote yet)
+/CLAUDE.md
