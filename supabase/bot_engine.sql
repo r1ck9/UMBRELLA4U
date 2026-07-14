@@ -197,16 +197,16 @@ begin
       ((now() at time zone 'America/Vancouver')::date - (greatest(days, 1) - 1))::timestamp,
       (now() at time zone 'America/Vancouver')::date::timestamp, interval '1 day') d
   ),
-  st as (select (s.created_at at time zone 'America/Vancouver')::date day, count(*) c
+  st as (select (s.created_at at time zone 'America/Vancouver')::date as day, count(*) as c
          from public.stories s join public.profiles pr on pr.id = s.author_id
          where not coalesce(pr.is_bot, false) group by 1),
-  um as (select (u.created_at at time zone 'America/Vancouver')::date day, count(*) c
+  um as (select (u.created_at at time zone 'America/Vancouver')::date as day, count(*) as c
          from public.umbrellas u join public.profiles pr on pr.id = u.user_id
          where not coalesce(pr.is_bot, false) group by 1),
-  au as (select ua.day, count(*) c
+  au as (select ua.day as day, count(*) as c
          from public.user_activity ua join public.profiles pr on pr.id = ua.user_id
          where not coalesce(pr.is_bot, false) group by 1),
-  rg as (select (pr.created_at at time zone 'America/Vancouver')::date day, count(*) c
+  rg as (select (pr.created_at at time zone 'America/Vancouver')::date as day, count(*) as c
          from public.profiles pr where not coalesce(pr.is_bot, false) group by 1)
   select sp.day,
          coalesce(dv.views_real, 0)::bigint,
