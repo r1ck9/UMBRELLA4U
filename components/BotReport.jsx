@@ -5,6 +5,15 @@ import { getMe } from '@/lib/me'
 
 function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '…' : t }
 const statusColor = { complete: '#2e9e6b', 'on track': '#3f6fa3', behind: '#d98329' }
+function nextLabel(secs) {
+  if (secs == null) return 'done'
+  const n = Number(secs)
+  if (n <= 0) return 'due now'
+  const m = Math.round(n / 60)
+  if (m < 60) return '~' + m + 'm'
+  const h = Math.floor(m / 60)
+  return '~' + h + 'h ' + (m % 60) + 'm'
+}
 
 function Sparkline({ data, range }) {
   const counts = (data || []).map((h) => Number(h.n) || 0)
@@ -123,6 +132,7 @@ export default function BotReport() {
               <th style={{ padding: '6px 8px', width: 120 }}>Fill</th>
               <th style={{ padding: '6px 8px' }}>Real</th>
               <th style={{ padding: '6px 8px' }}>Status</th>
+              <th style={{ padding: '6px 8px' }}>Next like</th>
             </tr>
           </thead>
           <tbody>
@@ -144,6 +154,7 @@ export default function BotReport() {
                 <td style={{ padding: '8px' }}>
                   <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || '#3f6fa3' }}>{p.drip_status}</span>
                 </td>
+                <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3,#888)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.next_secs)}</td>
               </tr>
             ))}
           </tbody>

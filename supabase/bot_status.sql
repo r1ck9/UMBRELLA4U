@@ -77,7 +77,7 @@ grant execute on function bot_status() to authenticated;
 -- ============================================================
 create or replace function bot_report_posts(n int default 30)
 returns table(post_excerpt text, cat text, is_anon boolean, posted_at timestamptz,
-              target_n int, bot_likes bigint, real_likes bigint, pct int, drip_status text)
+              target_n int, bot_likes bigint, real_likes bigint, pct int, drip_status text, next_secs bigint)
 language plpgsql security definer set search_path = public stable as $$
 begin
   if not exists (select 1 from profiles where id = auth.uid() and is_moderator) then
@@ -99,7 +99,11 @@ begin
          round(least(r.bl, r.tg)::numeric / nullif(r.tg, 0) * 100)::int,
          case when r.bl >= r.tg then 'complete'
               when r.bl >= r.due then 'on track'
-              else 'behind' end
+              else 'behind' end,
+         case when r.bl >= r.tg then null
+              else greatest(0, extract(epoch from
+                     (r.ca + ((r.bl + 1)::numeric / nullif(r.tg, 0)) * interval '24 hours') - now()))::bigint
+         end
   from r
   order by r.ca desc
   limit greatest(1, n);

@@ -377,7 +377,7 @@ where p.is_bot
 --    fleet WEIGHTED by behaviour: lurkers heaviest, then actives by their rate.
 with tgt as (
   select s.id as story_id, s.author_id, s.created_at,
-         least(60, 2 + floor(power(random(), 2.0) * 85)::int) as target   -- 2..60, skewed low
+         (8 + floor(random() * 51)::int) as target   -- 8..58, flat spread (no pile-up at a cap)
   from stories s
   where s.state = 'live'
 ),

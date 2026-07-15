@@ -67,7 +67,8 @@ begin
            (select count(*) from umbrellas u join profiles p on p.id = u.user_id
             where u.story_id = s.id and p.is_bot) as have,
            floor(s.umbrella_target
-                 * least(1.0, extract(epoch from (now() - s.created_at)) / 86400.0))::int as due
+                 * least(1.0, extract(epoch from (now() - s.created_at)) / 86400.0)
+                 + (random() - 0.5) * 1.2)::int as due   -- ±0.6 jitter → irregular spacing
     from stories s
     where s.state = 'live' and s.umbrella_target is not null
   ),
