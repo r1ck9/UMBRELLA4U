@@ -11,6 +11,9 @@ returns table(metric text, value text)
 language plpgsql security definer set search_path = public stable as $$
 declare cron_line text; sched int; lastrun text;
 begin
+  if not exists (select 1 from profiles where id = auth.uid() and is_moderator) then
+    raise exception using message = 'not_authorized';
+  end if;
   -- pg_cron / drip-engine health
   if to_regclass('cron.job') is null then
     cron_line := '⚠ NOT enabled — drip is not running automatically';
@@ -67,5 +70,42 @@ begin
 end $$;
 grant execute on function bot_status() to authenticated;
 
--- show it now
-select * from bot_status();
+-- ============================================================
+--  Per-post fake-like breakdown for the mod panel: which real posts the bots
+--  are boosting, how far each has filled toward its target, and its schedule
+--  status. Moderator-only.
+-- ============================================================
+create or replace function bot_report_posts(n int default 30)
+returns table(post_excerpt text, cat text, is_anon boolean, posted_at timestamptz,
+              target_n int, bot_likes bigint, real_likes bigint, pct int, drip_status text)
+language plpgsql security definer set search_path = public stable as $$
+begin
+  if not exists (select 1 from profiles where id = auth.uid() and is_moderator) then
+    raise exception using message = 'not_authorized';
+  end if;
+  return query
+  with r as (
+    select s.id, left(s.text, 90) as ex, s.category as cg, s.anonymous as an,
+           s.created_at as ca, s.umbrella_target as tg,
+           (select count(*) from umbrellas u join profiles p on p.id = u.user_id
+            where u.story_id = s.id and p.is_bot) as bl,
+           (select count(*) from umbrellas u join profiles p on p.id = u.user_id
+            where u.story_id = s.id and not coalesce(p.is_bot, false)) as rl,
+           floor(s.umbrella_target * least(1.0, extract(epoch from now() - s.created_at) / 86400.0)) as due
+    from stories s
+    where s.state = 'live' and s.umbrella_target is not null
+  )
+  select r.ex, r.cg, r.an, r.ca, r.tg, r.bl, r.rl,
+         round(least(r.bl, r.tg)::numeric / nullif(r.tg, 0) * 100)::int,
+         case when r.bl >= r.tg then 'complete'
+              when r.bl >= r.due then 'on track'
+              else 'behind' end
+  from r
+  order by r.ca desc
+  limit greatest(1, n);
+end $$;
+grant execute on function bot_report_posts(int) to authenticated;
+
+-- View it in the Moderation panel (you're signed in as a moderator there).
+-- These functions are moderator-gated, so calling them in the SQL editor
+-- (where there's no logged-in user) will report not_authorized — that's expected.
