@@ -6,7 +6,7 @@ export default function Landing() {
     <>
       <IntroHero />
       <section className="introabout">
-        <h2>What Umbrella is</h2>
+        <h2>What Haven is</h2>
         <p className="lead">
           Umbrella is a space for young people to share what&apos;s really going on — the hard days,
           the small wins, the things you can&apos;t say out loud yet — and to feel less alone.
@@ -33,7 +33,7 @@ export default function Landing() {
         </div>
       </section>
       <footer className="site-footer">
-        <div>☂ Umbrella — peer support, not a substitute for professional or crisis help.</div>
+        <div>☂ Haven — peer support, not a substitute for professional or crisis help.</div>
         <nav>
           <Link href="/welcome">How it works</Link>
           <Link href="/resources">Resources</Link>

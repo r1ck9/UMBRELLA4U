@@ -200,7 +200,7 @@ export default function Onboarding() {
         <div className="onb-nav">
           {step > 0 && <button className="btn ghost sm" onClick={() => setStep(step - 1)}>Back</button>}
           {step < 4 && <button className="btn prim sm" onClick={() => setStep(step + 1)}>Continue</button>}
-          {step === 4 && <button className="btn prim sm" disabled={!agreed || saving} onClick={finish}>{saving ? 'Setting up…' : 'Enter Umbrella ☂'}</button>}
+          {step === 4 && <button className="btn prim sm" disabled={!agreed || saving} onClick={finish}>{saving ? 'Setting up…' : 'Enter Haven ☂'}</button>}
         </div>
       </main>
     </>

@@ -151,7 +151,7 @@ export default function IntroHero() {
     <section className="introhero">
       <canvas ref={ref} className="introcanvas" aria-hidden="true" />
       <div className="inner">
-        <div className="ih-brand">☂ Umbrella</div>
+        <div className="ih-brand">☂ Haven</div>
         <h1>A place to say what you actually feel.</h1>
         <p>An anonymous community where young people share what they&apos;re going through — and show up for each other. No real names. No pile-ons. No judgment.</p>
         <div className="cta">

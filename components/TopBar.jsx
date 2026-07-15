@@ -64,12 +64,12 @@ export default function TopBar() {
   return (
     <header className="topbar">
       <MobileMenu />
-      <Link href="/feed" className="brand" title="Back to the main feed">☂ Umbrella</Link>
+      <Link href="/feed" className="brand" title="Back to the main feed">☂ Haven</Link>
       <form className="tb-search" onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`) }}>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
       </form>
       <div className="tb-right">
-        <Link href="/welcome" className="tb-help" title="How to use Umbrella">?</Link>
+        <Link href="/welcome" className="tb-help" title="How to use Haven">?</Link>
         {email ? (
           <>
             <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn">{unread}</span>}</Link>

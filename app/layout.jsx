@@ -8,7 +8,7 @@ import PushRegistrar from '@/components/PushRegistrar'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata = {
-  title: 'Umbrella — come in from the rain',
+  title: 'Haven — come in from the rain',
   description: "An anonymous space to share what you're carrying — and to know someone will stand with you."
 }
 

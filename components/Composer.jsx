@@ -226,7 +226,7 @@ export default function Composer() {
           <div className="modal-box" role="dialog" aria-label="Agree to community guidelines">
             <h2>Before you share</h2>
             <p className="care-line">We know struggling is hard. Please keep your words safe and kind — to yourself, and to everyone else here. 🫂</p>
-            <p className="ms-sub">A quick reminder — this keeps Umbrella safe for everyone.</p>
+            <p className="ms-sub">A quick reminder — this keeps Haven safe for everyone.</p>
             <ul className="rulelist">
               {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
             </ul>

@@ -73,7 +73,7 @@ export default function Settings() {
           <div className="set-group">
             <h3>Account</h3>
             <p className="set-line"><Link href="/profile">Edit your profile →</Link></p>
-            <p className="set-line"><Link href="/welcome">How Umbrella works &amp; why you’re safe →</Link></p>
+            <p className="set-line"><Link href="/welcome">How Haven works &amp; why you’re safe →</Link></p>
             <button className="btn ghost sm" onClick={logoutEverywhere}>Log out of all devices</button>
           </div>
         </main>
