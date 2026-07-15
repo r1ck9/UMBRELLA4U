@@ -3,9 +3,9 @@
 --  re-run. Complements seed_bots.sql. Private project only.
 --
 --  Does four things:
---   1. When a REAL person posts a story, it gets an umbrella_target of ~50
---      (sometimes up to ~120). A pg_cron job then DRIPS bot umbrellas onto it a
---      few at a time so the count climbs over hours, not all at once.
+--   1. When a REAL person posts a story, it gets an umbrella_target of ~50. A
+--      pg_cron job DRIPS bot umbrellas onto it on a 24-hour schedule, so the
+--      count climbs to ~50 gradually across the first day, not all at once.
 --   2. Every new real post is queued for the owner to reply to (owner_reply_queue)
 --      and surfaced in the Moderation page (pending_reply_posts()). Replying via
 --      reply_as_bot() posts your words as a member, so it lands in the poster's
@@ -42,7 +42,7 @@ begin
   if bot_author then return null; end if;
 
   -- target 50..120, skewed toward ~50, occasionally near 120
-  update stories set umbrella_target = 50 + floor(power(random(), 2.0) * 70)::int
+  update stories set umbrella_target = 45 + floor(random() * 11)::int   -- ~50 (45–55) over 24h
    where id = new.id and umbrella_target is null;
 
   insert into owner_reply_queue (story_id) values (new.id) on conflict do nothing;
@@ -53,32 +53,33 @@ create trigger trg_on_new_story after insert on stories
   for each row execute function on_new_story();
 
 -- ============================================================
---  2) The drip. Adds a FEW bot umbrellas per eligible post each run, so counts
---     rise gradually. Triggers stay enabled here (small volume), so umbrella_count
---     bumps normally. "have" counts only BOT umbrellas already on the post.
+--  2) The drip, paced over a 24-HOUR schedule. For each post: due = target ×
+--     (age / 24h). So a post climbs to ~50 umbrellas gradually across its first
+--     day, then stops. Runs every few minutes via pg_cron (below); each run just
+--     tops a post up to where the schedule says it should be (max a few per run,
+--     so nothing lands in a burst). "have" = bot umbrellas so far.
 -- ============================================================
 create or replace function drip_umbrellas() returns void
 language plpgsql security definer set search_path = public as $$
 begin
-  with need as (
+  with prog as (
     select s.id as story_id, s.author_id,
-           s.umbrella_target - (
-             select count(*) from umbrellas u join profiles p on p.id = u.user_id
-             where u.story_id = s.id and p.is_bot
-           ) as remaining
+           (select count(*) from umbrellas u join profiles p on p.id = u.user_id
+            where u.story_id = s.id and p.is_bot) as have,
+           floor(s.umbrella_target
+                 * least(1.0, extract(epoch from (now() - s.created_at)) / 86400.0))::int as due
     from stories s
     where s.state = 'live' and s.umbrella_target is not null
   ),
   picks as (
-    select story_id, author_id,
-           least(remaining, 1 + floor(random() * 3)::int) as add_n   -- 1..3 per run
-    from need
-    where remaining > 0
+    select story_id, author_id, least(due - have, 6)::int as add_n   -- catch up to schedule, max 6/run
+    from prog
+    where due > have
     order by random()
-    limit 300                                                        -- cap posts touched per run
+    limit 400                                                        -- cap posts touched per run
   )
   insert into umbrellas (story_id, user_id, created_at)
-  select pk.story_id, b.id, now() - (random() * interval '20 minutes')
+  select pk.story_id, b.id, now() - (random() * interval '4 minutes')
   from picks pk
   cross join lateral (
     select p.id from profiles p
@@ -228,14 +229,46 @@ grant execute on function activity_by_day(int) to anon, authenticated;
 --  Backfill: give EXISTING real live posts a target so the drip picks them up.
 --  (Bot-authored posts are left alone — they keep their seeded counts.)
 -- ============================================================
-update stories s set umbrella_target = 50 + floor(power(random(), 2.0) * 70)::int
+update stories s set umbrella_target = 45 + floor(random() * 11)::int
 from profiles pr
 where pr.id = s.author_id
   and not coalesce(pr.is_bot, false)
   and s.state = 'live'
   and s.umbrella_target is null;
 
+-- ---------- IS THE DRIP ACTUALLY RUNNING? ----------
+-- Reports whether pg_cron is enabled and the job is scheduled.
+do $$
+declare job_ct int;
+begin
+  if to_regclass('cron.job') is null then
+    raise notice '⚠ pg_cron is NOT enabled — the drip will NOT run on its own. Enable it (Dashboard → Database → Extensions → pg_cron), then re-run this file. You can still test by hand: select drip_umbrellas();';
+  else
+    execute 'select count(*) from cron.job where jobname = ''umbrella-drip''' into job_ct;
+    if job_ct > 0 then
+      raise notice '✅ pg_cron on, ''umbrella-drip'' scheduled — posts fill to ~50 over 24h.';
+    else
+      raise notice '⚠ pg_cron on but ''umbrella-drip'' is NOT scheduled. Run: select cron.schedule(''umbrella-drip'',''*/5 * * * *'',''select public.drip_umbrellas();'');';
+    end if;
+  end if;
+end $$;
+
 -- ---------- VERIFY ----------
 select 'real posts with a target' as metric, count(*)::bigint as value from stories where umbrella_target is not null
 union all select 'posts queued for reply', (select count(*) from owner_reply_queue where replied = false)
-union all select 'real members (engagement)', (select count(*) from profiles where not coalesce(is_bot, false));
+union all select 'real members (engagement)', (select count(*) from profiles where not coalesce(is_bot, false))
+union all select 'bot umbrellas on real posts',
+  (select count(*) from umbrellas u join profiles p on p.id = u.user_id
+   where p.is_bot and u.story_id in (select id from stories where umbrella_target is not null));
+
+-- Run drip once by hand to prove it works, then watch a few posts fill:
+--   select drip_umbrellas();
+--   select s.id, s.created_at, s.umbrella_target,
+--          round(extract(epoch from now()-s.created_at)/3600, 1) as age_hrs,
+--          (select count(*) from umbrellas u join profiles p on p.id=u.user_id
+--           where u.story_id=s.id and p.is_bot) as bot_umbrellas
+--   from stories s where s.umbrella_target is not null
+--   order by s.created_at desc limit 10;
+-- Check the schedule + recent runs (needs pg_cron):
+--   select jobname, schedule, active from cron.job;
+--   select status, return_message, start_time from cron.job_run_details order by start_time desc limit 10;
