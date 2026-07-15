@@ -31,7 +31,14 @@ export default function ReplyQueue() {
     setBusy(sid)
     const { error } = await supabase.rpc('reply_as_bot', { sid, body })
     setBusy(null)
-    if (error) { alert('Could not send: ' + error.message); return }
+    if (error) {
+      const m = error.message || ''
+      if (m.includes('no_names_in_reply')) alert('Keep replies anonymous — please don’t include names or @mentions.')
+      else if (m.includes('personal_info')) alert('Please remove personal info (like emails) from the reply.')
+      else if (m.includes('blocked_content')) alert('That reply was blocked by the content filter.')
+      else alert('Could not send: ' + m)
+      return
+    }
     setDraft((d) => ({ ...d, [sid]: '' }))
     load()
   }
