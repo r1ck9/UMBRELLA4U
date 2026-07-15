@@ -132,6 +132,45 @@ begin
 end $$;
 grant execute on function bot_likes_hourly() to authenticated;
 
+-- Range-aware series for the panel: mode 'day' → 24 hourly buckets (last 24h);
+-- mode 'week' → 7 daily buckets (last 7 days). Zero-filled. Moderator-only.
+create or replace function bot_likes_series(mode text default 'day')
+returns table(bucket timestamptz, n bigint)
+language plpgsql security definer set search_path = public stable as $$
+begin
+  if not exists (select 1 from profiles where id = auth.uid() and is_moderator) then
+    raise exception using message = 'not_authorized';
+  end if;
+  if mode = 'week' then
+    return query
+    with days as (
+      select generate_series(date_trunc('day', now()) - interval '6 days',
+                             date_trunc('day', now()), interval '1 day') as bucket
+    ),
+    c as (
+      select date_trunc('day', u.created_at) as bucket, count(*) as n
+      from umbrellas u join profiles p on p.id = u.user_id
+      where p.is_bot and u.created_at > now() - interval '7 days'
+      group by 1
+    )
+    select d.bucket, coalesce(c.n, 0)::bigint from days d left join c on c.bucket = d.bucket order by d.bucket;
+  else
+    return query
+    with hrs as (
+      select generate_series(date_trunc('hour', now()) - interval '23 hours',
+                             date_trunc('hour', now()), interval '1 hour') as bucket
+    ),
+    c as (
+      select date_trunc('hour', u.created_at) as bucket, count(*) as n
+      from umbrellas u join profiles p on p.id = u.user_id
+      where p.is_bot and u.created_at > now() - interval '24 hours'
+      group by 1
+    )
+    select h.bucket, coalesce(c.n, 0)::bigint from hrs h left join c on c.bucket = h.bucket order by h.bucket;
+  end if;
+end $$;
+grant execute on function bot_likes_series(text) to authenticated;
+
 -- View it in the Moderation panel (you're signed in as a moderator there).
 -- These functions are moderator-gated, so calling them in the SQL editor
 -- (where there's no logged-in user) will report not_authorized — that's expected.
