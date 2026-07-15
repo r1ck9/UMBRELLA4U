@@ -75,6 +75,9 @@ grant execute on function bot_status() to authenticated;
 --  are boosting, how far each has filled toward its target, and its schedule
 --  status. Moderator-only.
 -- ============================================================
+-- DROP first: adding a column to RETURNS TABLE is a return-type change, which
+-- CREATE OR REPLACE cannot do (it would error and keep the old definition).
+drop function if exists bot_report_posts(int);
 create or replace function bot_report_posts(n int default 30)
 returns table(post_excerpt text, cat text, is_anon boolean, posted_at timestamptz,
               target_n int, bot_likes bigint, real_likes bigint, pct int, drip_status text, next_secs bigint)
