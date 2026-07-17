@@ -8,7 +8,7 @@ import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { STREAK_MILESTONES } from '@/lib/badges'
 
 export default function Rail() {
-  const [stats, setStats] = useState({ stories: null, umbrellas: null })
+  const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
   const [postsLeft, setPostsLeft] = useState(null) // stories left today
   const [streak, setStreak] = useState(null) // days-in-a-row; null = guest
@@ -18,7 +18,8 @@ export default function Rail() {
     ;(async () => {
       const s = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
       const u = await supabase.rpc('community_umbrellas')   // aggregate count (umbrella rows are private)
-      setStats({ stories: s.count ?? 0, umbrellas: Number(u.data) || 0 })
+      const sun = await supabase.rpc('sunny_count')
+      setStats({ stories: s.count ?? 0, umbrellas: Number(u.data) || 0, sunny: Number(sun.data) || 0 })
 
       const { data } = await supabase.auth.getUser()
       if (data.user) {
@@ -80,6 +81,7 @@ export default function Rail() {
           <div className="l">☂ umbrellas opened</div>
         </div>
         <div className="ministat"><b>{stats.stories ?? '—'}</b> stories shared</div>
+        <div className="ministat">☀️ <b>{stats.sunny ?? '—'}</b> skies cleared to sunny</div>
       </div>
 
       <div className="panel quota">
