@@ -28,6 +28,14 @@ create table if not exists owner_reply_queue (
 );
 alter table owner_reply_queue enable row level security;   -- reached only via the definer functions below
 
+-- Safety: make sure triggers are ON. If a seed run errored between its
+-- disable/enable, on_new_story would never fire and new posts would get no
+-- umbrellas at all. Re-enabling here is harmless if they're already on.
+do $$ begin
+  execute 'alter table stories   enable trigger user';
+  execute 'alter table umbrellas enable trigger user';
+exception when others then null; end $$;
+
 -- ============================================================
 --  1) New real post → set an umbrella target + queue it for a reply.
 --     Fires only for real (non-bot) authors. During seed_bots.sql the triggers
@@ -41,9 +49,18 @@ begin
   select coalesce(is_bot, false) into bot_author from profiles where id = new.author_id;
   if bot_author then return null; end if;
 
-  -- target 50..120, skewed toward ~50, occasionally near 120
   update stories set umbrella_target = 45 + floor(random() * 11)::int   -- ~50 (45–55) over 24h
    where id = new.id and umbrella_target is null;
+
+  -- HEAD START: drop a few umbrellas on right away so a brand-new post never
+  -- sits at zero. The drip then ramps it toward ~50 over the next 24h.
+  insert into umbrellas (story_id, user_id, created_at)
+  select new.id, p.id, now() - (random() * interval '2 minutes')
+  from profiles p
+  where p.is_bot and p.id <> new.author_id
+  order by random()
+  limit (3 + floor(random() * 4)::int)          -- 3–6 immediately
+  on conflict (story_id, user_id) do nothing;
 
   insert into owner_reply_queue (story_id) values (new.id) on conflict do nothing;
   return null;
@@ -236,6 +253,27 @@ where pr.id = s.author_id
   and not coalesce(pr.is_bot, false)
   and s.state = 'live'
   and s.umbrella_target is null;
+
+-- HEAD START for existing real posts still near zero: top each up to ~5 bot
+-- umbrellas right now, so nothing sits empty while the drip catches up.
+insert into umbrellas (story_id, user_id, created_at)
+select t.id, b.id, now() - (random() * interval '45 minutes')
+from (
+  select s.id, s.author_id,
+         (4 + floor(random() * 4)::int) as want,
+         (select count(*) from umbrellas u join profiles p on p.id = u.user_id
+          where u.story_id = s.id and p.is_bot) as have
+  from stories s join profiles pr on pr.id = s.author_id
+  where not coalesce(pr.is_bot, false) and s.state = 'live' and s.umbrella_target is not null
+) t
+cross join lateral (
+  select p.id from profiles p
+  where p.is_bot and p.id <> t.author_id
+    and not exists (select 1 from umbrellas u where u.story_id = t.id and u.user_id = p.id)
+  order by random()
+  limit greatest(0, t.want - t.have)
+) b
+on conflict (story_id, user_id) do nothing;
 
 -- ---------- IS THE DRIP ACTUALLY RUNNING? ----------
 -- Reports whether pg_cron is enabled and the job is scheduled.
