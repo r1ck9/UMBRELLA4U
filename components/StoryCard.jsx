@@ -13,6 +13,37 @@ const INTENT = {
   similar: '💬 Similar stories', resources: '📎 Resources'
 }
 
+// Post weather: the author picks it; umbrellas clear it toward sunny. Heavier
+// weather needs more. WX[i].need = umbrellas to reach sunny from stage i.
+const WX = [
+  { e: '⛈️', l: 'Heavy rain', need: 50 },
+  { e: '🌧️', l: 'Rain', need: 35 },
+  { e: '☁️', l: 'Cloudy', need: 22 },
+  { e: '🌤️', l: 'Partly sunny', need: 12 },
+  { e: '☀️', l: 'Sunny', need: 8 },
+]
+function WeatherMeter({ weather, count }) {
+  const has = weather != null && weather >= 0 && weather <= 4
+  // legacy posts (no chosen weather): derive a stage from the count vs 50
+  const base = has ? weather : (count >= 50 ? 4 : count >= 40 ? 3 : count >= 25 ? 2 : count >= 10 ? 1 : 0)
+  const need = has ? WX[base].need : 50
+  const prog = need > 0 ? Math.min(count / need, 1) : 1
+  const idx = need > 0 ? Math.min(4, base + Math.round(prog * (4 - base))) : 4
+  const w = WX[idx]
+  const more = Math.max(0, need - count)
+  const sunny = idx >= 4
+  return (
+    <div className="wx-meter">
+      <div className="wx-head">
+        <span className="wx-e">{w.e}</span>
+        <span className="wx-l">{w.l}</span>
+        <span className="wx-need">{sunny ? 'Sunny ☀️' : `${more} umbrella${more === 1 ? '' : 's'} to sunny`}</span>
+      </div>
+      <div className="wx-bar"><div className="wx-fill" style={{ width: (prog * 100) + '%' }} /></div>
+    </div>
+  )
+}
+
 // The "who's here" hugger-faces row under a post is hidden for now (to be
 // redesigned/re-added later). Flip to true to bring it back.
 const SHOW_HUG_FACES = false
@@ -317,6 +348,8 @@ export default function StoryCard({ story }) {
           </div>
         )
       })()}
+
+      <WeatherMeter weather={story.weather} count={count} />
 
       <div className="cfoot">
         {isOwn

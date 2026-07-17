@@ -8,6 +8,15 @@ import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { DAILY_STORY_LIMIT } from '@/lib/config'
 import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
+
+// Post weather the author picks: heavier weather takes more umbrellas to clear.
+const WEATHERS = [
+  { v: 0, e: '⛈️', l: 'Heavy rain' },
+  { v: 1, e: '🌧️', l: 'Rain' },
+  { v: 2, e: '☁️', l: 'Cloudy' },
+  { v: 3, e: '🌤️', l: 'Partly sunny' },
+  { v: 4, e: '☀️', l: 'Sunny' },
+]
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
 // We normalize first — de-leet + strip non-letters — so "f u c k", "sh1t", "xxfaggotxx" are all caught.
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
@@ -29,6 +38,7 @@ export default function Composer() {
   const [heavy, setHeavy] = useState(false)                  // heavy/crisis language detected → suggest "just listen"
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
+  const [weather, setWeather] = useState(2)          // 0 heavy rain … 4 sunny; default cloudy
   const [pollOn, setPollOn] = useState(false)
   const [pollOpts, setPollOpts] = useState(['', ''])   // 2–4 options
   const [confirming, setConfirming] = useState(false)
@@ -87,7 +97,7 @@ export default function Composer() {
     } catch { /* network hiccup — fall through; the DB keyword trigger still guards */ }
 
     const { data: created, error } = await supabase.from('stories')
-      .insert({ text: text.trim(), intent, category, anonymous: anon, prompt_id: prompt?.key || null })
+      .insert({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null })
       .select('id').single()
     if (error) {
       setBusy(false)
@@ -120,7 +130,7 @@ export default function Composer() {
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); router.refresh() }, 3100)
+    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); router.refresh() }, 3100)
   }
 
   return (
@@ -173,6 +183,18 @@ export default function Composer() {
                   aria-pressed={category === c.key}>
                   <span className="cc-dot" style={{ background: c.color }} />
                   <span className="cc-text"><b>{c.name}</b><em>{c.desc}</em></span>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="wx-pick">
+            <span className="wx-lbl">How&apos;s your weather today? Umbrellas from others help clear it to sunny.</span>
+            <div className="wx-opts">
+              {WEATHERS.map((w) => (
+                <button type="button" key={w.v}
+                  className={'wx-opt' + (weather === w.v ? ' on' : '')}
+                  onClick={() => setWeather(w.v)} aria-pressed={weather === w.v}>
+                  <span className="we">{w.e}</span>{w.l}
                 </button>
               ))}
             </div>

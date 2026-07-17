@@ -54,7 +54,11 @@ begin
     if bot_author then return null; end if;
   end if;
 
-  update stories set umbrella_target = 45 + floor(random() * 11)::int   -- ~50 (45–55) over 24h
+  -- umbrellas needed to reach sunny, by the poster's chosen weather
+  -- (0 heavy rain · 1 rain · 2 cloudy · 3 partly sunny · 4 sunny; null → rain)
+  update stories set umbrella_target =
+    case coalesce(new.weather, 1)
+      when 0 then 50 when 1 then 35 when 2 then 22 when 3 then 12 when 4 then 8 else 35 end
    where id = new.id and umbrella_target is null;
 
   -- HEAD START: drop a few umbrellas on right away so a brand-new post never
