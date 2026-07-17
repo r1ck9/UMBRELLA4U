@@ -45,9 +45,14 @@ create or replace function on_new_story() returns trigger
 language plpgsql security definer set search_path = public as $$
 declare bot_author boolean;
 begin
-  if new.author_id is null then return null; end if;
-  select coalesce(is_bot, false) into bot_author from profiles where id = new.author_id;
-  if bot_author then return null; end if;
+  -- Skip seeded/bot posts. Real posts proceed — INCLUDING anonymous ones, which
+  -- carry author_id = NULL (the author is kept private). Do NOT bail on a null
+  -- author: those are real user posts and deserve umbrellas too.
+  if coalesce(new.seed, false) then return null; end if;
+  if new.author_id is not null then
+    select coalesce(is_bot, false) into bot_author from profiles where id = new.author_id;
+    if bot_author then return null; end if;
+  end if;
 
   update stories set umbrella_target = 45 + floor(random() * 11)::int   -- ~50 (45–55) over 24h
    where id = new.id and umbrella_target is null;
@@ -57,7 +62,7 @@ begin
   insert into umbrellas (story_id, user_id, created_at)
   select new.id, p.id, now() - (random() * interval '2 minutes')
   from profiles p
-  where p.is_bot and p.id <> new.author_id
+  where p.is_bot and (new.author_id is null or p.id <> new.author_id)
   order by random()
   limit (3 + floor(random() * 4)::int)          -- 3–6 immediately
   on conflict (story_id, user_id) do nothing;
@@ -101,7 +106,7 @@ begin
   from picks pk
   cross join lateral (
     select p.id from profiles p
-    where p.is_bot and p.id <> pk.author_id
+    where p.is_bot and (pk.author_id is null or p.id <> pk.author_id)
       and not exists (select 1 from umbrellas u where u.story_id = pk.story_id and u.user_id = p.id)
     order by random()
     limit pk.add_n
@@ -247,12 +252,13 @@ grant execute on function activity_by_day(int) to anon, authenticated;
 --  Backfill: give EXISTING real live posts a target so the drip picks them up.
 --  (Bot-authored posts are left alone — they keep their seeded counts.)
 -- ============================================================
+-- "real post" = live, not seeded, and not authored by a bot. author_id IS NULL
+-- (anonymous) counts as real — those are people posting anonymously.
 update stories s set umbrella_target = 45 + floor(random() * 11)::int
-from profiles pr
-where pr.id = s.author_id
-  and not coalesce(pr.is_bot, false)
-  and s.state = 'live'
-  and s.umbrella_target is null;
+where s.state = 'live' and s.umbrella_target is null
+  and coalesce(s.seed, false) = false
+  and (s.author_id is null
+       or not exists (select 1 from profiles p where p.id = s.author_id and p.is_bot));
 
 -- HEAD START for existing real posts still near zero: top each up to ~5 bot
 -- umbrellas right now, so nothing sits empty while the drip catches up.
@@ -263,12 +269,12 @@ from (
          (4 + floor(random() * 4)::int) as want,
          (select count(*) from umbrellas u join profiles p on p.id = u.user_id
           where u.story_id = s.id and p.is_bot) as have
-  from stories s join profiles pr on pr.id = s.author_id
-  where not coalesce(pr.is_bot, false) and s.state = 'live' and s.umbrella_target is not null
+  from stories s
+  where s.state = 'live' and s.umbrella_target is not null
 ) t
 cross join lateral (
   select p.id from profiles p
-  where p.is_bot and p.id <> t.author_id
+  where p.is_bot and (t.author_id is null or p.id <> t.author_id)
     and not exists (select 1 from umbrellas u where u.story_id = t.id and u.user_id = p.id)
   order by random()
   limit greatest(0, t.want - t.have)

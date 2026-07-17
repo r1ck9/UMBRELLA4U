@@ -25,12 +25,12 @@ from (
          floor(s.umbrella_target * least(1.0, extract(epoch from now() - s.created_at) / 86400.0))::int as due,
          (select count(*) from umbrellas u join profiles p on p.id = u.user_id
           where u.story_id = s.id and p.is_bot) as have
-  from stories s join profiles pr on pr.id = s.author_id
-  where not coalesce(pr.is_bot, false) and s.state = 'live' and s.umbrella_target is not null
+  from stories s
+  where s.state = 'live' and s.umbrella_target is not null
 ) t
 cross join lateral (
   select p.id from profiles p
-  where p.is_bot and p.id <> t.author_id
+  where p.is_bot and (t.author_id is null or p.id <> t.author_id)
     and not exists (select 1 from umbrellas u where u.story_id = t.id and u.user_id = p.id)
   order by random()
   limit greatest(0, t.due - t.have)
