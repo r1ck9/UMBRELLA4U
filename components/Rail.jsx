@@ -16,7 +16,8 @@ export default function Rail() {
   useEffect(() => {
     if (!supabase) return
     ;(async () => {
-      const s = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
+      const s = await supabase.from('stories').select('*', { count: 'exact', head: true })
+        .eq('state', 'live').not('seed', 'is', true)   // real posts only (exclude bot/seed)
       const u = await supabase.rpc('community_umbrellas')   // aggregate count (umbrella rows are private)
       const sun = await supabase.rpc('sunny_count')
       setStats({ stories: s.count ?? 0, umbrellas: Number(u.data) || 0, sunny: Number(sun.data) || 0 })
