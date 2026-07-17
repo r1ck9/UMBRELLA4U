@@ -32,12 +32,21 @@ function WeatherMeter({ weather, count }) {
   const w = WX[idx]
   const more = Math.max(0, need - count)
   const sunny = idx >= 4
+  // Once it's sunny, drop the bar and show a big sun instead — it's cleared.
+  if (sunny) {
+    return (
+      <div className="wx-meter wx-sunny">
+        <span className="wx-sun" aria-hidden="true">☀️</span>
+        <span className="wx-sun-txt">Sunny{count ? ` — cleared by ${count} umbrella${count === 1 ? '' : 's'}` : ''}</span>
+      </div>
+    )
+  }
   return (
     <div className="wx-meter">
       <div className="wx-head">
         <span className="wx-e">{w.e}</span>
         <span className="wx-l">{w.l}</span>
-        <span className="wx-need">{sunny ? 'Sunny ☀️' : `${more} umbrella${more === 1 ? '' : 's'} to sunny`}</span>
+        <span className="wx-need">{`${more} umbrella${more === 1 ? '' : 's'} to sunny`}</span>
       </div>
       <div className="wx-bar"><div className="wx-fill" style={{ width: (prog * 100) + '%' }} /></div>
     </div>
