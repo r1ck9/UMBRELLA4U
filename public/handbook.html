@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Umbrella Chapter Handbook</title>
+<style>
+  :root{
+    --paper:#eef1f6; --surface:#f8fafc; --surface-2:#e5ebf2;
+    --ink:#152232; --ink-2:#41526a; --ink-3:#6d7d92;
+    --blue:#3f6fa3; --blue-deep:#274f79; --amber:#e0852c; --amber-soft:#f7e3c6;
+    --line:rgba(21,34,50,.12); --line-2:rgba(21,34,50,.07);
+    --shadow:0 1px 2px rgba(21,34,50,.05),0 12px 32px -18px rgba(21,34,50,.28);
+    --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
+    --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --paper:#0d1520; --surface:#141f2c; --surface-2:#1c2a3a;
+    --ink:#e9eff7; --ink-2:#adbccd; --ink-3:#8395a8;
+    --blue:#6ea0d6; --blue-deep:#0a1420; --amber:#f0a252; --amber-soft:#3a2c1a;
+    --line:rgba(233,239,247,.14); --line-2:rgba(233,239,247,.07);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -20px rgba(0,0,0,.6);
+  }}
+  :root[data-theme="light"]{
+    --paper:#eef1f6; --surface:#f8fafc; --surface-2:#e5ebf2;
+    --ink:#152232; --ink-2:#41526a; --ink-3:#6d7d92;
+    --blue:#3f6fa3; --blue-deep:#274f79; --amber:#e0852c; --amber-soft:#f7e3c6;
+    --line:rgba(21,34,50,.12); --line-2:rgba(21,34,50,.07);
+    --shadow:0 1px 2px rgba(21,34,50,.05),0 12px 32px -18px rgba(21,34,50,.28);
+  }
+  :root[data-theme="dark"]{
+    --paper:#0d1520; --surface:#141f2c; --surface-2:#1c2a3a;
+    --ink:#e9eff7; --ink-2:#adbccd; --ink-3:#8395a8;
+    --blue:#6ea0d6; --blue-deep:#0a1420; --amber:#f0a252; --amber-soft:#3a2c1a;
+    --line:rgba(233,239,247,.14); --line-2:rgba(233,239,247,.07);
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -20px rgba(0,0,0,.6);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:1.05rem;line-height:1.66;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.12;text-wrap:balance;margin:0}
+  p{margin:0}
+  .col{max-width:760px;margin:0 auto;padding:0 24px}
+  .eyebrow{font-family:var(--sans);font-size:.72rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--blue)}
+  .amber-eye{color:var(--amber)}
+
+  /* cover */
+  .cover{color:#eef4fb;background:radial-gradient(125% 130% at 84% 118%,#f0a552 0%,#c17b3c 13%,#4574a6 52%,#22456e 100%);
+    padding:clamp(56px,9vw,104px) 0 clamp(48px,7vw,80px)}
+  .cover .eyebrow{color:#f1c592}
+  .cover h1{font-size:clamp(2.4rem,6vw,3.9rem);letter-spacing:-.02em;margin:12px 0 0}
+  .cover .mark{font-size:1.1em}
+  .cover p.sub{margin-top:18px;max-width:54ch;color:#d3e0f0;font-size:1.15rem}
+  .cover .tag{margin-top:20px;display:inline-block;font-size:.8rem;letter-spacing:.08em;color:#bcd0e6;border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:999px}
+
+  section{padding:clamp(44px,7vw,76px) 0}
+  section+section{border-top:1px solid var(--line-2)}
+  h2.sec{font-size:clamp(1.7rem,3.4vw,2.4rem);letter-spacing:-.015em;margin-top:10px}
+  .lead{color:var(--ink-2);font-size:1.14rem;margin-top:14px}
+  p.body{color:var(--ink-2);margin-top:16px}
+  .name-ex{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+  .name-ex .n{font-family:var(--serif);font-size:1.2rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 18px}
+  .haves{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px}
+  .haves span{font-size:.92rem;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 15px}
+
+  /* requirements */
+  .req-intro{color:var(--ink-2);margin-top:14px}
+  .reqs{list-style:none;margin:26px 0 0;padding:0;counter-reset:r;display:flex;flex-direction:column;gap:2px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+  .reqs li{counter-increment:r;background:var(--surface);padding:18px 20px;display:flex;gap:16px;align-items:flex-start}
+  .reqs li::before{content:counter(r);flex:0 0 auto;width:30px;height:30px;border-radius:50%;
+    background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue);font-weight:700;font-size:.92rem;
+    display:grid;place-items:center;font-family:var(--sans);margin-top:1px}
+  .reqs b{font-weight:650}
+  .reqs .d{color:var(--ink-3);font-size:.95rem;display:block;margin-top:2px}
+  .thats-it{margin-top:20px;font-family:var(--serif);font-size:1.25rem;color:var(--ink)}
+  .thats-it span{color:var(--amber)}
+
+  /* ideas library */
+  .ideas{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:28px}
+  @media(max-width:720px){.ideas{grid-template-columns:1fr}}
+  .cat{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:22px;box-shadow:var(--shadow)}
+  .cat h3{font-size:1.15rem;display:flex;align-items:center;gap:9px}
+  .cat h3 .ic{width:30px;height:30px;border-radius:9px;background:var(--amber-soft);display:grid;place-items:center;font-size:1rem}
+  .cat ul{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+  .cat li{font-size:.96rem;color:var(--ink-2);padding-left:18px;position:relative}
+  .cat li::before{content:"☂";position:absolute;left:0;top:0;font-size:.8rem;color:var(--amber);opacity:.8}
+  .free-note{margin-top:22px;padding:18px 20px;border-left:3px solid var(--amber);background:var(--surface);border-radius:0 12px 12px 0;color:var(--ink-2);font-size:1rem}
+
+  /* start steps */
+  .steps{list-style:none;margin:24px 0 0;padding:0;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+  .steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;color:var(--ink-2)}
+  .steps li::before{content:counter(s);flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:.85rem;display:grid;place-items:center;font-family:var(--sans)}
+  .cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;font-size:1rem;padding:13px 26px;border-radius:999px;text-decoration:none;border:1px solid transparent}
+  .btn.primary{background:var(--amber);color:#241505}
+  .btn.ghost{border-color:var(--line);color:var(--ink)}
+
+  footer{padding:40px 0;border-top:1px solid var(--line-2);color:var(--ink-3);font-size:.86rem}
+  a{color:var(--blue)}
+</style>
+
+<header class="cover">
+  <div class="col">
+    <p class="eyebrow">An Umbrella4U guide</p>
+    <h1><span class="mark">☂</span> Umbrella Chapter Handbook</h1>
+    <p class="sub">How to start and run a Chapter — the local heart of Umbrella. Short on rules, long on freedom. Here's the whole deal.</p>
+    <span class="tag">Version 1 · concept</span>
+  </div>
+</header>
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The idea</p>
+    <h2 class="sec">Chapters bring Umbrella to life — locally.</h2>
+    <p class="lead">Umbrella provides the mission. Local <b>chapters</b> create safe spaces in their own communities — a school, a campus, a whole city.</p>
+    <div class="name-ex">
+      <div class="n">☂ Umbrella Chapter — St. George's School</div>
+      <div class="n">☂ Umbrella Chapter — Brown University</div>
+      <div class="n">☂ Umbrella Chapter — Vancouver</div>
+    </div>
+    <p class="body">Every Chapter is run by real people who care about the same thing you do. At minimum, a Chapter has:</p>
+    <div class="haves">
+      <span>👥 Leaders</span><span>🤝 Volunteers</span><span>📅 Events</span><span>📣 Community outreach</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <p class="eyebrow amber-eye">The floor</p>
+    <h2 class="sec">What every Chapter has to do.</h2>
+    <p class="req-intro">This is the whole list. Meet these seven, and you're a Chapter in good standing. Everything beyond this is yours to invent.</p>
+    <ol class="reqs">
+      <li><div><b>Hold at least one meeting each month.</b><span class="d">Keep the group alive and connected — in person or online.</span></div></li>
+      <li><div><b>Run one awareness campaign each semester.</b><span class="d">Anything from the Ideas Library counts. Just reach people.</span></div></li>
+      <li><div><b>Stay in contact with one counselor or youth organization.</b><span class="d">A real adult or org you can point someone to when it's beyond peer support.</span></div></li>
+      <li><div><b>Promote Umbrella &amp; Haven responsibly.</b><span class="d">Honest, kind, and never over-promising. We're peer support, not a crisis line.</span></div></li>
+      <li><div><b>Follow the moderation &amp; safeguarding guidelines.</b><span class="d">The safety rules are non-negotiable. They're what makes this trustworthy.</span></div></li>
+      <li><div><b>Report concerns to the national team.</b><span class="d">If something feels off or someone's at risk, tell us. You're never handling it alone.</span></div></li>
+      <li><div><b>Complete an annual review.</b><span class="d">A short once-a-year check-in on how your Chapter is doing.</span></div></li>
+    </ol>
+    <p class="thats-it">That's it. <span>Seven things.</span></p>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The ceiling</p>
+    <h2 class="sec">Your freedom: the Ideas Library.</h2>
+    <p class="lead">Beyond the seven, how you run your Chapter is up to you. Here's a menu to steal from — pick what fits your community, and invent your own.</p>
+    <div class="ideas">
+      <div class="cat">
+        <h3><span class="ic">📣</span> Awareness</h3>
+        <ul>
+          <li>Put up posters</li>
+          <li>Morning announcements</li>
+          <li>Instagram Reels</li>
+          <li>Club-fair booth</li>
+          <li>QR-code stickers</li>
+          <li>School-paper feature</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <h3><span class="ic">🫂</span> Community</h3>
+        <ul>
+          <li>Mental Health Week</li>
+          <li>Kindness Wall</li>
+          <li>Anonymous gratitude board</li>
+          <li>Coffee chats</li>
+          <li>Movie night</li>
+          <li>Exam-season destress</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <h3><span class="ic">🤝</span> Partnerships</h3>
+        <ul>
+          <li>School counselor</li>
+          <li>Youth centre</li>
+          <li>Library</li>
+          <li>Community centre</li>
+          <li>Local nonprofits</li>
+          <li>Student council</li>
+        </ul>
+      </div>
+    </div>
+    <p class="free-note">The list is a starting point, not a limit. If you dream up something that helps people feel less alone, that <em>is</em> an Umbrella idea. Try it, tell us how it went, and we'll add the good ones here for every other Chapter.</p>
+  </div>
+</section>
+
+<section>
+  <div class="col">
+    <p class="eyebrow amber-eye">Getting started</p>
+    <h2 class="sec">How to open your Chapter.</h2>
+    <ol class="steps">
+      <li>Apply to lead — fill out the Chapter application (about ten minutes).</li>
+      <li>Complete the safety &amp; peer-support training we send you.</li>
+      <li>Recruit a couple of co-leads and a handful of volunteers.</li>
+      <li>Hold your first meeting and pick your first campaign from the Ideas Library.</li>
+      <li>Connect with one local counselor or youth org — and you're official.</li>
+    </ol>
+    <div class="cta">
+      <a class="btn primary" href="https://docs.google.com/forms/d/e/1FAIpQLScOq_Ia0X5UksN8V68HedMTrIpm3i2HyXCFA9hFeja7pk2tiw/viewform?usp=header" target="_blank" rel="noopener">Apply to open a Chapter →</a>
+      <a class="btn ghost" href="mailto:hello@umbrella4u.ca">Ask a question</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="col">
+    ☂ Umbrella4U · Umbrella Chapter Handbook v1 · Umbrella provides the mission; local Chapters make it real.
+  </div>
+</footer>
