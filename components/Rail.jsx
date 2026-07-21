@@ -32,7 +32,7 @@ export default function Rail() {
           .select('*', { count: 'exact', head: true })
           .eq('author_id', data.user.id).gte('created_at', start)
         setPostsLeft(Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0)))
-        // gentle daily streak — counts "showing up," idempotent per day
+        // gentle daily streak, counts "showing up," idempotent per day
         const { data: sc } = await supabase.rpc('touch_streak')
         setStreak(typeof sc === 'number' ? sc : 0)
         // celebrate a milestone once, the day it's reached
@@ -69,7 +69,7 @@ export default function Rail() {
           <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> {streak} day{streak === 1 ? '' : 's'}</div>
           <p className="streak-msg">
             {streak === 1
-              ? 'You showed up today. That’s the whole thing — come back tomorrow to keep it going. 🫂'
+              ? 'You showed up today. That’s the whole thing, come back tomorrow to keep it going. 🫂'
               : `${streak} days in a row. Every day you’re here, someone feels a little less alone.`}
           </p>
         </div>
@@ -77,11 +77,11 @@ export default function Rail() {
       <div className="panel">
         <h3>The community</h3>
         <div className="bigcount">
-          <div className="n">{stats.umbrellas ?? '—'}</div>
+          <div className="n">{stats.umbrellas ?? ', '}</div>
           <div className="l">☂ umbrellas opened</div>
         </div>
-        <div className="ministat"><b>{stats.stories ?? '—'}</b> stories shared</div>
-        <div className="ministat">☀️ <b>{stats.sunny ?? '—'}</b> skies cleared to sunny</div>
+        <div className="ministat"><b>{stats.stories ?? ', '}</b> stories shared</div>
+        <div className="ministat">☀️ <b>{stats.sunny ?? ', '}</b> skies cleared to sunny</div>
       </div>
 
       <div className="panel quota">
@@ -106,7 +106,7 @@ export default function Rail() {
       <div className="panel">
         <h3>Need help now?</h3>
         <Link className="crisis" href="/resources">Resource hub &amp; crisis lines →</Link>
-        <p className="safe">Peer support — not a substitute for professional counselling or crisis services.</p>
+        <p className="safe">Peer support, not a substitute for professional counselling or crisis services.</p>
       </div>
     </aside>
   )

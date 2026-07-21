@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 
-// Fixed color per intent (categorical slots 1–4) — color follows the entity,
+// Fixed color per intent (categorical slots 1–4), color follows the entity,
 // never its rank, so sorting bars by count doesn't repaint them. Every bar also
 // carries a text label + count, which is the relief for the low-contrast slots.
 const INTENTS = [

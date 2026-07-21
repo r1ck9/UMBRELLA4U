@@ -108,11 +108,11 @@ export default function BotReport() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', rowGap: 4, columnGap: 16, fontSize: '.92rem', marginTop: 16 }}>
         {s.summary.map((r, i) => {
-          const isHead = /^—/.test(r.metric)
+          const isHead = /^, /.test(r.metric)
           return isHead ? (
             <div key={i} style={{ gridColumn: '1 / -1', marginTop: i ? 10 : 0, fontSize: '.72rem', fontWeight: 700,
               letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3,#777)' }}>
-              {r.metric.replace(/—/g, '').trim()}
+              {r.metric.replace(/, /g, '').trim()}
             </div>
           ) : (
             <Fragment key={i}>

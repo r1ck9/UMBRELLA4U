@@ -9,7 +9,7 @@ import { bannerStyle } from '@/lib/banners'
 import { earnedBadges } from '@/lib/badges'
 
 function since(ts) {
-  if (!ts) return '—'
+  if (!ts) return ', '
   const d = new Date(ts)
   return d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
 }

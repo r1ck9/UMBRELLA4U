@@ -50,7 +50,7 @@ export default function Settings() {
 
           <div className="set-group">
             <h3>Appearance</h3>
-            <p className="set-hint">Pick the color that feels right — it applies everywhere, just for you.</p>
+            <p className="set-hint">Pick the color that feels right, it applies everywhere, just for you.</p>
             <ThemeChooser />
           </div>
 
@@ -65,7 +65,7 @@ export default function Settings() {
           <div className="set-group">
             <h3>Notifications</h3>
             <label className="set-row">
-              <span><b>Email me when someone opens an umbrella</b><em>A gentle nudge when there’s new support on your stories. (Coming soon — this saves your preference.)</em></span>
+              <span><b>Email me when someone opens an umbrella</b><em>A gentle nudge when there’s new support on your stories. (Coming soon, this saves your preference.)</em></span>
               <button className={'toggle' + (prefs.notify_email ? ' on' : '')} onClick={() => toggle('notify_email')} aria-pressed={prefs.notify_email}><span /></button>
             </label>
           </div>

@@ -7,7 +7,7 @@ import { getMe } from '@/lib/me'
 // The "you were seen" moment: when a returning member has new umbrellas on
 // their stories since they last checked their inbox, greet them with it right
 // at the top of the feed. This is the emotional payoff of the reciprocity loop
-// — the single biggest reason someone comes back.
+//, the single biggest reason someone comes back.
 export default function SeenBanner() {
   const [n, setN] = useState(0)
   const [note, setNote] = useState(null)

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { GUIDELINES } from '@/lib/guidelines'
 
 // Mounted once globally (in layout). Opens when anything dispatches
-// window event "umbrella:guidelines" — so any button can pop it up.
+// window event "umbrella:guidelines", so any button can pop it up.
 export default function GuidelinesModal() {
   const [open, setOpen] = useState(false)
   useEffect(() => {

@@ -38,7 +38,7 @@ export default function Feedback() {
           ) : (
             <>
               <p className="sub" style={{ color: 'var(--ink-2)', margin: '0 0 14px', lineHeight: 1.6 }}>
-                Found a bug? Have an idea? Something feel off or unsafe? Tell us anything — it&apos;s read by the team, and you can share it without your name.
+                Found a bug? Have an idea? Something feel off or unsafe? Tell us anything, it&apos;s read by the team, and you can share it without your name.
               </p>
               <textarea className="fb-box" value={text} maxLength={1500}
                 onChange={(e) => setText(e.target.value)}
@@ -48,7 +48,7 @@ export default function Feedback() {
                 <button className="btn prim" onClick={submit} disabled={!text.trim() || busy}>{busy ? 'Sending…' : 'Send feedback'}</button>
               </div>
               <p className="sub" style={{ color: 'var(--ink-3)', fontSize: 13, marginTop: 14 }}>
-                If it&apos;s an emergency or you&apos;re in danger, please use the <Link href="/resources">Resource hub</Link> — this box isn&apos;t monitored in real time.
+                If it&apos;s an emergency or you&apos;re in danger, please use the <Link href="/resources">Resource hub</Link>, this box isn&apos;t monitored in real time.
               </p>
             </>
           )}

@@ -10,11 +10,11 @@ export default function Forgot() {
 
   async function submit(e) {
     e.preventDefault()
-    if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
+    if (!isConfigured) { setMsg('Connect Supabase first, see README.md.'); return }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset`
     })
-    // Don't reveal whether an email is registered — always show the same message.
+    // Don't reveal whether an email is registered, always show the same message.
     if (error && !/rate|limit/i.test(error.message)) { setMsg(error.message); return }
     setSent(true)
   }
@@ -23,7 +23,7 @@ export default function Forgot() {
     <main className="auth">
       <h1>Reset your password</h1>
       {sent ? (
-        <p className="msg">If an account exists for that email, we just sent a reset link — click it to choose a new password. Don’t see it? Check your spam / junk folder. ☂</p>
+        <p className="msg">If an account exists for that email, we just sent a reset link, click it to choose a new password. Don’t see it? Check your spam / junk folder. ☂</p>
       ) : (
         <>
           <p className="sub">Enter your email and we’ll send you a link to set a new password.</p>

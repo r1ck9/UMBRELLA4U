@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 
-const DEFAULT_MSG = "We can't stop the rain — but we can hold out an umbrella for each other."
+const DEFAULT_MSG = "We can't stop the rain, but we can hold out an umbrella for each other."
 
 // Global full-screen umbrella-open celebration.
 // Trigger: window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { message, variant } }))

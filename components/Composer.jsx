@@ -18,16 +18,16 @@ const WEATHERS = [
   { v: 4, e: '☀️', l: 'Sunny' },
 ]
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
-// We normalize first — de-leet + strip non-letters — so "f u c k", "sh1t", "xxfaggotxx" are all caught.
+// We normalize first, de-leet + strip non-letters, so "f u c k", "sh1t", "xxfaggotxx" are all caught.
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
 const norm = (t) => t.toLowerCase().replace(/[0134578@$!|]/g, (c) => LEET[c] || '').replace(/[^a-z]/g, '')
 // terms matched even when hidden inside other text (mirror of the DB 'substr' list, worst offenders)
 const HARM_EMBEDDED = ['killyourself', 'killurself', 'godie', 'youshoulddie', 'faggot', 'nigger', 'nigga', 'kike', 'motherfucker', 'fuck']
 const HARM = (t) => { const n = norm(t); return HARM_EMBEDDED.some((w) => n.includes(w)) }
-const REJECT_MSG = "This can't be posted — it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
+const REJECT_MSG = "This can't be posted, it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
 const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
-const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous — no full names, schools, addresses, or contact info. 💛"
+const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous, no full names, schools, addresses, or contact info. 💛"
 
 export default function Composer() {
   const router = useRouter()
@@ -59,7 +59,7 @@ export default function Composer() {
   }, [])
 
   // Gently steer heavy posts toward "Just listen" so someone sharing something
-  // hard isn't met with unsolicited advice — unless they've chosen an intent.
+  // hard isn't met with unsolicited advice, unless they've chosen an intent.
   useEffect(() => {
     const isHeavy = CRISIS.test(text)
     setHeavy(isHeavy)
@@ -73,11 +73,11 @@ export default function Composer() {
     if (EMAIL.test(text)) { setRejected(PII_MSG); return }
     if (pollOn) {
       const opts = pollOpts.map((o) => o.trim()).filter(Boolean)
-      if (opts.length < 2) { setRejected('A poll needs at least two options — or turn the poll off. 💛'); return }
+      if (opts.length < 2) { setRejected('A poll needs at least two options, or turn the poll off. 💛'); return }
       const bad = opts.find((o) => HARM(o) || EMAIL.test(o))
       if (bad) { setRejected(EMAIL.test(bad) ? PII_MSG : REJECT_MSG); return }
     }
-    if (!supabase) { alert('Connect Supabase to post — see README.md.'); return }
+    if (!supabase) { alert('Connect Supabase to post, see README.md.'); return }
     setRejected(''); setAgreed(false); setConfirming(true)
   }
 
@@ -94,7 +94,7 @@ export default function Composer() {
       })
       const mod = await res.json()
       if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(mod.reason === 'doxxing' ? DOX_MSG : REJECT_MSG); return }
-    } catch { /* network hiccup — fall through; the DB keyword trigger still guards */ }
+    } catch { /* network hiccup, fall through; the DB keyword trigger still guards */ }
 
     const { data: created, error } = await supabase.from('stories')
       .insert({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null })
@@ -104,7 +104,7 @@ export default function Composer() {
       setConfirming(false)
       if (/blocked_content/i.test(error.message)) setRejected(REJECT_MSG)
       else if (/personal_info/i.test(error.message)) setRejected(PII_MSG)
-      else if (/daily_story_limit/i.test(error.message)) setRejected(`You've shared your ${DAILY_STORY_LIMIT} stories for today. Come back tomorrow — a fresh page, a fresh start. ☂`)
+      else if (/daily_story_limit/i.test(error.message)) setRejected(`You've shared your ${DAILY_STORY_LIMIT} stories for today. Come back tomorrow, a fresh page, a fresh start. ☂`)
       else alert(error.message)
       return
     }
@@ -128,7 +128,7 @@ export default function Composer() {
     setConfirming(false)
     track('posted')
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
-      detail: { variant: 'post', message: "We can't stop the rain — but we can hold out an umbrella for each other." }
+      detail: { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
     }))
     setTimeout(() => { setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); router.refresh() }, 3100)
   }
@@ -158,8 +158,8 @@ export default function Composer() {
             </div>
           )}
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) track('compose_start'); if (rejected) setRejected('') }}
-            placeholder="You don't have to share your worst moment — just whatever you're carrying right now." />
-          <p className="compose-privacy">🔒 Keep it anonymous — please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
+            placeholder="You don't have to share your worst moment, just whatever you're carrying right now." />
+          <p className="compose-privacy">🔒 Keep it anonymous, please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
           <div className="row">
             <label>Respond with
               <select value={intent} onChange={(e) => { setIntent(e.target.value); setIntentTouched(true) }}>
@@ -171,7 +171,7 @@ export default function Composer() {
             </label>
           </div>
           {heavy && !intentTouched && intent === 'listen' && (
-            <p className="intent-hint">🫂 This sounds heavy — we set this to <b>Just listen</b> so you can share without getting advice. Change it anytime.</p>
+            <p className="intent-hint">🫂 This sounds heavy, we set this to <b>Just listen</b> so you can share without getting advice. Change it anytime.</p>
           )}
           <div className="cat-pick">
             <span className="cat-lbl">What&apos;s this about?</span>
@@ -247,8 +247,8 @@ export default function Composer() {
         <div className="modal-scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirming(false) }}>
           <div className="modal-box" role="dialog" aria-label="Agree to community guidelines">
             <h2>Before you share</h2>
-            <p className="care-line">We know struggling is hard. Please keep your words safe and kind — to yourself, and to everyone else here. 🫂</p>
-            <p className="ms-sub">A quick reminder — this keeps Haven safe for everyone.</p>
+            <p className="care-line">We know struggling is hard. Please keep your words safe and kind, to yourself, and to everyone else here. 🫂</p>
+            <p className="ms-sub">A quick reminder, this keeps Haven safe for everyone.</p>
             <ul className="rulelist">
               {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
             </ul>

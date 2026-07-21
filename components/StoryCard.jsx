@@ -32,12 +32,12 @@ function WeatherMeter({ weather, count }) {
   const w = WX[idx]
   const more = Math.max(0, need - count)
   const sunny = idx >= 4
-  // Once it's sunny, drop the bar and show a big sun instead — it's cleared.
+  // Once it's sunny, drop the bar and show a big sun instead, it's cleared.
   if (sunny) {
     return (
       <div className="wx-meter wx-sunny">
         <span className="wx-sun" aria-hidden="true">☀️</span>
-        <span className="wx-sun-txt">Sunny{count ? ` — cleared by ${count} umbrella${count === 1 ? '' : 's'}` : ''}</span>
+        <span className="wx-sun-txt">Sunny{count ? `, cleared by ${count} umbrella${count === 1 ? '' : 's'}` : ''}</span>
       </div>
     )
   }
@@ -67,11 +67,11 @@ function HugAvatar({ h }) {
   return <span className="hug-av" style={style} title={'@' + h.username}>{isEmoji ? url.slice(6) : (isImg ? '' : initial)}</span>
 }
 const NOTE_PROMPT = {
-  advice: 'one line of advice…', similar: '“me too” — in a sentence…', resources: 'a link or resource that helped…'
+  advice: 'one line of advice…', similar: '“me too”, in a sentence…', resources: 'a link or resource that helped…'
 }
 const RESPOND_LABEL = {
-  advice: '💡 They asked for advice — offer one kind line:',
-  similar: '💬 Let them know they’re not alone — share a “me too”:',
+  advice: '💡 They asked for advice, offer one kind line:',
+  similar: '💬 Let them know they’re not alone, share a “me too”:',
   resources: '📎 Share a link or resource that helped you:'
 }
 
@@ -231,7 +231,7 @@ export default function StoryCard({ story }) {
     if (error && !/duplicate/i.test(error.message)) { setReported(false); alert(error.message) }
   }
 
-  // Quiet "this doesn't belong here" signal — no score is shown to the poster.
+  // Quiet "this doesn't belong here" signal, no score is shown to the poster.
   async function handleNotRelevant() {
     if (!supabase) { setMarked(true); return } // sample mode
     const { data } = await supabase.auth.getUser()
@@ -260,7 +260,7 @@ export default function StoryCard({ story }) {
     if (opened || isOwn) return
     if (note && CRISIS.test(note)) { alert(CRISIS_MESSAGE); return }
     if (note && /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(note)) {
-      alert('Please remove the email from your note — keep everyone anonymous. 💛'); return
+      alert('Please remove the email from your note, keep everyone anonymous. 💛'); return
     }
     if (!supabase) { setOpened(true); setCount((c) => c + 1); if (note) setSent(note); fireBurst(); return } // sample mode
     const { data } = await supabase.auth.getUser()
@@ -271,13 +271,13 @@ export default function StoryCard({ story }) {
     if (error) {
       setOpened(false); setCount((c) => c - 1); setSent('')
       if (/daily_umbrella_limit/i.test(error.message)) {
-        alert(`You've opened all ${DAILY_UMBRELLA_LIMIT} umbrellas for today. They refill tomorrow — that's what makes each one mean something. ☂`)
+        alert(`You've opened all ${DAILY_UMBRELLA_LIMIT} umbrellas for today. They refill tomorrow, that's what makes each one mean something. ☂`)
       } else if (/duplicate|unique/i.test(error.message)) {
-        setOpened(true) // already sheltered this one — the "one umbrella each" rule
+        setOpened(true) // already sheltered this one, the "one umbrella each" rule
       } else if (/self_umbrella/i.test(error.message)) {
-        // can't umbrella your own story — just quietly undo (UI already hides this)
+        // can't umbrella your own story, just quietly undo (UI already hides this)
       } else if (/blocked_content|personal_info/i.test(error.message)) {
-        alert('That note can’t be sent — please keep it kind and leave out personal info (names, emails, and the like). 💛')
+        alert('That note can’t be sent, please keep it kind and leave out personal info (names, emails, and the like). 💛')
       } else {
         alert(error.message)
       }
@@ -369,7 +369,7 @@ export default function StoryCard({ story }) {
             </button>}
         {!isOwn && (
           <button className={'hug' + (hugged ? ' on' : '')} onClick={toggleHug}
-            title={hugged ? 'You’re here with them' : 'Send a hug — I’m here with you'}>
+            title={hugged ? 'You’re here with them' : 'Send a hug, I’m here with you'}>
             🫂 <span>{hugCount}</span>
           </button>
         )}
@@ -377,19 +377,19 @@ export default function StoryCard({ story }) {
           {isOwn
             ? 'Your story. Umbrellas people open for you land in your inbox. ☂'
             : story.intent === 'listen'
-              ? 'Just listen — the umbrella is the whole message.'
-              : (opened ? 'One umbrella each — no threads.' : 'Add a word below, or just open an umbrella.')}
+              ? 'Just listen, the umbrella is the whole message.'
+              : (opened ? 'One umbrella each, no threads.' : 'Add a word below, or just open an umbrella.')}
         </span>
         <span className="cfoot-actions">
           {me.userId && me.userId !== story.author_id && !marked && !reported &&
             <button className="notrel" onClick={handleNotRelevant} title="Quietly flag this as spam, a joke, or off-topic. The poster is never shown a score.">Not relevant here</button>}
-          {marked && <span className="marked">Thanks — noted ✓</span>}
+          {marked && <span className="marked">Thanks, noted ✓</span>}
           {me.userId && me.userId !== story.author_id && !reported &&
             <button className="report" onClick={handleReport}>🛑 Report</button>}
           {reported && <span className="reported">Reported ✓</span>}
           {me.isModerator &&
             <button className={'boost' + (boosted ? ' on' : '')} onClick={toggleBoost}
-              title="Promote this story — a boost gives it 25 umbrellas' worth of reach in the feed. Moderators only.">
+              title="Promote this story, a boost gives it 25 umbrellas' worth of reach in the feed. Moderators only.">
               ▲ {boosted ? 'Promoted' : 'Promote'}{boostCount > 0 ? ` · ${boostCount}` : ''}
             </button>}
           {canRemove &&

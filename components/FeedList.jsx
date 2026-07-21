@@ -15,8 +15,8 @@ export default function FeedList({ stories, category = null }) {
     if (!supabase) { setGuest(false); return }
     getMe().then((m) => {
       setGuest(!m.userId)
-      // Moderators see the feed in plain time order — no ranking, boost, or
-      // off-topic sinking — so it's easier to review everything as it comes in.
+      // Moderators see the feed in plain time order, no ranking, boost, or
+      // off-topic sinking, so it's easier to review everything as it comes in.
       if (m.isModerator) {
         let q = supabase.from('stories').select('*').eq('state', 'live')
           .order('created_at', { ascending: false }).limit(100)

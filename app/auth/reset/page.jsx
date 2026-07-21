@@ -16,7 +16,7 @@ export default function ResetPassword() {
   const [pw2, setPw2] = useState('')
 
   useEffect(() => {
-    if (!isConfigured) { setStatus('error'); setMsg('Connect Supabase first — see README.md.'); return }
+    if (!isConfigured) { setStatus('error'); setMsg('Connect Supabase first, see README.md.'); return }
     // A recovery link fires this event once the session is set (implicit flow).
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') { setReady(true); setStatus('form'); setMsg('') }
@@ -59,7 +59,7 @@ export default function ResetPassword() {
     if (pw !== pw2) { setMsg('Those two passwords don’t match.'); return }
     const { error } = await supabase.auth.updateUser({ password: pw })
     if (error) { setMsg(error.message); return }
-    setStatus('done'); setMsg('Password updated — you’re logged in. Taking you in… ☂')
+    setStatus('done'); setMsg('Password updated, you’re logged in. Taking you in… ☂')
     setTimeout(() => router.replace('/feed'), 1200)
   }
 

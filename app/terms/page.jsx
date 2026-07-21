@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 
-export const metadata = { title: 'Terms of Use — Umbrella' }
+export const metadata = { title: 'Terms of Use, Umbrella' }
 
 export default function Terms() {
   return (
@@ -13,7 +13,7 @@ export default function Terms() {
         <p className="legal-date">Last updated: July 7, 2026</p>
 
         <div className="legal-tldr">
-          <strong>The short version:</strong> Be 13 or older. Be kind — no hate, harassment, or sharing anyone's private info. Umbrella is peer support, not a crisis or medical service. We can remove content or accounts that break the rules.
+          <strong>The short version:</strong> Be 13 or older. Be kind, no hate, harassment, or sharing anyone's private info. Umbrella is peer support, not a crisis or medical service. We can remove content or accounts that break the rules.
         </div>
 
         <h2>1. Accepting these terms</h2>
@@ -22,7 +22,7 @@ export default function Terms() {
         <h2>2. Who can use Umbrella</h2>
         <p>You must be <strong>13 years or older</strong> to use Umbrella. If you're under the age of majority where you live, we ask that a parent or guardian is aware you're using it.</p>
 
-        <h2>3. What Umbrella is — and isn't</h2>
+        <h2>3. What Umbrella is, and isn't</h2>
         <p>Umbrella is an anonymous space for peer support and community connection. It is <strong>not</strong> a counseling, medical, or emergency service, and it is not a substitute for professional help. <strong>If you or someone else may be in danger, contact local emergency services or a crisis line right away</strong> (Canada: <strong>988</strong>; Kids Help Phone: <strong>text CONNECT to 686868</strong>).</p>
 
         <h2>4. Your account</h2>
@@ -33,7 +33,7 @@ export default function Terms() {
         </ul>
 
         <h2>5. Community rules</h2>
-        <p>You agree to follow our <Link href="/guidelines">Community Guidelines</Link>. In short: respect every identity, criticize ideas not people, and <strong>no hate speech, harassment, personal attacks, doxxing, threats, sexual content involving minors, or illegal content</strong>. Don't share anyone's private or identifying information — including your own if it could put you at risk.</p>
+        <p>You agree to follow our <Link href="/guidelines">Community Guidelines</Link>. In short: respect every identity, criticize ideas not people, and <strong>no hate speech, harassment, personal attacks, doxxing, threats, sexual content involving minors, or illegal content</strong>. Don't share anyone's private or identifying information, including your own if it could put you at risk.</p>
 
         <h2>6. Your content</h2>
         <p>What you share stays yours. By posting, you give Umbrella permission to display it within the service so the community can see and support it. You're responsible for what you post, and you confirm you have the right to share it.</p>

@@ -75,7 +75,7 @@ export default function Onboarding() {
     }).eq('id', user.id)
     setSaving(false)
     if (error) {
-      if (/duplicate|unique/i.test(error.message)) { setErr('That username is taken — try another.'); setStep(1) }
+      if (/duplicate|unique/i.test(error.message)) { setErr('That username is taken, try another.'); setStep(1) }
       else if (/blocked_content/i.test(error.message)) { setErr('Please remove any hurtful or unsafe words from your name, bio, or tags. 💛'); setStep(1) }
       else setErr(error.message)
       return
@@ -101,9 +101,9 @@ export default function Onboarding() {
         {step === 0 && (
           <div className="onb-step">
             <h1>Welcome in from the rain ☂</h1>
-            <p className="onb-lead">Umbrella is a quiet place to share what you’re carrying and to stand with others. Let’s set up your anonymous profile — it takes a minute.</p>
+            <p className="onb-lead">Umbrella is a quiet place to share what you’re carrying and to stand with others. Let’s set up your anonymous profile, it takes a minute.</p>
             <ul className="onb-quick">
-              <li>🕶️ You’re anonymous — no real names, ever.</li>
+              <li>🕶️ You’re anonymous, no real names, ever.</li>
               <li>☂ People respond with one umbrella, the way you asked to be met.</li>
               <li>🛟 Word filter, AI screening, reports and human moderators keep it safe.</li>
             </ul>
@@ -114,7 +114,7 @@ export default function Onboarding() {
         {step === 1 && (
           <div className="onb-step">
             <h1>Pick a name</h1>
-            <p className="onb-lead">This is your handle — make it something that isn’t your real name.</p>
+            <p className="onb-lead">This is your handle, make it something that isn’t your real name.</p>
             <label>Username<input value={p.username} maxLength={20}
               onChange={(e) => set('username', e.target.value)} placeholder={ph.names[0]} /></label>
             <div className="onb-suggest">
@@ -154,7 +154,7 @@ export default function Onboarding() {
         {step === 3 && (
           <div className="onb-step">
             <h1>A little about you</h1>
-            <p className="onb-lead">All optional. Whatever you’re into, there’s a corner here for it — tags help you find your people.</p>
+            <p className="onb-lead">All optional. Whatever you’re into, there’s a corner here for it, tags help you find your people.</p>
             <label>Today’s weather (status)<input value={p.status_weather} maxLength={60}
               onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
             <label>About me<textarea value={p.about_me} maxLength={300}
@@ -184,7 +184,7 @@ export default function Onboarding() {
         {step === 4 && (
           <div className="onb-step">
             <h1>Keep it a shelter</h1>
-            <p className="onb-lead">We know struggling is hard. Please keep your words safe and kind — to yourself, and to everyone here. 🫂</p>
+            <p className="onb-lead">We know struggling is hard. Please keep your words safe and kind, to yourself, and to everyone here. 🫂</p>
             <ul className="rulelist">
               {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
             </ul>

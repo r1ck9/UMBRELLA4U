@@ -77,7 +77,7 @@ export default function IntroHero() {
       const pr = (P) => { const f = fov / (camZ - P.z); return { x: cx + P.x * f * scale, y: cy - P.y * f * scale, z: P.z } }
 
       ctx.clearRect(0, 0, W, H)
-      // slow drifting ambient light — gives the flat gradient subtle life (#3)
+      // slow drifting ambient light, gives the flat gradient subtle life (#3)
       const lx = W * 0.5 + Math.sin(tt * 0.12) * W * 0.28, ly = H * 0.34 + Math.cos(tt * 0.09) * H * 0.12
       const amb = ctx.createRadialGradient(lx, ly, 0, lx, ly, Math.max(W, H) * 0.6)
       amb.addColorStop(0, 'rgba(130,160,205,.10)'); amb.addColorStop(1, 'rgba(130,160,205,0)')
@@ -153,7 +153,7 @@ export default function IntroHero() {
       <div className="inner">
         <div className="ih-brand">☂ Haven</div>
         <h1>A place to say what you actually feel.</h1>
-        <p>An anonymous community where young people share what they&apos;re going through — and show up for each other. No real names. No pile-ons. No judgment.</p>
+        <p>An anonymous community where young people share what they&apos;re going through, and show up for each other. No real names. No pile-ons. No judgment.</p>
         <div className="cta">
           <Link className="btn prim" href="/signup">Create or log in to an account</Link>
           <Link className="btn ghost light" href="/feed">Look around first</Link>

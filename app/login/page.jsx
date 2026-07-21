@@ -12,7 +12,7 @@ export default function Login() {
 
   async function submit(e) {
     e.preventDefault()
-    if (!isConfigured) { setMsg('Connect Supabase first — see README.md.'); return }
+    if (!isConfigured) { setMsg('Connect Supabase first, see README.md.'); return }
     const { error } = await supabase.auth.signInWithPassword({ email, password: pw })
     if (error) { setMsg(error.message); return }
     router.push('/onboarding') // bounces to /feed automatically if already set up

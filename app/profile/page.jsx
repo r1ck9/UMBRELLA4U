@@ -11,22 +11,22 @@ import { earnedBadges } from '@/lib/badges'
 
 const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
 
-// Rotating example bios — a fresh one is picked each time the page opens.
+// Rotating example bios, a fresh one is picked each time the page opens.
 const BIO_EXAMPLES = [
   'Volleyball, playlists on repeat, and still figuring it out. 🌱',
   'Art kid. Overthinker. Trying to be kinder to myself.',
   'Loves rainy days, bad puns, and my dog. Here to listen.',
   'Just a teen navigating school, friends, and everything in between.',
-  'Books over parties. Anxiety is loud — but so is my hope.',
+  'Books over parties. Anxiety is loud, but so is my hope.',
   'Learning guitar (badly). Big feelings, small steps.',
   'Third-culture kid finding where I belong. 🌍',
-  'Some days heavy, some days light — either way, I’m here.',
+  'Some days heavy, some days light, either way, I’m here.',
   'Coffee, coding, and cats. Say hi. ☕',
   'Trying my best, one deep breath at a time.',
   'Music makes it bearable. Ask me for song recs. 🎧',
   'New school, new city, still me. Figuring it out.',
   'Soft-spoken, but I’ve always got your back.',
-  'Plant parent in training 🌿 — here to hold umbrellas.',
+  'Plant parent in training 🌿, here to hold umbrellas.',
   'Gamer, dreamer, occasional crier. All are welcome here.'
 ]
 const STATUS_EXAMPLES = [
@@ -92,7 +92,7 @@ export default function Profile() {
     }).eq('id', user.id)
     if (error) {
       alert(/blocked_content/i.test(error.message)
-        ? "Some of your profile text isn’t allowed — please remove any hurtful or unsafe words and try again. 💛"
+        ? "Some of your profile text isn’t allowed, please remove any hurtful or unsafe words and try again. 💛"
         : error.message)
       return
     }
@@ -152,7 +152,7 @@ export default function Profile() {
               <label>Avatar
                 <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
               </label>
-              <p className="up-note">Choose any emoji as your picture — on Apple devices you’ll see the Apple emoji set. Custom photo uploads are coming once we add image moderation to keep everyone safe. 🔒</p>
+              <p className="up-note">Choose any emoji as your picture, on Apple devices you’ll see the Apple emoji set. Custom photo uploads are coming once we add image moderation to keep everyone safe. 🔒</p>
 
               <label>Display name<input value={p.display_name} maxLength={30} onChange={(e) => set('display_name', e.target.value)} placeholder={p.username} /></label>
               <label>Pronouns<input value={p.pronouns} maxLength={30} onChange={(e) => set('pronouns', e.target.value)} placeholder="they/them (optional)" /></label>

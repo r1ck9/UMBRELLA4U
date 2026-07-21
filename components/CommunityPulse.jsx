@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 
 // A live banner that makes the community feel alive. Uses cumulative totals
-// (which only grow — never an awkward zero) and ticks up in real time as
+// (which only grow, never an awkward zero) and ticks up in real time as
 // umbrellas open. "Today" only shows once there's something to show.
 export default function CommunityPulse() {
   const [s, setS] = useState(null)

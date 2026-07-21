@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase, isConfigured } from '@/lib/supabase'
 
 // Where the email-confirmation link lands. Finalizes the confirmation no matter
-// which email-link style Supabase sends, and — crucially — works even when the
+// which email-link style Supabase sends, and, crucially, works even when the
 // link is opened on a DIFFERENT device/browser than the one that signed up:
 //   • token_hash + type  → verifyOtp()          (device-independent; preferred)
 //   • code               → exchangeCodeForSession() (PKCE, same-device only)
@@ -18,7 +18,7 @@ export default function ConfirmEmail() {
   const [resent, setResent] = useState(false)
 
   useEffect(() => {
-    if (!isConfigured) { setStatus('error'); setMsg('Connect Supabase first — see README.md.'); return }
+    if (!isConfigured) { setStatus('error'); setMsg('Connect Supabase first, see README.md.'); return }
     ;(async () => {
       try {
         const url = new URL(window.location.href)
@@ -44,7 +44,7 @@ export default function ConfirmEmail() {
 
         const { data } = await supabase.auth.getSession()
         if (data.session) {
-          setStatus('ok'); setMsg('Email confirmed — you’re in. Taking you to setup… ☂')
+          setStatus('ok'); setMsg('Email confirmed, you’re in. Taking you to setup… ☂')
           setTimeout(() => router.replace('/onboarding'), 1200)
         } else {
           setStatus('ok'); setMsg('Email confirmed! Just log in and we’ll set you up. ☂')
@@ -53,7 +53,7 @@ export default function ConfirmEmail() {
       } catch (e) {
         setStatus('error')
         setMsg(/expired|invalid|already/i.test(e.message)
-          ? 'This confirmation link has expired or was already used. Try logging in — or send yourself a fresh link below.'
+          ? 'This confirmation link has expired or was already used. Try logging in, or send yourself a fresh link below.'
           : (e.message || 'Something went wrong confirming your email.'))
       }
     })()
@@ -77,7 +77,7 @@ export default function ConfirmEmail() {
       {status === 'error' && (
         <>
           {resent
-            ? <p className="msg">Sent — check your inbox (and spam / junk). ☂</p>
+            ? <p className="msg">Sent, check your inbox (and spam / junk). ☂</p>
             : <form onSubmit={resend}>
                 <input type="email" placeholder="Your email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 <button className="btn prim" type="submit">Resend confirmation link</button>

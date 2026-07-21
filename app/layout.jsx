@@ -8,8 +8,8 @@ import PushRegistrar from '@/components/PushRegistrar'
 import { Analytics } from '@vercel/analytics/next'
 
 export const metadata = {
-  title: 'Haven — come in from the rain',
-  description: "An anonymous space to share what you're carrying — and to know someone will stand with you."
+  title: 'Haven, come in from the rain',
+  description: "An anonymous space to share what you're carrying, and to know someone will stand with you."
 }
 
 // Ensure phones render at device width so the responsive top-bar rules apply

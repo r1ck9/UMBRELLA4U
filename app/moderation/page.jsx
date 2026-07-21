@@ -22,11 +22,11 @@ export default function Moderation() {
           <FunnelChart />
           <PostTypeReport />
           <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
-            Bot activity — how the seeded accounts are boosting real posts toward ~50 umbrellas over 24h.
+            Bot activity, how the seeded accounts are boosting real posts toward ~50 umbrellas over 24h.
           </p>
           <BotReport />
           <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
-            New posts waiting for a reply. Type a note — it&apos;s posted as a member and lands in their inbox.
+            New posts waiting for a reply. Type a note, it&apos;s posted as a member and lands in their inbox.
           </p>
           <ReplyQueue />
           <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>

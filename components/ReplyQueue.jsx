@@ -33,7 +33,7 @@ export default function ReplyQueue() {
     setBusy(null)
     if (error) {
       const m = error.message || ''
-      if (m.includes('no_names_in_reply')) alert('Keep replies anonymous — please don’t include names or @mentions.')
+      if (m.includes('no_names_in_reply')) alert('Keep replies anonymous, please don’t include names or @mentions.')
       else if (m.includes('personal_info')) alert('Please remove personal info (like emails) from the reply.')
       else if (m.includes('blocked_content')) alert('That reply was blocked by the content filter.')
       else alert('Could not send: ' + m)

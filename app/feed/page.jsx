@@ -33,7 +33,7 @@ export default async function Feed({ searchParams }) {
           <SeenBanner />
           <CommunityPulse />
           <SafetyNote />
-          <p className="care-banner">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here — just be kind to yourself, and to everyone else.</p>
+          <p className="care-banner">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here, just be kind to yourself, and to everyone else.</p>
           <Composer />
           {stories.length === 0
             ? <p className="empty">No stories here yet. Be the first to share this weather. ☂</p>

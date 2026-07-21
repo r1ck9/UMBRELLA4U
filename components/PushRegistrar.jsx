@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 
-// Registers this device for push notifications — but ONLY when running inside
+// Registers this device for push notifications, but ONLY when running inside
 // the native Capacitor app. On the plain website it's a no-op (the dynamic
 // imports never resolve because @capacitor/* isn't bundled for web use here).
 export default function PushRegistrar() {
