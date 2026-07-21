@@ -95,7 +95,23 @@
 
   footer{padding:40px 0;border-top:1px solid var(--line-2);color:var(--ink-3);font-size:.86rem}
   a{color:var(--blue)}
+  .site-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 24px;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-2)}
+  .site-brand{font-family:var(--serif);font-weight:700;font-size:1.1rem;color:var(--ink);text-decoration:none}
+  .site-links{display:flex;align-items:center;gap:16px;font-size:.92rem}
+  .site-links a{color:var(--ink-2);text-decoration:none}
+  .site-links a:hover{color:var(--ink)}
+  .site-links a.here{color:var(--ink);font-weight:600}
+  .site-cta{background:var(--amber);color:#241505 !important;padding:8px 15px;border-radius:999px;font-weight:650}
 </style>
+
+<nav class="site-nav">
+  <a class="site-brand" href="/umbrella4u">☂ Umbrella4U</a>
+  <div class="site-links">
+    <a href="/about">About</a>
+    <a href="/handbook" class="here">Chapters</a>
+    <a class="site-cta" href="https://umbrella4u.ca">Enter Haven</a>
+  </div>
+</nav>
 
 <header class="cover">
   <div class="col">
@@ -112,8 +128,9 @@
     <h2 class="sec">Chapters bring Umbrella to life — locally.</h2>
     <p class="lead">Umbrella provides the mission. Local <b>chapters</b> create safe spaces in their own communities — a school, a campus, a whole city.</p>
     <div class="name-ex">
-      <div class="n">☂ Umbrella Chapter — St. George's School</div>
-      <div class="n">☂ Umbrella Chapter — Brown University</div>
+      <div class="n">☂ Umbrella Chapter — Eastside Secondary</div>
+      <div class="n">☂ Umbrella Chapter — Riverview High</div>
+      <div class="n">☂ Umbrella Chapter — Northgate College</div>
       <div class="n">☂ Umbrella Chapter — Vancouver</div>
     </div>
     <p class="body">Every Chapter is run by real people who care about the same thing you do. At minimum, a Chapter has:</p>
