@@ -64,7 +64,7 @@ export default function Terms() {
 
         <p className="legal-note">This is plain-language starter text for a youth community project, not legal advice. Please review it with a trusted adult before public launch.</p>
 
-        <p className="legal-back"><Link href="/">← Back to Umbrella</Link> · <Link href="/privacy">Privacy Policy</Link></p>
+        <p className="legal-back"><Link href="/feed">← Back to Haven</Link> · <Link href="/privacy">Privacy Policy</Link></p>
       </main>
     </>
   )

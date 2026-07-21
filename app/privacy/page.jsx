@@ -71,7 +71,7 @@ export default function Privacy() {
 
         <p className="legal-note">This is a plain-language policy for a youth community project. It isn't legal advice — it should be reviewed with a trusted adult (and, where possible, someone familiar with youth-privacy law) before public launch.</p>
 
-        <p className="legal-back"><Link href="/">← Back to Umbrella</Link> · <Link href="/terms">Terms of Use</Link></p>
+        <p className="legal-back"><Link href="/feed">← Back to Haven</Link> · <Link href="/terms">Terms of Use</Link></p>
       </main>
     </>
   )
