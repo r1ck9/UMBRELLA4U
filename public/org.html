@@ -76,7 +76,14 @@
   /* ---------- hero (committed dark canopy world) ---------- */
   .hero{position:relative;isolation:isolate;color:#eef4fb;overflow:hidden;
     background:linear-gradient(180deg,#0b0f17 0%,#182233 55%,#26344e 100%);
-    padding:clamp(80px,13vw,168px) 0 clamp(72px,10vw,128px)}
+    min-height:100vh;min-height:100svh;display:flex;align-items:center;
+    padding:clamp(64px,10vw,110px) 0 clamp(96px,12vw,140px)}
+  .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
+    display:flex;flex-direction:column;align-items:center;gap:3px;color:#b7cbe4;opacity:.85;
+    font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
+  .scroll-cue i{font-style:normal;font-size:1.35rem;line-height:1;animation:scrollbob 1.8s ease-in-out infinite}
+  @keyframes scrollbob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
+  @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
   .hero canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;opacity:.9}
   .hero::after{content:"";position:absolute;inset:0;z-index:-1;
     background:linear-gradient(180deg,transparent 55%,rgba(10,22,40,.5) 100%)}
@@ -249,6 +256,7 @@
       </div>
       <p class="dom">☂ Haven is the flagship product of <b>Umbrella4U</b>, a youth mental-wellness organization. &nbsp;·&nbsp; <b>umbrella4u.ca</b></p>
     </div>
+    <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><i>⌄</i></div>
   </section>
 
   <!-- ABOUT -->
