@@ -11,8 +11,17 @@ function ago(iso) {
 }
 function excerpt(t = '') { return t.length > 70 ? t.slice(0, 70) + '…' : t }
 
+// Quick thank-yous the poster can send back to whoever left them a word.
+const THANKS = [
+  'Thank you for sharing 💛',
+  'Thank you for your advice 🙏',
+  'This really helped, thank you 🫂',
+]
+
 export default function InboxList() {
   const [state, setState] = useState({ loading: true, user: null, items: [] })
+  const [sent, setSent] = useState({})   // umbrella_id -> the thank-you sent
+  const [busy, setBusy] = useState(null)
 
   useEffect(() => {
     if (!supabase) { setState({ loading: false, user: null, items: [] }); return }
@@ -33,17 +42,46 @@ export default function InboxList() {
       let umbs = []
       if (ids.length) {
         const { data: u } = await supabase.from('umbrellas')
-          .select('story_id,note,created_at,user_id')
+          .select('id,story_id,note,created_at,user_id')
           .in('story_id', ids).order('created_at', { ascending: false })
         umbs = (u || []).filter((x) => x.user_id !== user.id) // don't notify you about your own
       }
 
+      // thank-yous other posters sent me for words I left on their stories
+      const { data: th } = await supabase.from('thanks')
+        .select('id,message,created_at,from_user').eq('to_user', user.id)
+        .order('created_at', { ascending: false })
+
+      // thank-yous I've already sent, so those replies show a "Sent" state
+      const { data: mine } = await supabase.from('thanks')
+        .select('umbrella_id,message').eq('from_user', user.id)
+      const already = {}
+      ;(mine || []).forEach((t) => { if (t.umbrella_id) already[t.umbrella_id] = t.message })
+      setSent(already)
+
       const seen = localStorage.getItem('umbrella_inbox_seen') || '1970-01-01T00:00:00Z'
-      const items = umbs.map((u) => ({ ...u, story: map[u.story_id], isNew: u.created_at > seen }))
+      const umbItems = umbs.map((u) => ({
+        kind: 'umbrella', id: u.id, note: u.note, user_id: u.user_id,
+        story: map[u.story_id], created_at: u.created_at, isNew: u.created_at > seen,
+      }))
+      const thankItems = (th || []).map((t) => ({
+        kind: 'thanks', id: 't' + t.id, message: t.message,
+        created_at: t.created_at, isNew: t.created_at > seen,
+      }))
+      const items = [...umbItems, ...thankItems].sort((a, b) => b.created_at.localeCompare(a.created_at))
       setState({ loading: false, user, items })
       localStorage.setItem('umbrella_inbox_seen', new Date().toISOString()) // mark read on view
     })()
   }, [])
+
+  async function sendThanks(umbrellaId, message) {
+    if (!supabase || sent[umbrellaId]) return
+    setBusy(umbrellaId)
+    const { error } = await supabase.rpc('send_thanks', { u_id: umbrellaId, msg: message })
+    setBusy(null)
+    if (error) { alert('Could not send thanks: ' + (error.message || 'try again')); return }
+    setSent((s) => ({ ...s, [umbrellaId]: message }))
+  }
 
   if (state.loading) return <p className="empty">Loading…</p>
   if (!state.user) return <p className="empty">Log in to see your notifications.</p>
@@ -56,20 +94,44 @@ export default function InboxList() {
     <>
       {newCount > 0 && <p className="notif-new">{newCount} new</p>}
       <div className="notif-list">
-        {state.items.map((n, i) => (
-          <div className={'notif' + (n.isNew ? ' new' : '')} key={i}>
-            <span className="ic">{n.note ? '💬' : '🌂'}</span>
-            <div className="nbody">
-              <div className="ntext">
-                {n.note
-                  ? <>Someone left you a word: <b>&ldquo;{n.note}&rdquo;</b></>
-                  : <>Someone opened an umbrella on your story</>}
+        {state.items.map((n) => {
+          if (n.kind === 'thanks') {
+            return (
+              <div className={'notif' + (n.isNew ? ' new' : '')} key={n.id}>
+                <span className="ic">💛</span>
+                <div className="nbody">
+                  <div className="ntext">Someone you helped said thanks: <b>&ldquo;{n.message}&rdquo;</b></div>
+                </div>
+                <span className="ntm">{ago(n.created_at)}</span>
               </div>
-              <div className="nctx">on &ldquo;{excerpt(n.story?.text)}&rdquo;</div>
+            )
+          }
+          return (
+            <div className={'notif' + (n.isNew ? ' new' : '')} key={n.id}>
+              <span className="ic">{n.note ? '💬' : '🌂'}</span>
+              <div className="nbody">
+                <div className="ntext">
+                  {n.note
+                    ? <>Someone left you a word: <b>&ldquo;{n.note}&rdquo;</b></>
+                    : <>Someone opened an umbrella on your story</>}
+                </div>
+                <div className="nctx">on &ldquo;{excerpt(n.story?.text)}&rdquo;</div>
+                {n.note && (
+                  sent[n.id]
+                    ? <div className="thanks-sent">Sent {sent[n.id]}</div>
+                    : <div className="thanks-row">
+                        {THANKS.map((t) => (
+                          <button key={t} type="button" className="thanks-chip"
+                            disabled={busy === n.id}
+                            onClick={() => sendThanks(n.id, t)}>{t}</button>
+                        ))}
+                      </div>
+                )}
+              </div>
+              <span className="ntm">{ago(n.created_at)}</span>
             </div>
-            <span className="ntm">{ago(n.created_at)}</span>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </>
   )

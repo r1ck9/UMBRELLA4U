@@ -248,6 +248,12 @@ a{color:inherit}
 .notif .ntext{font-size:14px; line-height:1.4}
 .notif .nctx{font-size:12.5px; color:var(--ink-3); margin-top:2px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .notif .ntm{font-size:11.5px; color:var(--ink-3); white-space:nowrap; flex:0 0 auto; margin-top:2px}
+.thanks-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:8px}
+.thanks-chip{font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; border:1.5px solid var(--shelter);
+  color:var(--shelter-deep); background:var(--panel); border-radius:999px; padding:5px 12px; line-height:1.2}
+.thanks-chip:hover:not(:disabled){background:var(--shelter); color:var(--on-accent)}
+.thanks-chip:disabled{opacity:.5; cursor:default}
+.thanks-sent{margin-top:8px; font-size:12.5px; font-weight:700; color:var(--shelter-deep)}
 
 /* umbrella note (story card) */
 .addword{background:none; border:none; color:var(--ink-3); font-weight:600; font-size:13px; cursor:pointer}
