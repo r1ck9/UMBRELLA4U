@@ -54,14 +54,21 @@
   :where(section){padding:clamp(64px,9vw,120px) 0}
 
   /* ---------- nav ---------- */
-  header.nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(10px);
-    background:color-mix(in srgb,var(--paper) 82%,transparent);border-bottom:1px solid var(--line-2)}
+  header.nav{position:fixed;top:0;left:0;right:0;z-index:50;
+    background:transparent;border-bottom:1px solid transparent;
+    transition:background .25s ease,border-color .25s ease,backdrop-filter .25s ease}
+  header.nav.scrolled{backdrop-filter:blur(10px);
+    background:color-mix(in srgb,var(--paper) 82%,transparent);border-bottom-color:var(--line-2)}
   .nav .wrap{display:flex;align-items:center;gap:28px;height:66px}
   .brand{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:1.28rem;letter-spacing:-.01em}
   .brand .mark{width:26px;height:26px;flex:0 0 auto}
   .nav nav{margin-left:auto;display:flex;gap:26px;align-items:center}
-  .nav nav a{font-size:.95rem;color:var(--ink-2);transition:color .18s}
-  .nav nav a:hover{color:var(--ink)}
+  .nav .brand{color:#f2f6fc}
+  .nav.scrolled .brand{color:var(--ink)}
+  .nav nav a{font-size:.95rem;color:rgba(238,244,251,.82);transition:color .18s}
+  .nav nav a:hover{color:#fff}
+  .nav.scrolled nav a{color:var(--ink-2)}
+  .nav.scrolled nav a:hover{color:var(--ink)}
   .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;
     font-size:.95rem;padding:11px 20px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .16s,box-shadow .16s,background .16s}
   .btn.primary{background:var(--amber);color:#241505}
@@ -241,6 +248,11 @@
     </nav>
   </div>
 </header>
+<script>
+(function(){var n=document.querySelector('header.nav');if(!n)return;
+var f=function(){n.classList.toggle('scrolled',(window.scrollY||0)>40)};
+f();addEventListener('scroll',f,{passive:true});})();
+</script>
 
 <main id="top">
   <!-- HERO -->
