@@ -256,6 +256,15 @@
   .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
   .reveal.in{opacity:1;transform:none}
   @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
+  /* ---- page transitions (View Transitions API) ---- */
+  @view-transition{navigation:auto}
+  ::view-transition-old(root){animation:vtOut .30s ease both}
+  ::view-transition-new(root){animation:vtIn .44s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes vtOut{to{opacity:0;transform:translateY(-12px) scale(.99)}}
+  @keyframes vtIn{from{opacity:0;transform:translateY(22px) scale(.995)}}
+  @media(prefers-reduced-motion:reduce){
+    ::view-transition-old(root),::view-transition-new(root){animation:none}
+  }
   :focus-visible{outline:2.5px solid var(--amber);outline-offset:3px;border-radius:6px}
 </style>
 

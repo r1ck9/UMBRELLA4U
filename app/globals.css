@@ -1,3 +1,17 @@
+/* ---- page transitions ---- */
+@view-transition{navigation:auto}
+::view-transition-old(root){animation:vtOut .30s ease both}
+::view-transition-new(root){animation:vtIn .44s cubic-bezier(.2,.7,.2,1) both}
+@keyframes vtOut{to{opacity:0;transform:translateY(-12px) scale(.99)}}
+@keyframes vtIn{from{opacity:0;transform:translateY(22px) scale(.995)}}
+/* in-app (client-side) route change fade — replays via keyed wrapper on nav */
+.route-fade{animation:routeFade .40s cubic-bezier(.2,.7,.2,1) both}
+@keyframes routeFade{from{opacity:0;transform:translateY(12px)}}
+@media(prefers-reduced-motion:reduce){
+  ::view-transition-old(root),::view-transition-new(root){animation:none}
+  .route-fade{animation:none}
+}
+
 :root{
   /* ---- Theme D · Ink (minimal editorial) ---- */
   --rain-0:#faf9f7; --rain-1:#f1efea; --rain-2:#e6e4df;

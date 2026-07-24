@@ -33,6 +33,13 @@
 
   /* nav */
   .site-nav{position:sticky;top:0;z-index:60;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:11px 24px;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line-2)}
+  /* ---- page transitions (View Transitions API) ---- */
+  @view-transition{navigation:auto}
+  ::view-transition-old(root){animation:vtOut .30s ease both}
+  ::view-transition-new(root){animation:vtIn .44s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes vtOut{to{opacity:0;transform:translateY(-12px) scale(.99)}}
+  @keyframes vtIn{from{opacity:0;transform:translateY(22px) scale(.995)}}
+  @media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}}
   .site-brand{font-family:var(--serif);font-weight:700;font-size:1.1rem;color:var(--ink);text-decoration:none}
   .site-links{display:flex;align-items:center;gap:16px;font-size:.92rem}
   .site-links a{color:var(--ink-2);text-decoration:none}

@@ -1,4 +1,5 @@
 import './globals.css'
+import PageTransition from '@/components/PageTransition'
 import Rain from '@/components/Rain'
 import GuidelinesModal from '@/components/GuidelinesModal'
 import UmbrellaBurst from '@/components/UmbrellaBurst'
@@ -22,7 +23,7 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t)document.documentElement.setAttribute('data-ui-theme',t)}catch(e){}" }} />
       </head>
-      <body><Rain /><ViewCounter /><FunnelTracker /><PushRegistrar />{children}<GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
+      <body><Rain /><ViewCounter /><FunnelTracker /><PushRegistrar /><PageTransition>{children}</PageTransition><GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
     </html>
   )
 }
