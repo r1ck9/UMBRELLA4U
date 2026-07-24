@@ -108,7 +108,7 @@
     .hero .lede{margin-left:auto;margin-right:auto}
   }
   .haven-title{display:flex;align-items:center;gap:.24em;margin:14px 0 0;
-    font-size:clamp(3.6rem,12vw,7.4rem);letter-spacing:-.035em;line-height:.9}
+    font-size:clamp(2.6rem,7.6vw,5.4rem);letter-spacing:-.03em;line-height:.92}
   .haven-title .haven-mark{width:.82em;height:.82em;flex:0 0 auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.25))}
   .btn.big{font-size:1.22rem;padding:18px 42px;border-radius:999px;font-weight:700}
   @media(max-width:520px){.haven-title{gap:.15em}}
@@ -140,6 +140,16 @@
   .sec-head p.sub{margin-top:16px;color:var(--ink-2);font-size:1.12rem;max-width:56ch}
 
   /* about split */
+  /* Meet Haven — flagship band, moved below the Umbrella4U title page */
+  .havensec{background:linear-gradient(180deg,var(--surface),var(--surface-2))}
+  .havensec .inner{max-width:72ch}
+  .havensec .eyebrow{color:var(--amber)}
+  .havensec h2{font-size:clamp(1.9rem,3.6vw,2.9rem);letter-spacing:-.015em;margin-top:12px}
+  .havensec .lede2{margin-top:16px;color:var(--ink-2);font-size:1.14rem;max-width:62ch}
+  .havensec .feat{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 0;padding:0;list-style:none}
+  .havensec .feat li{font-size:.92rem;font-weight:600;color:var(--forest-deep);
+    background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px}
+  .havensec .cta-row{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   .about{background:var(--surface)}
   .about-intro{border-bottom:1px solid var(--line-2);
     padding-bottom:clamp(36px,5vw,56px);margin-bottom:clamp(36px,5vw,56px)}
@@ -295,20 +305,20 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
   <section class="hero">
     <canvas id="umb3d" aria-hidden="true"></canvas>
     <div class="wrap">
-      <p class="eyebrow">An Umbrella4U product</p>
-      <h1 class="haven-title"><span>Haven<i class="splash" id="splash">Umbrella4U FOREVER!</i></span></h1>
-      <p class="lede">A safe place to be heard, no name required. Share what you're carrying and get met with warmth, not judgment. When a story moves you, you open an umbrella. That's the whole idea.</p>
+      <p class="eyebrow">Youth mental-wellness · non-profit</p>
+      <h1 class="haven-title"><span>Umbrella4U<i class="splash" id="splash">You're not alone! ☂</i></span></h1>
+      <p class="lede">A youth mental-wellness organization building free, helpful tools so no young person has to face the hard stuff alone. Started by students, run by volunteers, spread city by city.</p>
       <ul class="hero-keys" aria-label="What we stand for">
-        <li><b>☂</b>Anonymous</li>
+        <li><b>☂</b>Non-profit</li>
         <li><b>♡</b>Free forever</li>
         <li><b>◈</b>Safe by design</li>
-        <li><b>✿</b>Youth-first</li>
+        <li><b>✿</b>Youth-led</li>
       </ul>
       <div class="cta-row">
         <a class="btn light big" href="/feed">Enter Haven →</a>
-        <a class="btn ghost" href="#products" style="border-color:rgba(255,255,255,.3);color:#eef4fb">Explore Umbrella4U</a>
+        <a class="btn ghost" href="#about" style="border-color:rgba(255,255,255,.3);color:#eef4fb">What we're about</a>
       </div>
-      <p class="dom">☂ Haven is the flagship product of <b>Umbrella4U</b>, a youth mental-wellness organization. &nbsp;·&nbsp; <b>umbrella4u.ca</b></p>
+      <p class="dom">☂ Home of <b>Haven</b>, our anonymous peer-support app. &nbsp;·&nbsp; <b>umbrella4u.ca</b></p>
     </div>
     <div class="scroll-cue" aria-hidden="true"><span>Scroll</span><i>⌄</i></div>
   </section>
@@ -341,6 +351,27 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
           <div class="pillar"><span class="n">✿</span><div><h3>Free where it counts</h3><p>Any young person gets full access for free, forever. Schools and systems fund the rest.</p></div></div>
           <div class="pillar"><span class="n">◈</span><div><h3>Safety is the product</h3><p>Human moderation, crisis pathways, and privacy by default, not an afterthought bolted on later.</p></div></div>
           <div class="pillar"><span class="n">↗</span><div><h3>Built to scale</h3><p>One shelter, many tools, designed to reach a whole continent, not just one classroom.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEET HAVEN (flagship) -->
+  <section class="havensec" id="haven">
+    <div class="wrap">
+      <div class="inner reveal">
+        <p class="eyebrow">Our flagship · live today</p>
+        <h2>Meet Haven ☂</h2>
+        <p class="lede2">Haven is our anonymous peer-support app: a safe place to be heard, no name required. Share what you're carrying and get met with warmth, not judgment. When a story moves you, you open one umbrella, a quiet "I'm standing with you." No pile-ons, no arguing, no names.</p>
+        <ul class="feat">
+          <li>No name required</li>
+          <li>One umbrella each</li>
+          <li>Human moderation</li>
+          <li>Crisis pathways</li>
+        </ul>
+        <div class="cta-row">
+          <a class="btn primary big" href="/feed">Enter Haven →</a>
+          <a class="btn ghost" href="/welcome">How it works</a>
         </div>
       </div>
     </div>
