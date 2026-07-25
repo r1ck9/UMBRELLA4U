@@ -9,6 +9,8 @@ const nextConfig = {
       ],
       afterFiles: [
         { source: '/about', destination: '/about.html' },
+        { source: '/about-us', destination: '/about-us.html' },
+        { source: '/team', destination: '/about-us.html' },
         { source: '/handbook', destination: '/handbook.html' },
         { source: '/umbrella4u', destination: '/org.html' },
       ],
