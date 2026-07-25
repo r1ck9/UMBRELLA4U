@@ -46,6 +46,8 @@ export default function Composer() {
   const [busy, setBusy] = useState(false)
   const [rejected, setRejected] = useState('')
   const [prompt, setPrompt] = useState(null)
+  const [channels, setChannels] = useState([])       // the current user's channels
+  const [channelId, setChannelId] = useState('')     // chosen channel (non-anonymous only)
 
   // The "Answer this" button in the Rail opens the composer with the prompt pinned.
   useEffect(() => {
@@ -56,6 +58,17 @@ export default function Composer() {
     }
     window.addEventListener('umbrella:answer-prompt', onAnswer)
     return () => window.removeEventListener('umbrella:answer-prompt', onAnswer)
+  }, [])
+
+  // Load the current user's channels so they can file a (non-anonymous) post.
+  useEffect(() => {
+    if (!supabase) return
+    ;(async () => {
+      const { data: u } = await supabase.auth.getUser()
+      if (!u.user) return
+      const { data } = await supabase.from('channels').select('id,name').eq('owner_id', u.user.id).order('created_at', { ascending: true })
+      setChannels(data || [])
+    })()
   }, [])
 
   // Gently steer heavy posts toward "Just listen" so someone sharing something
@@ -97,7 +110,7 @@ export default function Composer() {
     } catch { /* network hiccup, fall through; the DB keyword trigger still guards */ }
 
     const { data: created, error } = await supabase.from('stories')
-      .insert({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null })
+      .insert({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, channel_id: (!anon && channelId) ? channelId : null })
       .select('id').single()
     if (error) {
       setBusy(false)
@@ -203,6 +216,16 @@ export default function Composer() {
             <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} />
             🕶️ Post fully anonymously (not linked to your account name)
           </label>
+
+          {!anon && channels.length > 0 && (
+            <div className="compose-channel">
+              <span>📺 Channel:</span>
+              <select value={channelId} onChange={(e) => setChannelId(e.target.value)}>
+                <option value="">None</option>
+                {channels.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+          )}
 
           <div className="poll-add">
             {!pollOn ? (

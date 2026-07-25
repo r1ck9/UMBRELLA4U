@@ -598,6 +598,18 @@ a{color:inherit}
 .tb-help:hover{border-color:var(--shelter); color:var(--shelter)}
 .tb-team{font-weight:700; font-size:14px; color:var(--ink-2); text-decoration:none; white-space:nowrap; flex:0 0 auto}
 .tb-team:hover{color:var(--shelter)}
+/* follows + channels */
+.followbtn{margin-left:auto;align-self:flex-start;font-weight:700;font-size:14px;border:1.5px solid var(--shelter);
+  color:var(--shelter-deep);background:var(--panel);border-radius:999px;padding:8px 16px;cursor:pointer;white-space:nowrap;flex:0 0 auto}
+.followbtn.on{background:var(--shelter);color:var(--on-accent);border-color:var(--shelter)}
+.followbtn:disabled{opacity:.6}
+.chan-tabs{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
+.chan-tab{flex:0 0 auto;font-size:13px;font-weight:700;padding:8px 14px;border-radius:999px;border:1px solid var(--rain-2);
+  background:var(--panel);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.chan-tab.on{background:var(--shelter-wash);border-color:var(--shelter);color:var(--shelter-deep)}
+.chan-tab.new{border-style:dashed;color:var(--shelter-deep)}
+.compose-channel{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:13.5px;color:var(--ink-2)}
+.compose-channel select{font:inherit;font-size:13.5px;border:1.5px solid var(--rain-2);border-radius:10px;padding:7px 10px;background:var(--panel);color:var(--ink-1)}
 .set-hint{font-size:12.5px; color:var(--ink-3); margin:0 0 12px; line-height:1.45}
 .wl-sub{font-size:15px; color:var(--ink-2); line-height:1.55; margin:0 0 16px}
 .theme-choose{display:grid; grid-template-columns:1fr 1fr; gap:10px}
