@@ -69,6 +69,7 @@ export default function TopBar() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
       </form>
       <div className="tb-right">
+        <a href="/team" className="tb-team" title="Meet the Umbrella4U team">Our Team</a>
         <Link href="/welcome" className="tb-help" title="How to use Haven">?</Link>
         {email ? (
           <>

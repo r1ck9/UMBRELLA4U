@@ -58,6 +58,9 @@ export default function MobileMenu() {
                 <span className="mi-ic" aria-hidden="true">{l.icon}</span>{l.label}
               </Link>
             ))}
+            <a href="/team" className="mm-item">
+              <span className="mi-ic" aria-hidden="true">🫂</span>Our Team
+            </a>
             <button className="mm-item" onClick={tour}>
               <span className="mi-ic" aria-hidden="true">🧭</span>Take a tour
             </button>
