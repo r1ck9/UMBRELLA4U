@@ -1,0 +1,16 @@
+{
+  "name": "Haven — Umbrella4U",
+  "short_name": "Haven",
+  "description": "An anonymous space to share what you're carrying, and to know someone will stand with you.",
+  "start_url": "/feed",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1520",
+  "theme_color": "#3f6fa3",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

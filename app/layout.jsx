@@ -21,6 +21,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link rel="manifest" href="/manifest.webmanifest" />
+        <meta name="theme-color" content="#3f6fa3" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t)document.documentElement.setAttribute('data-ui-theme',t)}catch(e){}" }} />
       </head>
       <body><Rain /><ViewCounter /><FunnelTracker /><PushRegistrar /><PageTransition>{children}</PageTransition><GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
