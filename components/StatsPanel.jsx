@@ -13,7 +13,7 @@ export default function StatsPanel() {
     ;(async () => {
       const me = await getMe()
       if (!me.isModerator) return
-      const users = await supabase.from('profiles').select('*', { count: 'exact', head: true })
+      const users = await supabase.from('profiles').select('id', { count: 'exact', head: true })
       const stories = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
       const v = await supabase.from('site_metrics').select('value').eq('key', 'views').maybeSingle()
       const pa = await supabase.from('stories')

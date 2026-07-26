@@ -31,7 +31,7 @@ export default function PublicProfile({ params }) {
   useEffect(() => {
     if (!supabase) { setState({ loading: false, prof: null }); return }
     ;(async () => {
-      const { data: prof } = await supabase.from('profiles').select('*').eq('username', uname).single()
+      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,last_active_date,created_at').eq('username', uname).single()
       if (!prof) { setState({ loading: false, prof: null }); return }
 
       const me = await getMe()
@@ -42,7 +42,7 @@ export default function PublicProfile({ params }) {
         supabase.rpc('umbrellas_opened_by', { uid: prof.id }),
         supabase.rpc('follow_counts', { target: prof.id }),
         supabase.from('channels').select('id,name').eq('owner_id', prof.id).order('created_at', { ascending: true }),
-        supabase.from('stories').select('*').eq('author_id', prof.id).eq('anonymous', false).eq('state', 'live').order('created_at', { ascending: false })
+        supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather,channel_id').eq('author_id', prof.id).eq('anonymous', false).eq('state', 'live').order('created_at', { ascending: false })
       ])
       const s = mine || []
       setStats({ stories: s.length, received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0), opened: Number(opened) || 0 })

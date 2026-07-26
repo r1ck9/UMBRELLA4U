@@ -56,7 +56,7 @@ export default function Profile() {
       const { data } = await supabase.auth.getUser()
       if (!data.user) { setLoading(false); return }
       setUser(data.user)
-      const { data: prof } = await supabase.from('profiles').select('*').eq('id', data.user.id).single()
+      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,last_active_date,created_at').eq('id', data.user.id).single()
       if (prof) setP({
         username: prof.username || '', display_name: prof.display_name || '', pronouns: prof.pronouns || '',
         status_weather: prof.status_weather || '', about_me: prof.about_me || '',
