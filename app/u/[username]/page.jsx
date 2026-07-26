@@ -31,7 +31,7 @@ export default function PublicProfile({ params }) {
   useEffect(() => {
     if (!supabase) { setState({ loading: false, prof: null }); return }
     ;(async () => {
-      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,last_active_date,created_at').eq('username', uname).single()
+      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,created_at').eq('username', uname).single()
       if (!prof) { setState({ loading: false, prof: null }); return }
 
       const me = await getMe()

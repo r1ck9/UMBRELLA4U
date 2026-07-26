@@ -52,35 +52,47 @@ where is_moderator = true
 --    every bot via the API. Grant access ONLY to the safe columns.
 -- ============================================================
 
--- profiles: readable columns (everything EXCEPT is_bot, bot_kind,
--- bot_posts_per_day, bot_umbrellas_per_day).
-revoke select, update on table profiles from anon, authenticated;
-grant select (
-  id, username, display_name, pronouns, status_weather, about_me,
-  accent_color, avatar_url, banner_url, banner_theme, tags,
-  discoverable, notify_email, onboarded, post_count, streak_count,
-  umbrellas_sent, is_moderator, last_active_date, last_notified_at,
-  last_reengaged_at, created_at
-) on table profiles to anon, authenticated;
--- writable columns (safe profile fields only — never is_moderator / is_bot).
-grant update (
-  username, display_name, pronouns, status_weather, about_me,
-  accent_color, avatar_url, banner_url, banner_theme, tags,
-  onboarded, discoverable, notify_email
-) on table profiles to authenticated;
+-- These run dynamically so they only touch columns that actually EXIST in your
+-- database (some migrations may not be applied) — grant every column EXCEPT the
+-- blocklisted ones. No "column does not exist" errors.
+do $$
+declare cols text;
+begin
+  -- profiles SELECT: hide the bot markers.
+  revoke select on table profiles from anon, authenticated;
+  select string_agg(quote_ident(column_name), ', ')
+    into cols from information_schema.columns
+   where table_schema='public' and table_name='profiles'
+     and column_name not in ('is_bot','bot_kind','bot_posts_per_day','bot_umbrellas_per_day');
+  execute format('grant select (%s) on table profiles to anon, authenticated', cols);
 
--- stories: readable columns (everything EXCEPT seed, seed_batch,
--- umbrella_target — the seeding/drip markers).
-revoke select, insert on table stories from anon, authenticated;
-grant select (
-  id, author_id, author_name, anonymous, text, intent, category,
-  content_warning, umbrella_count, state, created_at, boost_count,
-  hug_count, off_topic_count, prompt_id, view_count, weather, channel_id
-) on table stories to anon, authenticated;
--- insertable columns (the app sets these; counts/state/seed keep safe defaults).
-grant insert (
-  text, intent, category, anonymous, weather, prompt_id, channel_id, content_warning
-) on table stories to authenticated;
+  -- profiles UPDATE: users may write only non-privileged, non-server columns.
+  revoke update on table profiles from anon, authenticated;
+  select string_agg(quote_ident(column_name), ', ')
+    into cols from information_schema.columns
+   where table_schema='public' and table_name='profiles'
+     and column_name not in ('id','is_moderator','is_bot','bot_kind','bot_posts_per_day',
+       'bot_umbrellas_per_day','post_count','streak_count','umbrellas_sent','created_at',
+       'last_active_date','last_notified_at','last_reengaged_at');
+  execute format('grant update (%s) on table profiles to authenticated', cols);
+
+  -- stories SELECT: hide the seeding / drip markers.
+  revoke select on table stories from anon, authenticated;
+  select string_agg(quote_ident(column_name), ', ')
+    into cols from information_schema.columns
+   where table_schema='public' and table_name='stories'
+     and column_name not in ('seed','seed_batch','umbrella_target');
+  execute format('grant select (%s) on table stories to anon, authenticated', cols);
+
+  -- stories INSERT: users set only content columns; counts/state/seed default.
+  revoke insert on table stories from anon, authenticated;
+  select string_agg(quote_ident(column_name), ', ')
+    into cols from information_schema.columns
+   where table_schema='public' and table_name='stories'
+     and column_name in ('text','intent','category','anonymous','weather',
+       'prompt_id','channel_id','content_warning');
+  execute format('grant insert (%s) on table stories to authenticated', cols);
+end $$;
 
 
 -- ============================================================
