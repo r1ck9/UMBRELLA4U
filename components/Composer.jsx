@@ -110,7 +110,7 @@ export default function Composer() {
     } catch { /* network hiccup, fall through; the DB keyword trigger still guards */ }
 
     const { data: created, error } = await supabase.from('stories')
-      .insert({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, channel_id: (!anon && channelId) ? channelId : null })
+      .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
       .select('id').single()
     if (error) {
       setBusy(false)

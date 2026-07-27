@@ -18,7 +18,7 @@ export default function FeedList({ stories, category = null }) {
       // Moderators see the feed in plain time order, no ranking, boost, or
       // off-topic sinking, so it's easier to review everything as it comes in.
       if (m.isModerator) {
-        let q = supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather,channel_id').eq('state', 'live')
+        let q = supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather').eq('state', 'live')
           .order('created_at', { ascending: false }).limit(100)
         if (category) q = q.eq('category', category)
         q.then(({ data }) => { if (data) setModRows(data) })
