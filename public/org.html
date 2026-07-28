@@ -407,6 +407,18 @@ var m=["Umbrella4U FOREVER!","Break the social norm!","Welcome to this version!"
 "Every umbrella counts!","Also try journaling!","Skies clear here!","Peer support > algorithms!",
 "You matter here!","One umbrella at a time!"];
 s.textContent=m[Math.floor(Math.random()*m.length)];})();
+(function(){
+  if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+  document.addEventListener('click',function(e){
+    var link=e.target.closest('a[href^="#"]');if(!link)return;
+    var id=link.getAttribute('href').slice(1),target=id&&document.getElementById(id);if(!target)return;
+    e.preventDefault();
+    var from=window.scrollY,to=Math.max(0,target.getBoundingClientRect().top+from-84);
+    var duration=Math.min(520,Math.max(260,Math.abs(to-from)*.18)),started=performance.now();
+    function tick(now){var p=Math.min(1,(now-started)/duration),ease=1-Math.pow(1-p,4);window.scrollTo(0,from+(to-from)*ease);if(p<1)requestAnimationFrame(tick);else history.replaceState(null,'','#'+id)}
+    requestAnimationFrame(tick);
+  });
+})();
 </script>
 
 <canvas id="rainall" aria-hidden="true"></canvas>
