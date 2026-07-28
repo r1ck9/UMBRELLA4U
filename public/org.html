@@ -86,7 +86,7 @@
   @media(max-width:760px){.nav nav a:not(.cta-link){display:none}}
 
   /* ---------- hero (committed dark canopy world) ---------- */
-  .hero{position:relative;isolation:isolate;color:#f8f2fc;overflow:hidden;
+  .hero{position:relative;isolation:isolate;z-index:45;color:#f8f2fc;overflow:hidden;
     background:linear-gradient(180deg,#110b19 0%,#281737 55%,#47275c 100%);
     min-height:100vh;min-height:100svh;display:flex;align-items:center;
     padding:clamp(64px,10vw,110px) 0 clamp(96px,12vw,140px)}
@@ -97,6 +97,9 @@
   @keyframes scrollbob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
   @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
   .hero canvas{position:absolute;inset:0;z-index:-1;width:100%;height:100%;opacity:.9}
+  /* ---------- page-wide rain (falls over every section, under the nav & hero) ---------- */
+  #rainall{position:fixed;inset:0;width:100%;height:100%;z-index:40;pointer-events:none}
+  @media(prefers-reduced-motion:reduce){#rainall{display:none}}
   .hero::after{content:"";position:absolute;inset:0;z-index:-1;
     background:linear-gradient(180deg,transparent 55%,rgba(28,14,38,.56) 100%)}
   .hero .eyebrow{color:#dfc2f1}
@@ -331,6 +334,8 @@ var m=["Umbrella4U FOREVER!","Break the social norm!","Welcome to this version!"
 "You matter here!","One umbrella at a time!"];
 s.textContent=m[Math.floor(Math.random()*m.length)];})();
 </script>
+
+<canvas id="rainall" aria-hidden="true"></canvas>
 
 <main id="top">
   <!-- HERO -->
@@ -582,6 +587,84 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target);} });
     },{threshold:.14});
     els.forEach(function(e){io.observe(e)});
+  })();
+
+  // Page-wide rain: a fixed layer so the rain keeps falling over every section,
+  // not just the hero. Sits under the nav and under the hero (which paints its own
+  // umbrella rain), so there's no doubling up at the top of the page.
+  (function(){
+    var canvas = document.getElementById('rainall'); if(!canvas) return;
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var ctx = canvas.getContext('2d');
+    var W=0,H=0,DPR=1,tt=0,last=null,acc=0,drops=[];
+    function resize(){
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      W = canvas.clientWidth; H = canvas.clientHeight;
+      canvas.width = Math.round(W*DPR); canvas.height = Math.round(H*DPR);
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    var mq = window.matchMedia('(prefers-color-scheme:dark)');
+    function isDark(){
+      var t = document.documentElement.getAttribute('data-theme');
+      if(t === 'dark') return true;
+      if(t === 'light') return false;
+      return mq.matches;
+    }
+    function stroke(a){
+      // light purple on dark backgrounds, deep purple on light ones, so the rain
+      // stays readable across every section of the page.
+      return isDark() ? 'rgba(213,190,232,'+a+')' : 'rgba(86,49,113,'+a+')';
+    }
+    function spawn(y){
+      // seeded off the right edge as well, since the wind blows right-to-left
+      drops.push({
+        x: Math.random()*(W+220)-40,
+        y: y,
+        len: 26+Math.random()*46,
+        spd: 540+Math.random()*390,
+        drift: -35+Math.random()*32,
+        depth: 0.58+Math.random()*0.68,
+        opacity: 0.10+Math.random()*0.14,
+        vx: -60, vy: 600
+      });
+    }
+    for(var i=0;i<70;i++) spawn(Math.random()*H);
+    function update(dt){
+      var density = W < 760 ? 0.08 : 0.11;
+      acc += dt*W*density;
+      while(acc>1){ acc--; spawn(-40); }
+      for(var i=drops.length-1;i>=0;i--){
+        var rn=drops[i];
+        rn.vx = (-42 + Math.sin(tt*0.7 + rn.depth)*18) + rn.drift;
+        rn.vy = rn.spd*rn.depth;
+        rn.x += rn.vx*dt; rn.y += rn.vy*dt;
+        if(rn.y>H+rn.len+40 || rn.x<-120 || rn.x>W+120) drops.splice(i,1);
+      }
+      if(drops.length>900) drops.splice(0,drops.length-900);
+    }
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      ctx.lineCap='round';
+      for(var i=0;i<drops.length;i++){
+        var rn=drops[i];
+        ctx.strokeStyle=stroke(rn.opacity*rn.depth);
+        ctx.lineWidth=Math.max(0.8,rn.depth*1.08);
+        var speed=Math.max(1,Math.hypot(rn.vx,rn.vy));
+        ctx.beginPath();
+        ctx.moveTo(rn.x,rn.y);
+        ctx.lineTo(rn.x-rn.vx/speed*rn.len, rn.y-rn.vy/speed*rn.len);
+        ctx.stroke();
+      }
+    }
+    function loop(ts){
+      if(last===null)last=ts;
+      var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
+      update(dt); draw();
+      requestAnimationFrame(loop);
+    }
+    resize();
+    window.addEventListener('resize',resize);
+    requestAnimationFrame(loop);
   })();
 
   // The original hand-built 3D umbrella (canvas), the "top stuff", kept.
