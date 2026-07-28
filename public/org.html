@@ -586,7 +586,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var rim=Math.pow(1-Math.abs(n.z),3);
       var r=34+(112-34)*lum+rim*128, g=23+(73-23)*lum+rim*92, b=45+(137-45)*lum+rim*118;
       return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
-    var angle=-0.34, targetAngle=-0.34, last=null, tt=0, rain=[], rainAcc=0, splashes=[];
+    var angle=-0.50, targetAngle=-0.50, last=null, tt=0, rain=[], rainAcc=0, splashes=[];
     var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
     function scene(){
       var narrow = W < 760;
@@ -605,8 +605,8 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var dx = aim.x - sc.cx;
       var dy = aim.y - sc.cy;
       targetAngle = Math.atan2(dx, Math.max(90, -dy + sc.scale*0.72));
-      targetAngle = -0.34 + Math.max(-0.10, Math.min(0.10, targetAngle));
-      angle += wrapAngle(targetAngle-angle) * Math.min(1, dt*7.5);
+      targetAngle = -0.50 + Math.max(-0.10, Math.min(0.10, targetAngle));
+      angle += wrapAngle(targetAngle-angle) * Math.min(1, dt*3.75);
       tilt = -0.46 + Math.max(-0.06, Math.min(0.06, dy/Math.max(H,1)*0.20));
     }
     function buildFrame(sc){
