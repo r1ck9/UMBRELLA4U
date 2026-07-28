@@ -50,7 +50,7 @@ function Results() {
               const isEmoji = av.startsWith('emoji:')
               const isImg = /^https?:/.test(av)
               const initial = (pr.display_name || pr.username || '☂').trim().charAt(0).toUpperCase()
-              const st = isImg ? { backgroundImage: `url(${av})` } : { background: pr.accent_color || '#3f6fa3' }
+              const st = isImg ? { backgroundImage: `url(${av})` } : { background: pr.accent_color || '#76509a' }
               return (
                 <Link key={pr.username} href={`/u/${encodeURIComponent(pr.username)}`} className="person-chip">
                   <span className="pc-av" style={st}>{isEmoji ? av.slice(6) : (isImg ? '' : initial)}</span>

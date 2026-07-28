@@ -109,12 +109,12 @@ export default function InvisibleShelter() {
         coolY,
         Math.max(width, height) * 0.68,
       )
-      ambient.addColorStop(0, 'rgba(115, 150, 205, 0.11)')
-      ambient.addColorStop(1, 'rgba(115, 150, 205, 0)')
+      ambient.addColorStop(0, 'rgba(166, 127, 199, 0.13)')
+      ambient.addColorStop(1, 'rgba(166, 127, 199, 0)')
       ctx.fillStyle = ambient
       ctx.fillRect(0, 0, width, height)
 
-      const warmGlow = ctx.createRadialGradient(
+      const violetGlow = ctx.createRadialGradient(
         shelter.x,
         shelter.y,
         0,
@@ -122,10 +122,10 @@ export default function InvisibleShelter() {
         shelter.y,
         shelter.radiusX * 1.85,
       )
-      warmGlow.addColorStop(0, 'rgba(244, 174, 91, 0.18)')
-      warmGlow.addColorStop(0.48, 'rgba(222, 145, 71, 0.065)')
-      warmGlow.addColorStop(1, 'rgba(222, 145, 71, 0)')
-      ctx.fillStyle = warmGlow
+      violetGlow.addColorStop(0, 'rgba(194, 146, 230, 0.2)')
+      violetGlow.addColorStop(0.48, 'rgba(143, 87, 181, 0.08)')
+      violetGlow.addColorStop(1, 'rgba(143, 87, 181, 0)')
+      ctx.fillStyle = violetGlow
       ctx.fillRect(0, 0, width, height)
     }
 
@@ -189,9 +189,9 @@ export default function InvisibleShelter() {
         floorY,
         shelter.radiusX * 1.05,
       )
-      floorGlow.addColorStop(0, 'rgba(246, 186, 112, 0.15)')
-      floorGlow.addColorStop(0.55, 'rgba(246, 186, 112, 0.045)')
-      floorGlow.addColorStop(1, 'rgba(246, 186, 112, 0)')
+      floorGlow.addColorStop(0, 'rgba(205, 164, 235, 0.17)')
+      floorGlow.addColorStop(0.55, 'rgba(205, 164, 235, 0.055)')
+      floorGlow.addColorStop(1, 'rgba(205, 164, 235, 0)')
       ctx.fillStyle = floorGlow
       ctx.beginPath()
       ctx.ellipse(
@@ -208,9 +208,9 @@ export default function InvisibleShelter() {
       // The shelter is only suggested by a dim upper rim, never drawn as an umbrella.
       const pulse = 0.5 + Math.sin(time * 0.7) * 0.5
       ctx.save()
-      ctx.strokeStyle = `rgba(246, 190, 119, ${0.11 + pulse * 0.045})`
+      ctx.strokeStyle = `rgba(211, 171, 239, ${0.12 + pulse * 0.05})`
       ctx.lineWidth = 1.2
-      ctx.shadowColor = 'rgba(246, 176, 92, 0.35)'
+      ctx.shadowColor = 'rgba(181, 126, 222, 0.38)'
       ctx.shadowBlur = 18 + pulse * 8
       ctx.beginPath()
       ctx.ellipse(
@@ -238,14 +238,14 @@ export default function InvisibleShelter() {
         const haloRadius = person.size * (4.5 + shimmer)
 
         const halo = ctx.createRadialGradient(x, y, 0, x, y, haloRadius)
-        halo.addColorStop(0, `rgba(255, 219, 164, ${0.42 * visibility})`)
-        halo.addColorStop(1, 'rgba(255, 198, 118, 0)')
+        halo.addColorStop(0, `rgba(229, 202, 248, ${0.44 * visibility})`)
+        halo.addColorStop(1, 'rgba(193, 148, 226, 0)')
         ctx.fillStyle = halo
         ctx.beginPath()
         ctx.arc(x, y, haloRadius, 0, TAU)
         ctx.fill()
 
-        ctx.fillStyle = `rgba(255, 229, 188, ${(0.72 + shimmer * 0.18) * visibility})`
+        ctx.fillStyle = `rgba(241, 222, 253, ${(0.72 + shimmer * 0.18) * visibility})`
         ctx.beginPath()
         ctx.arc(x, y, person.size, 0, TAU)
         ctx.fill()

@@ -75,7 +75,7 @@ export default function PublicProfile({ params }) {
   const isEmoji = av.startsWith('emoji:')
   const isImg = /^https?:/.test(av)
   const initial = (prof?.display_name || prof?.username || '☂').trim().charAt(0).toUpperCase()
-  const avStyle = isImg ? { backgroundImage: `url(${av})` } : { background: prof?.accent_color || '#3f6fa3' }
+  const avStyle = isImg ? { backgroundImage: `url(${av})` } : { background: prof?.accent_color || '#76509a' }
   const shown = posts.filter((p) => sel === 'all' || p.channel_id === sel)
 
   return (

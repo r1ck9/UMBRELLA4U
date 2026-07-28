@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 
 function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '…' : t }
-const statusColor = { complete: '#2e9e6b', 'on track': '#3f6fa3', behind: '#d98329' }
+const statusColor = { complete: '#2e9e6b', 'on track': '#76509a', behind: '#8b5bb5' }
 function nextLabel(secs) {
   if (secs == null) return 'done'
   const n = Number(secs)
@@ -26,7 +26,7 @@ function Sparkline({ data, range }) {
         {counts.map((c, i) => (
           <div key={i} title={`${c} in that ${unit}`}
             style={{ flex: 1, height: Math.max(2, (c / max) * 46), borderRadius: 2,
-              background: i === counts.length - 1 ? '#e8913c' : '#3f6fa3', opacity: c ? 1 : 0.35 }} />
+              background: i === counts.length - 1 ? '#a978cf' : '#76509a', opacity: c ? 1 : 0.35 }} />
         ))}
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '.7rem', color: 'var(--ink-3,#999)' }}>
@@ -81,8 +81,8 @@ export default function BotReport() {
   const tab = (val, label) => (
     <button onClick={() => setRange(val)} style={{
       font: 'inherit', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', borderRadius: 999, padding: '4px 11px',
-      border: '1px solid ' + (range === val ? '#3f6fa3' : 'var(--line,#ccc)'),
-      background: range === val ? '#3f6fa3' : 'transparent',
+      border: '1px solid ' + (range === val ? '#76509a' : 'var(--line,#ccc)'),
+      background: range === val ? '#76509a' : 'transparent',
       color: range === val ? '#fff' : 'var(--ink-2,#555)' }}>{label}</button>
   )
 
@@ -147,12 +147,12 @@ export default function BotReport() {
                 </td>
                 <td style={{ padding: '8px' }}>
                   <div style={{ background: 'var(--line-2,#eee)', borderRadius: 999, height: 7, overflow: 'hidden' }}>
-                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.drip_status] || '#3f6fa3' }} />
+                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.drip_status] || '#76509a' }} />
                   </div>
                 </td>
                 <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3,#888)' }}>{p.real_likes}</td>
                 <td style={{ padding: '8px' }}>
-                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || '#3f6fa3' }}>{p.drip_status}</span>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || '#76509a' }}>{p.drip_status}</span>
                 </td>
                 <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3,#888)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.next_secs)}</td>
               </tr>

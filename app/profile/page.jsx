@@ -9,7 +9,7 @@ import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
 import { earnedBadges } from '@/lib/badges'
 
-const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
+const ACCENTS = ['#76509a', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#a978cf']
 
 // Rotating example bios, a fresh one is picked each time the page opens.
 const BIO_EXAMPLES = [
@@ -47,7 +47,7 @@ export default function Profile() {
   const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES) }))
   const [p, setP] = useState({
     username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
-    accent_color: '#3f6fa3', avatar_url: '', banner_theme: 'rain', tags: []
+    accent_color: '#76509a', avatar_url: '', banner_theme: 'rain', tags: []
   })
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function Profile() {
       if (prof) setP({
         username: prof.username || '', display_name: prof.display_name || '', pronouns: prof.pronouns || '',
         status_weather: prof.status_weather || '', about_me: prof.about_me || '',
-        accent_color: prof.accent_color || '#3f6fa3', avatar_url: prof.avatar_url || '',
+        accent_color: prof.accent_color || '#76509a', avatar_url: prof.avatar_url || '',
         banner_theme: prof.banner_theme || 'rain', tags: prof.tags || []
       })
       if (prof) setStreak(prof.streak_count || 0)

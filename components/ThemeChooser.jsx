@@ -7,7 +7,11 @@ export default function ThemeChooser() {
   const [cur, setCur] = useState('ink')
 
   useEffect(() => {
-    try { setCur(localStorage.getItem(THEME_KEY) || 'ink') } catch {}
+    try {
+      const saved = localStorage.getItem(THEME_KEY)
+      if (THEMES.some((theme) => theme.key === saved)) setCur(saved)
+      else if (saved) localStorage.removeItem(THEME_KEY)
+    } catch {}
   }, [])
 
   function choose(key) {

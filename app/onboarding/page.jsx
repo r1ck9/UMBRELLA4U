@@ -9,7 +9,7 @@ import { GUIDELINES } from '@/lib/guidelines'
 import EmojiPicker from '@/components/EmojiPicker'
 import { track } from '@/lib/analytics'
 
-const ACCENTS = ['#3f6fa3', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#e8913c']
+const ACCENTS = ['#76509a', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#a978cf']
 const USERNAME_IDEAS = ['rainy_owl', 'quiet_fern', 'soft_static', 'paper_boats', 'moonlit_kid', 'still_water', 'little_lighthouse', 'warm_socks', 'cloud_nine', 'half_asleep', 'tiny_thunder', 'sunday_dust']
 const SUGGESTED_TAGS = ['art', 'music', 'gaming', 'anime', 'books', 'poetry', 'film', 'photography', 'coding', 'sports', 'volleyball', 'skating', 'dance', 'coffee', 'plants', 'baking', 'anxiety', 'mental health', 'lgbtq+', 'newcomer', 'faith', 'languages', 'studying', 'night owl', 'introvert', 'overthinker', 'trying my best']
 const BIO_EXAMPLES = [
@@ -35,7 +35,7 @@ export default function Onboarding() {
   const [err, setErr] = useState('')
   const [p, setP] = useState({
     username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
-    accent_color: '#3f6fa3', avatar_url: 'emoji:☂', banner_theme: 'rain', tags: []
+    accent_color: '#76509a', avatar_url: 'emoji:☂', banner_theme: 'rain', tags: []
   })
   const [tagInput, setTagInput] = useState('')
   const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES), names: [...USERNAME_IDEAS].sort(() => Math.random() - 0.5).slice(0, 4) }))
@@ -51,7 +51,7 @@ export default function Onboarding() {
       if (prof) setP((prev) => ({
         ...prev,
         username: prof.username || '', display_name: prof.display_name || '',
-        avatar_url: prof.avatar_url || 'emoji:☂', accent_color: prof.accent_color || '#3f6fa3'
+        avatar_url: prof.avatar_url || 'emoji:☂', accent_color: prof.accent_color || '#76509a'
       }))
       setLoading(false)
     })()

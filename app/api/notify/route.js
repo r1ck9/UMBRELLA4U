@@ -34,12 +34,12 @@ async function sendEmail(to, subject, html) {
 
 const shell = (body) =>
   `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a">
-     <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#3f6fa3;margin-bottom:14px">☂ Umbrella</div>
+     <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#76509a;margin-bottom:14px">☂ Umbrella</div>
      ${body}
      <p style="font-size:12px;color:#8a8a86;margin-top:22px">You get these because notifications are on. Turn them off anytime in Settings.</p>
    </div>`
 
-const btn = (href, label, color = '#3f6fa3') =>
+const btn = (href, label, color = '#76509a') =>
   `<a href="${href}" style="display:inline-block;background:${color};color:#fff;text-decoration:none;padding:11px 22px;border-radius:999px;font-weight:bold;font-size:14px">${label}</a>`
 
 const digestHtml = (n) => shell(
@@ -48,7 +48,7 @@ const digestHtml = (n) => shell(
 
 const promptHtml = (text) => shell(
   `<p style="font-size:15px;line-height:1.6">This week’s prompt is up:</p>
-   <p style="font-size:16px;line-height:1.5;font-family:Georgia,serif;color:#1a1a1a;border-left:3px solid #3f6fa3;padding-left:12px;margin:12px 0">${text}</p>
+   <p style="font-size:16px;line-height:1.5;font-family:Georgia,serif;color:#24182f;border-left:3px solid #76509a;padding-left:12px;margin:12px 0">${text}</p>
    <p style="font-size:15px;line-height:1.6">Share your answer — someone out there feels the same.</p>
    ${btn(`${SITE}/feed`, 'Answer this week’s prompt ☂')}`)
 
