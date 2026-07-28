@@ -61,7 +61,7 @@
       radial-gradient(34rem 13rem at 109% 72%,rgba(111,66,148,.11),transparent 70%),
       radial-gradient(1.8px 1.8px at 10% 26%,rgba(130,85,169,.3) 0 70%,transparent 76%),
       radial-gradient(1.4px 1.4px at 92% 70%,rgba(130,85,169,.24) 0 70%,transparent 78%);
-    background-size:auto,auto,78px 108px,96px 126px;animation:mistslide 18s ease-in-out infinite alternate}
+    background-size:auto,auto,78px 108px,96px 126px}
   .visual-section::after{content:"";position:absolute;z-index:1;left:-8%;right:-8%;top:-42px;height:86px;pointer-events:none;
     border-radius:0 0 50% 50%;background:radial-gradient(52% 108% at 50% 0,rgba(157,109,193,.12) 0 45%,transparent 46%)}
   .visual-section:nth-of-type(even)::before{animation-direction:alternate-reverse}
@@ -341,7 +341,7 @@
   footer{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#1c0f29,var(--footer) 56%,#2a1838);color:#d4bee2;padding:44px 0}
   footer::before{content:"";position:absolute;z-index:0;inset:0;opacity:.74;background:
     radial-gradient(circle at 9% 26%,rgba(244,225,255,.82) 0 1px,transparent 1.7px),radial-gradient(circle at 68% 16%,rgba(244,225,255,.64) 0 1px,transparent 1.7px),radial-gradient(circle at 87% 68%,rgba(244,225,255,.56) 0 1px,transparent 1.7px),
-    radial-gradient(20rem 8rem at 50% 120%,rgba(158,91,205,.24),transparent 68%);background-size:113px 79px,167px 103px,139px 121px,auto;animation:footerSky 18s linear infinite}
+    radial-gradient(20rem 8rem at 50% 120%,rgba(158,91,205,.24),transparent 68%);background-size:113px 79px,167px 103px,139px 121px,auto}
   footer .wrap{position:relative;z-index:1}
   @keyframes footerSky{to{background-position:113px 79px,-167px 103px,139px -121px,center}}
   :root[data-theme="light"] footer{color:#ddc8e9}
@@ -718,7 +718,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var canvas=cta && cta.querySelector('.cta-rain');
     if(!cta || !canvas) return;
     var reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    var ctx=canvas.getContext('2d'), W=0,H=0,DPR=1,last=null,open=0,target=0,acc=0,drops=[];
+    var ctx=canvas.getContext('2d'), W=0,H=0,DPR=1,last=null,open=0,target=0,acc=0,drops=[],visible=false,running=false;
     function resize(){
       DPR=Math.min(window.devicePixelRatio||1,2);
       W=canvas.clientWidth; H=canvas.clientHeight;
@@ -766,15 +766,21 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
     }
     function loop(ts){
+      if(!visible){running=false;last=null;return;}
       if(last===null)last=ts;
       var dt=Math.min((ts-last)/1000,.05); last=ts;
       update(dt); draw(); requestAnimationFrame(loop);
     }
+    function start(){if(!visible || running || reduced)return;running=true;last=null;requestAnimationFrame(loop)}
     resize(); updateState();
     window.addEventListener('resize',function(){resize();updateState()},{passive:true});
     window.addEventListener('scroll',updateState,{passive:true});
     if(reduced){target=1;open=1;cta.classList.add('is-open');for(var i=0;i<55;i++)spawn(Math.random()*H);draw();}
-    else {for(var j=0;j<55;j++)spawn(Math.random()*H);requestAnimationFrame(loop);}
+    else {
+      for(var j=0;j<55;j++)spawn(Math.random()*H);
+      if('IntersectionObserver' in window){new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();else ctx.clearRect(0,0,W,H)},{threshold:.03}).observe(cta)}
+      else {visible=true;start();}
+    }
   })();
 
   // Page-wide rain: a fixed layer so the rain keeps falling over every section,
@@ -846,6 +852,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function loop(ts){
       if(last===null)last=ts;
+      if(ts-last<32){requestAnimationFrame(loop);return;}
       var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
       update(dt); draw();
       requestAnimationFrame(loop);
@@ -859,15 +866,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
   (function(){
     var canvas=document.getElementById('cursor-rain');
     if(!canvas || innerWidth<=760 || matchMedia('(prefers-reduced-motion:reduce)').matches) return;
-    var ctx=canvas.getContext('2d'),W=0,H=0,DPR=1,last=null,lastDrop=0,drops=[];
+    var ctx=canvas.getContext('2d'),W=0,H=0,DPR=1,last=null,lastDrop=0,drops=[],raf=0;
     function resize(){DPR=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0)}
     function add(x,y){drops.push({x:x+(Math.random()-.5)*7,y:y+(Math.random()-.5)*7,vx:-18+Math.random()*36,vy:18+Math.random()*35,age:0,life:.42+Math.random()*.26,r:1+Math.random()*1.4})}
-    addEventListener('pointermove',function(e){var now=performance.now();if(now-lastDrop>32){lastDrop=now;add(e.clientX,e.clientY)}},{passive:true});
-    function frame(ts){if(last===null)last=ts;var dt=Math.min((ts-last)/1000,.05);last=ts;ctx.clearRect(0,0,W,H);
+    function start(){if(!raf){last=null;raf=requestAnimationFrame(frame)}}
+    addEventListener('pointermove',function(e){var now=performance.now();if(now-lastDrop>32){lastDrop=now;add(e.clientX,e.clientY);start()}},{passive:true});
+    function frame(ts){raf=0;if(last===null)last=ts;var dt=Math.min((ts-last)/1000,.05);last=ts;ctx.clearRect(0,0,W,H);
       for(var i=drops.length-1;i>=0;i--){var d=drops[i];d.age+=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=23*dt;if(d.age>d.life){drops.splice(i,1);continue}var a=(1-d.age/d.life)*.48;
         ctx.fillStyle='rgba(221,188,247,'+a+')';ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*.7,d.r*1.25,0,0,6.29);ctx.fill()}
-      requestAnimationFrame(frame)}
-    resize();addEventListener('resize',resize,{passive:true});requestAnimationFrame(frame);
+      if(drops.length)raf=requestAnimationFrame(frame)}
+    resize();addEventListener('resize',resize,{passive:true});
   })();
 
   // The original hand-built 3D umbrella (canvas), the "top stuff", kept.
@@ -875,7 +883,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var canvas = document.getElementById('umb3d'); if(!canvas) return;
     var ctx = canvas.getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-    var W, H, DPR, raf;
+    var W, H, DPR, raf=0, visible=true;
     function resize(){
       DPR = Math.min(window.devicePixelRatio || 1, 2);
       W = canvas.clientWidth; H = canvas.clientHeight;
@@ -1074,15 +1082,18 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.4)');
       ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
     }
-    function loop(ts){ if(last===null)last=ts; var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
+    function loop(ts){ raf=0; if(!visible){last=null;return;} if(last===null)last=ts; var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
       var sc=scene(); aimUmbrella(sc,dt); var frame=buildFrame(sc); updateRain(dt,sc,frame);
       render(sc,frame); raf=requestAnimationFrame(loop); }
+    function start(){if(!visible || raf || reduce)return;last=null;raf=requestAnimationFrame(loop)}
     window.addEventListener('pointermove',function(e){
       var r=canvas.getBoundingClientRect();
       pointer.x=e.clientX-r.left; pointer.y=e.clientY-r.top; pointer.active=true;
     },{passive:true});
     window.addEventListener('pointerleave',function(){ pointer.active=false; },{passive:true});
     resize(); window.addEventListener('resize', resize);
-    if(reduce){ var sc=scene(); aimUmbrella(sc,0); var frame=buildFrame(sc); updateRain(0.016,sc,frame); render(sc,frame); } else raf=requestAnimationFrame(loop);
+    if(reduce){ var sc=scene(); aimUmbrella(sc,0); var frame=buildFrame(sc); updateRain(0.016,sc,frame); render(sc,frame); }
+    else if('IntersectionObserver' in window){new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();else if(raf){cancelAnimationFrame(raf);raf=0;last=null;}},{threshold:.03}).observe(canvas)}
+    else start();
   })();
 </script>
