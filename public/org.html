@@ -585,12 +585,88 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var rim=Math.pow(1-Math.abs(n.z),3);
       var r=34+(112-34)*lum+rim*128, g=23+(73-23)*lum+rim*92, b=45+(137-45)*lum+rim*118;
       return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
-    var angle=0, last=null, tt=0, rain=[], rainAcc=0;
-    function render(){
+    var angle=0, targetAngle=0.35, last=null, tt=0, rain=[], rainAcc=0, splashes=[];
+    var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
+    function scene(){
       var narrow = W < 760;
       var cx = narrow ? W/2 : W*0.72;
       var cy = narrow ? H*0.34 : H*0.50;
       var scale = Math.min(W,H) * (narrow ? 0.24 : 0.34);
+      return {narrow:narrow,cx:cx,cy:cy,scale:scale,canopy:{x:cx,y:cy-scale*0.08,rx:scale*1.18,ry:scale*0.50}};
+    }
+    function wrapAngle(v){ while(v>Math.PI)v-=Math.PI*2; while(v<-Math.PI)v+=Math.PI*2; return v; }
+    function aimUmbrella(sc,dt){
+      var tx = pointer.active ? pointer.x : (sc.narrow ? W*0.28 : W*0.38) + Math.sin(tt*0.25)*W*0.08;
+      var ty = pointer.active ? pointer.y : H*0.34 + Math.cos(tt*0.2)*H*0.07;
+      if(!aim.ready){ aim.x=tx; aim.y=ty; aim.ready=true; }
+      var ease = 1 - Math.pow(0.001, Math.max(dt,0.016));
+      aim.x += (tx-aim.x)*ease; aim.y += (ty-aim.y)*ease;
+      var dx = aim.x - sc.cx;
+      var dy = aim.y - sc.cy;
+      targetAngle = Math.atan2(dx, Math.max(90, -dy + sc.scale*0.72));
+      angle += wrapAngle(targetAngle-angle) * Math.min(1, dt*7.5);
+      tilt = -0.46 + Math.max(-0.18, Math.min(0.18, dy/Math.max(H,1)*0.42));
+    }
+    function canopyY(canopy,x){
+      var nx=(x-canopy.x)/canopy.rx;
+      if(nx<-1 || nx>1)return null;
+      return canopy.y - Math.sqrt(1-nx*nx)*canopy.ry;
+    }
+    function createSplash(x,y,nx){
+      splashes.push({x:x,y:y,age:0,life:0.34,dir:nx<0?-1:1,spread:8+Math.random()*10});
+      if(splashes.length>64)splashes.shift();
+    }
+    function updateRain(dt,sc){
+      var density = W < 760 ? 0.12 : 0.16;
+      rainAcc += dt*W*density;
+      while(rainAcc>1){
+        rainAcc--;
+        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:560+Math.random()*430,drift:-35+Math.random()*32,depth:0.55+Math.random()*0.75,opacity:0.10+Math.random()*0.17});
+      }
+      for(var i=rain.length-1;i>=0;i--){
+        var rn=rain[i], py=rn.y;
+        var wind = -42 + Math.sin(tt*0.7 + rn.depth)*18;
+        rn.x += (wind + rn.drift)*dt;
+        rn.y += rn.spd*rn.depth*dt;
+        var hitY = canopyY(sc.canopy,rn.x);
+        if(hitY!==null && py<hitY && rn.y>=hitY){
+          var nx=(rn.x-sc.canopy.x)/sc.canopy.rx;
+          createSplash(rn.x,hitY,nx);
+          rain.splice(i,1);
+          continue;
+        }
+        if(rn.y>H+rn.len+40 || rn.x<-90 || rn.x>W+90)rain.splice(i,1);
+      }
+      for(var si=splashes.length-1;si>=0;si--){
+        splashes[si].age += dt;
+        if(splashes[si].age>splashes[si].life)splashes.splice(si,1);
+      }
+    }
+    function drawRain(){
+      ctx.lineCap='round';
+      for(var ri=0;ri<rain.length;ri++){
+        var rn=rain[ri], a=rn.opacity*rn.depth;
+        ctx.strokeStyle='rgba(213,190,232,'+a+')';
+        ctx.lineWidth=Math.max(0.7,rn.depth);
+        ctx.beginPath();
+        ctx.moveTo(rn.x,rn.y);
+        ctx.lineTo(rn.x+rn.drift*0.028-5,rn.y-rn.len);
+        ctx.stroke();
+      }
+      for(var si=0;si<splashes.length;si++){
+        var sp=splashes[si], t=sp.age/sp.life, fade=1-t;
+        ctx.strokeStyle='rgba(226,205,242,'+(0.38*fade)+')';
+        ctx.lineWidth=1;
+        for(var k=-1;k<=1;k++){
+          ctx.beginPath();
+          ctx.moveTo(sp.x,sp.y);
+          ctx.lineTo(sp.x+(sp.dir*sp.spread+k*5)*(0.7+t),sp.y-(5+k*2)*fade);
+          ctx.stroke();
+        }
+      }
+    }
+    function render(sc){
+      var cx = sc.cx, cy = sc.cy, scale = sc.scale;
       var ca=Math.cos(angle),sa=Math.sin(angle),ct=Math.cos(tilt),st=Math.sin(tilt);
       var bob=Math.sin(tt*0.8)*0.05;
       var tf=function(p){ var y1=p.y*ct-p.z*st, z1=p.y*st+p.z*ct, x1=p.x; var x2=x1*ca+z1*sa, z2=-x1*sa+z1*ca; return {x:x2,y:y1+bob,z:z2}; };
@@ -600,8 +676,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var amb=ctx.createRadialGradient(lx,ly,0,lx,ly,Math.max(W,H)*0.6);
       amb.addColorStop(0,'rgba(166,127,199,.13)'); amb.addColorStop(1,'rgba(166,127,199,0)');
       ctx.fillStyle=amb; ctx.fillRect(0,0,W,H);
-      ctx.lineCap='round';
-      for(var ri=0;ri<rain.length;ri++){ var rn=rain[ri]; ctx.strokeStyle='rgba(205,181,225,.15)'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(rn.x,rn.y); ctx.lineTo(rn.x-1.4,rn.y-rn.len); ctx.stroke(); }
+      drawRain();
       var glow=ctx.createRadialGradient(cx,cy-40,20,cx,cy-40,Math.min(W,H)*0.75);
       glow.addColorStop(0,'rgba(191,141,226,.15)'); glow.addColorStop(1,'rgba(191,141,226,0)');
       ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
@@ -627,11 +702,15 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.4)');
       ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
     }
-    function loop(ts){ if(last===null)last=ts; var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt; angle+=dt*0.34;
-      rainAcc+=dt*W*0.05; while(rainAcc>1){ rainAcc--; rain.push({x:Math.random()*W,y:-20,len:22+Math.random()*30,spd:420+Math.random()*320}); }
-      for(var i=rain.length-1;i>=0;i--){ var rn=rain[i]; rn.y+=rn.spd*dt; if(rn.y>H+24)rain.splice(i,1); }
-      render(); raf=requestAnimationFrame(loop); }
+    function loop(ts){ if(last===null)last=ts; var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
+      var sc=scene(); aimUmbrella(sc,dt); updateRain(dt,sc);
+      render(sc); raf=requestAnimationFrame(loop); }
+    window.addEventListener('pointermove',function(e){
+      var r=canvas.getBoundingClientRect();
+      pointer.x=e.clientX-r.left; pointer.y=e.clientY-r.top; pointer.active=true;
+    },{passive:true});
+    window.addEventListener('pointerleave',function(){ pointer.active=false; },{passive:true});
     resize(); window.addEventListener('resize', resize);
-    if(reduce){ angle=0.6; render(); } else raf=requestAnimationFrame(loop);
+    if(reduce){ var sc=scene(); aimUmbrella(sc,0); updateRain(0.016,sc); render(sc); } else raf=requestAnimationFrame(loop);
   })();
 </script>
