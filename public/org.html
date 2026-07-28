@@ -238,25 +238,10 @@
   .tag.soon{color:var(--ink-3)}
   .prod.flagship .dsc{max-width:60ch;font-size:1.12rem}
 
-  /* glass cards and a small 3D umbrella pause between page chapters */
+  /* glass cards */
   .goal,.prod,.role-card,.apply-cta,.map-panel,.map-placeholder,.pillars{backdrop-filter:blur(12px) saturate(1.08)}
   .goal,.role-card{background:color-mix(in srgb,var(--surface) 86%,transparent)}
   .prod{background:color-mix(in srgb,var(--paper) 84%,transparent)}
-  .umbrella-interlude{position:relative;z-index:41;min-height:210px;display:grid;place-items:center;overflow:hidden;
-    background:linear-gradient(180deg,var(--surface) 0%,color-mix(in srgb,var(--surface-2) 72%,var(--surface)) 100%)}
-  .umbrella-interlude::before{content:"";position:absolute;width:min(780px,110vw);height:110px;border-radius:50%;
-    background:radial-gradient(ellipse,rgba(109,58,144,.24),transparent 67%);filter:blur(8px);transform:translateY(62px)}
-  .interlude-umbrella{position:relative;width:330px;height:172px;transform-style:preserve-3d;animation:umbrellaFloat 7s ease-in-out infinite}
-  .interlude-umbrella .canopy{position:absolute;left:0;top:5px;width:330px;height:130px;border-radius:50% 50% 14% 14% / 95% 95% 22% 22%;
-    transform:perspective(650px) rotateX(58deg) rotateZ(-7deg);transform-origin:50% 100%;
-    background:repeating-conic-gradient(from 244deg at 50% 106%,#3b1d50 0 15deg,#724394 15deg 29deg,#aa76ca 29deg 43deg,#5b3077 43deg 58deg);
-    box-shadow:inset 0 11px 20px rgba(255,234,255,.22),0 30px 25px rgba(43,21,59,.24)}
-  .interlude-umbrella .stem{position:absolute;left:50%;top:77px;width:10px;height:100px;border-radius:9px;background:linear-gradient(90deg,#26112f,#b98bdb 52%,#432054);transform:translateX(-50%);box-shadow:0 10px 18px rgba(46,22,58,.26)}
-  .interlude-umbrella .hook{position:absolute;left:calc(50% - 1px);top:158px;width:43px;height:29px;border:9px solid #452354;border-left:0;border-top:0;border-radius:0 0 34px 0}
-  .interlude-caption{position:absolute;bottom:16px;font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
-  @keyframes umbrellaFloat{0%,100%{transform:translate3d(0,3px,0) rotate(-1deg)}50%{transform:translate3d(0,-10px,16px) rotate(2deg)}}
-  @media(prefers-reduced-motion:reduce){.interlude-umbrella{animation:none}}
-
   /* real-story placeholders: intentionally no invented testimonials */
   .story-wall{position:relative;z-index:41;padding:clamp(54px,7vw,90px) 0;overflow:hidden;
     background:linear-gradient(135deg,color-mix(in srgb,var(--surface-2) 72%,var(--paper)),var(--surface))}
@@ -521,11 +506,6 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       <p class="foot">Figures above are the goals we're organizing around, not current totals.</p>
     </div>
   </section>
-
-  <div class="umbrella-interlude" aria-hidden="true">
-    <div class="interlude-umbrella"><span class="canopy"></span><span class="stem"></span><span class="hook"></span></div>
-    <span class="interlude-caption">One umbrella, shared shelter</span>
-  </div>
 
   <!-- PRODUCTS -->
   <section class="products visual-section" id="products">
