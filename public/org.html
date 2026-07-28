@@ -661,11 +661,11 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       rainAcc += dt*W*density;
       while(rainAcc>1){
         rainAcc--;
-        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:540+Math.random()*390,drift:35-Math.random()*32,depth:0.58+Math.random()*0.68,opacity:0.115+Math.random()*0.16});
+        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.58+Math.random()*0.68,opacity:0.115+Math.random()*0.16});
       }
       for(var i=rain.length-1;i>=0;i--){
         var rn=rain[i], px=rn.x, py=rn.y;
-        var wind = 42 + Math.sin(tt*0.7 + rn.depth)*18;
+        var wind = -42 + Math.sin(tt*0.7 + rn.depth)*18;
         rn.x += (wind + rn.drift)*dt;
         rn.y += rn.spd*rn.depth*dt;
         var hit = rainHit(frame,px,py,rn.x,rn.y);
@@ -694,7 +694,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         ctx.lineWidth=Math.max(0.8,rn.depth*1.08);
         ctx.beginPath();
         ctx.moveTo(rn.x,rn.y);
-        ctx.lineTo(rn.x+rn.drift*0.028+5,rn.y-rn.len);
+        ctx.lineTo(rn.x+rn.drift*0.028-5,rn.y-rn.len);
         ctx.stroke();
       }
     }
