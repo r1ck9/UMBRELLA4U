@@ -11,6 +11,7 @@
     --amber:#8b4eab; --amber-soft:#eee2f7; --sky:#76509a;
     --line:rgba(54,31,72,.14); --line-2:rgba(54,31,72,.08);
     --shadow:0 1px 2px rgba(54,31,72,.06), 0 12px 32px -18px rgba(54,31,72,.3);
+    --interactive-glow:0 12px 28px -12px color-mix(in srgb,var(--amber) 74%,transparent);
     --maxw:1120px;
     --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
     --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -77,6 +78,10 @@
   .btn.ghost:hover{background:var(--surface-2)}
   .btn.light{background:rgba(255,255,255,.94);color:#123}
   .btn.light:hover{transform:translateY(-1px)}
+  .btn:hover,.btn:focus-visible,.chip:hover,.chip:focus-visible,.prod:hover,.prod:focus-visible,.nav nav a:hover,.nav nav a:focus-visible,footer a:hover,footer a:focus-visible{
+    box-shadow:var(--interactive-glow);
+    transform:translateY(-1px);
+  }
   .nav .btn{padding:9px 17px}
   @media(max-width:760px){.nav nav a:not(.cta-link){display:none}}
 

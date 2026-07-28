@@ -21,6 +21,7 @@
   /* wash + glow follow the accent AND the light/dark panel, so themes work in both modes */
   --shelter-wash:color-mix(in srgb, var(--shelter) 16%, var(--panel));
   --sky-glow:color-mix(in srgb, var(--shelter) 12%, var(--panel));
+  --interactive-glow:0 12px 28px -12px color-mix(in srgb,var(--shelter) 70%,transparent);
   --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
   --shadow:0 10px 30px -18px rgba(54,31,72,.28);
   --rainc:rgba(152,122,177,.30);
@@ -52,13 +53,20 @@ a{color:inherit}
 
 /* buttons */
 .btn{display:inline-flex; align-items:center; gap:7px; border:none; border-radius:999px;
-  padding:12px 20px; font-weight:700; font-size:15px; cursor:pointer; text-decoration:none}
+  padding:12px 20px; font-weight:700; font-size:15px; cursor:pointer; text-decoration:none;
+  transition:background .16s,border-color .16s,color .16s,box-shadow .16s,transform .16s}
 .btn.sm{padding:9px 15px; font-size:14px}
 .btn.prim{background:var(--shelter); color:var(--on-accent)}
 .btn.prim:hover{background:var(--shelter-deep)}
 .btn.ghost{background:transparent; border:1.5px solid var(--rain-2); color:var(--ink-1)}
 .btn.ghost:hover{border-color:var(--ink-3)}
 .btn:disabled{opacity:.5; cursor:not-allowed}
+.btn:not(:disabled):hover,.btn:not(:disabled):focus-visible,
+:where(.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a):hover,
+:where(.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a):focus-visible{
+  box-shadow:var(--interactive-glow);
+  transform:translateY(-1px);
+}
 
 /* top bar */
 .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;

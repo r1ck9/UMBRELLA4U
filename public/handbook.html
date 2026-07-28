@@ -10,6 +10,7 @@
     --blue:#76509a; --blue-deep:#563171; --amber:#8b4eab; --amber-soft:#eee2f7;
     --line:rgba(54,31,72,.14); --line-2:rgba(54,31,72,.08);
     --shadow:0 1px 2px rgba(54,31,72,.06),0 12px 32px -18px rgba(54,31,72,.3);
+    --interactive-glow:0 12px 28px -12px color-mix(in srgb,var(--amber) 74%,transparent);
     --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
     --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   }
@@ -89,9 +90,10 @@
   .steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;color:var(--ink-2)}
   .steps li::before{content:counter(s);flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;font-size:.85rem;display:grid;place-items:center;font-family:var(--sans)}
   .cta{margin-top:30px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;font-size:1rem;padding:13px 26px;border-radius:999px;text-decoration:none;border:1px solid transparent}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;font-size:1rem;padding:13px 26px;border-radius:999px;text-decoration:none;border:1px solid transparent;transition:transform .16s,box-shadow .16s,background .16s,border-color .16s,color .16s}
   .btn.primary{background:var(--amber);color:#211329}
   .btn.ghost{border-color:var(--line);color:var(--ink)}
+  .btn:hover,.btn:focus-visible,.site-links a:hover,.site-links a:focus-visible{box-shadow:var(--interactive-glow);transform:translateY(-1px)}
 
   footer{padding:40px 0;border-top:1px solid var(--line-2);color:var(--ink-3);font-size:.86rem}
   a{color:var(--blue)}
