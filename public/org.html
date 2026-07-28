@@ -586,7 +586,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var rim=Math.pow(1-Math.abs(n.z),3);
       var r=34+(112-34)*lum+rim*128, g=23+(73-23)*lum+rim*92, b=45+(137-45)*lum+rim*118;
       return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
-    var angle=-0.50, targetAngle=-0.50, last=null, tt=0, rain=[], rainAcc=0, splashes=[];
+    var angle=-1.20, targetAngle=-1.20, last=null, tt=0, rain=[], rainAcc=0, splashes=[];
     var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
     function scene(){
       var narrow = W < 760;
@@ -605,7 +605,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var dx = aim.x - sc.cx;
       var dy = aim.y - sc.cy;
       targetAngle = Math.atan2(dx, Math.max(90, -dy + sc.scale*0.72));
-      targetAngle = -0.50 + Math.max(-0.10, Math.min(0.10, targetAngle));
+      targetAngle = -1.20 + Math.max(-0.10, Math.min(0.10, targetAngle));
       angle += wrapAngle(targetAngle-angle) * Math.min(1, dt*3.75);
       tilt = -0.46 + Math.max(-0.06, Math.min(0.06, dy/Math.max(H,1)*0.20));
     }
@@ -662,7 +662,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       rainAcc += dt*W*density;
       while(rainAcc>1){
         rainAcc--;
-        rain.push({x:Math.random()*W,y:-40,len:24+Math.random()*38,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.48+Math.random()*0.58,opacity:0.075+Math.random()*0.12});
+        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.58+Math.random()*0.68,opacity:0.115+Math.random()*0.16});
       }
       for(var i=rain.length-1;i>=0;i--){
         var rn=rain[i], px=rn.x, py=rn.y;
@@ -692,7 +692,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         var rn=rain[ri], a=rn.opacity*rn.depth;
         if(hitUmbrella(frame,rn.x,rn.y) || hitUmbrella(frame,rn.x-3,rn.y-rn.len*0.45))continue;
         ctx.strokeStyle='rgba(213,190,232,'+a+')';
-        ctx.lineWidth=Math.max(0.45,rn.depth*0.72);
+        ctx.lineWidth=Math.max(0.8,rn.depth*1.08);
         ctx.beginPath();
         ctx.moveTo(rn.x,rn.y);
         ctx.lineTo(rn.x+rn.drift*0.028-5,rn.y-rn.len);
