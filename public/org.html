@@ -89,10 +89,6 @@
   .nav.scrolled nav a:hover{color:var(--ink)}
   .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;
     position:relative;isolation:isolate;overflow:hidden;font-size:.95rem;padding:11px 20px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .16s,box-shadow .16s,background .16s}
-  .btn::after,.chip::after,.prod::after,.goal::after,.role-card::after{content:"";position:absolute;pointer-events:none;z-index:0;
-    width:130px;height:130px;left:50%;top:50%;border:1px solid color-mix(in srgb,var(--amber) 62%,transparent);border-radius:50%;
-    transform:translate(-50%,-50%) scale(.15);opacity:0;transition:transform .62s cubic-bezier(.15,.8,.2,1),opacity .48s ease}
-  .btn:hover::after,.chip:hover::after,.prod:hover::after,.goal:hover::after,.role-card:hover::after{transform:translate(-50%,-50%) scale(1.35);opacity:.58}
   .chip,.goal,.role-card{position:relative;overflow:hidden}
   .btn.primary{background:var(--amber);color:#211329}
   .btn.primary:hover{transform:translateY(-1px);box-shadow:0 8px 22px -10px var(--amber)}
