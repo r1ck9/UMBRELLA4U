@@ -646,23 +646,23 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       return null;
     }
     function createSplash(x,y,nx){
-      var dir=nx<0?-1:1, count=8+(Math.random()*6|0);
+      var dir=nx<0?-1:1, count=5+(Math.random()*4|0);
       for(var i=0;i<count;i++){
         var side=dir*(65+Math.random()*115)+(Math.random()*70-35);
         splashes.push({
-          x:x,y:y,px:x,py:y,age:0,life:0.24+Math.random()*0.24,
-          vx:side,vy:-75-Math.random()*125,r:0.9+Math.random()*1.8,
-          a:0.42+Math.random()*0.34
+          x:x,y:y,px:x,py:y,age:0,life:0.20+Math.random()*0.18,
+          vx:side,vy:-70-Math.random()*105,r:0.45+Math.random()*0.85,
+          a:0.22+Math.random()*0.24
         });
       }
       if(splashes.length>120)splashes.splice(0,splashes.length-120);
     }
     function updateRain(dt,sc,frame){
-      var density = W < 760 ? 0.06 : 0.08;
+      var density = W < 760 ? 0.09 : 0.12;
       rainAcc += dt*W*density;
       while(rainAcc>1){
         rainAcc--;
-        rain.push({x:Math.random()*W,y:-40,len:22+Math.random()*34,spd:520+Math.random()*360,drift:-35+Math.random()*32,depth:0.46+Math.random()*0.52,opacity:0.055+Math.random()*0.095});
+        rain.push({x:Math.random()*W,y:-40,len:24+Math.random()*38,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.48+Math.random()*0.58,opacity:0.075+Math.random()*0.12});
       }
       for(var i=rain.length-1;i>=0;i--){
         var rn=rain[i], px=rn.x, py=rn.y;
@@ -704,7 +704,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       for(var si=0;si<splashes.length;si++){
         var sp=splashes[si], t=sp.age/sp.life, fade=1-t;
         ctx.strokeStyle='rgba(232,211,248,'+(0.24*fade)+')';
-        ctx.lineWidth=Math.max(.7,sp.r*.55);
+        ctx.lineWidth=Math.max(.35,sp.r*.34);
         ctx.beginPath(); ctx.moveTo(sp.px,sp.py); ctx.lineTo(sp.x,sp.y); ctx.stroke();
         ctx.fillStyle='rgba(238,221,252,'+(sp.a*fade)+')';
         ctx.beginPath(); ctx.arc(sp.x,sp.y,sp.r*fade,0,6.29); ctx.fill();
