@@ -371,6 +371,43 @@
   @media(prefers-reduced-motion:reduce){
     ::view-transition-old(root),::view-transition-new(root){animation:none}
   }
+  /* ---------- phone-first layout: simple, readable, and intentionally lightweight ---------- */
+  @media(max-width:760px){
+    html{scroll-padding-top:72px}
+    body{font-size:.98rem;line-height:1.55}
+    .wrap{padding-left:18px;padding-right:18px}
+    :where(section){padding:58px 0}
+    .visual-section::before,.visual-section::after{display:none}
+    .eyebrow{font-size:.65rem;letter-spacing:.14em}.eyebrow::before{width:1.5em;height:1.5em;margin-right:.45em}
+    .hero{min-height:0;padding:96px 0 58px;align-items:flex-start}
+    .hero canvas,.stormflash,#rainall,.cta-rain{display:none}
+    .hero h1,.haven-title{font-size:clamp(2.25rem,11vw,2.75rem);margin-top:12px;max-width:none}
+    .splash{font-size:.72rem;margin-top:10px}
+    .hero .lede{margin-top:16px;font-size:1rem;line-height:1.52}
+    .hero-keys{margin-top:20px;gap:8px;justify-content:center}
+    .hero-keys li{font-size:.76rem;padding:5px 9px}
+    .hero .cta-row{margin-top:26px;gap:10px;justify-content:center}
+    .btn.big{font-size:1rem;padding:14px 24px}.hero .cta-row .btn.light{width:min(100%,260px);justify-content:center}
+    .hero .dom{margin-top:20px;font-size:.78rem;line-height:1.5}
+    .sec-head h2,.about-intro h2,.havensec h2{font-size:clamp(1.75rem,8vw,2.2rem);line-height:1.12}
+    .sec-head p.sub,.about-intro .sub,.havensec .lede2{font-size:1rem;line-height:1.55}
+    .about .grid{gap:28px}.about-intro{padding-bottom:28px;margin-bottom:28px}
+    .about .body p{font-size:1rem;margin-top:14px}.about .body p:first-child{font-size:1.12rem}
+    .facts{margin-top:20px;gap:8px}.facts li{font-size:.82rem;padding:7px 9px}
+    .pillar{padding:16px;gap:12px}.pillar .n{font-size:1rem}.pillar p{font-size:.9rem}
+    .goals .g-grid,.p-grid,.role-cols{grid-template-columns:1fr;margin-top:32px;gap:14px}
+    .goal,.prod,.role-card{padding:20px 18px;border-radius:16px;backdrop-filter:none}
+    .goal .num{font-size:2.45rem}.prod .top{gap:10px;flex-wrap:wrap}.prod h3,.role-card h3{font-size:1.25rem}
+    .soon{margin-top:18px;gap:8px}.chip{font-size:.82rem;padding:7px 10px}
+    .mapwrap{min-height:0;margin-top:30px;padding:14px;border-radius:18px}.map-board{min-height:220px;padding:18px;border-radius:14px}
+    .map-placeholder{padding:18px}.map-placeholder .mark{width:48px;height:48px;margin-bottom:12px;font-size:1.55rem}
+    .map-panel{padding:18px;border-radius:14px}.map-list{gap:8px}.map-list li{font-size:.86rem}
+    .role-cols{margin-top:30px}.role-list li{padding:11px 0;font-size:.92rem}.apply-cta{margin-top:24px;padding:20px;gap:14px}
+    .story-wall{padding:58px 0}.polaroids{margin-top:28px;gap:16px}.polaroid{min-height:0;padding:15px 15px 20px}.polaroid::before{height:104px;margin-bottom:13px}
+    .cta{padding:68px 0}.cta-shield{display:none}.cta h2{font-size:clamp(1.85rem,8vw,2.35rem)}.cta p{font-size:1rem;line-height:1.55}
+    .cta .cta-row{margin-top:24px;flex-direction:column;align-items:center}.cta .cta-row .btn{width:min(100%,260px);justify-content:center}
+    footer{padding:34px 0;text-align:center}footer .wrap{flex-direction:column;align-items:center;gap:16px}footer .fnav{justify-content:center;gap:12px 18px}footer .fine{margin-top:2px;padding-top:14px}
+  }
   :focus-visible{outline:2.5px solid var(--amber);outline-offset:3px;border-radius:6px}
 </style>
 
@@ -724,6 +761,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var cta=document.getElementById('cta');
     var canvas=cta && cta.querySelector('.cta-rain');
     if(!cta || !canvas) return;
+    if(window.innerWidth<=760) return;
     var reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
     var ctx=canvas.getContext('2d'), W=0,H=0,DPR=1,last=null,open=0,target=0,acc=0,drops=[],visible=false,running=false;
     function resize(){
@@ -795,6 +833,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
   // umbrella rain), so there's no doubling up at the top of the page.
   (function(){
     var canvas = document.getElementById('rainall'); if(!canvas) return;
+    if(window.innerWidth<=760) return;
     if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
     var ctx = canvas.getContext('2d');
     var W=0,H=0,DPR=1,tt=0,last=null,acc=0,drops=[];
@@ -888,6 +927,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
   // The original hand-built 3D umbrella (canvas), the "top stuff", kept.
   (function(){
     var canvas = document.getElementById('umb3d'); if(!canvas) return;
+    if(window.innerWidth<=760) return;
     var ctx = canvas.getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     var W, H, DPR, raf=0, visible=true;
