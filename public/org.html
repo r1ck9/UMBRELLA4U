@@ -101,7 +101,13 @@
     transform:translateY(-1px);
   }
   .nav .btn{padding:9px 17px}
-  @media(max-width:760px){.nav nav a:not(.cta-link){display:none}}
+  @media(max-width:760px){
+    .nav .wrap{height:64px;padding-left:16px;padding-right:16px;gap:10px}
+    .brand{font-size:1.28rem;gap:9px}.brand .mark{width:36px;height:36px}
+    .nav nav{gap:0}.nav nav a:not(.cta-link),.nav nav a.btn.cta-link{display:none}
+    .nav nav a.cta-link:not(.btn){display:inline-flex;align-items:center;white-space:nowrap;padding:7px 10px;
+      border:1px solid rgba(255,255,255,.24);border-radius:999px;background:rgba(255,255,255,.08);font-size:.76rem}
+  }
 
   /* ---------- hero (committed dark canopy world) ---------- */
   .hero{position:relative;isolation:isolate;z-index:45;color:#f8f2fc;overflow:hidden;
@@ -140,6 +146,7 @@
     .hero .wrap{margin:0 auto;text-align:center;max-width:600px}
     .hero .cta-row{justify-content:center}
     .hero .lede{margin-left:auto;margin-right:auto}
+    .scroll-cue{display:none}
   }
   .haven-title{display:flex;align-items:center;gap:.24em;margin:14px 0 0;
     font-size:clamp(2.6rem,7.6vw,5.4rem);letter-spacing:-.03em;line-height:.92}
