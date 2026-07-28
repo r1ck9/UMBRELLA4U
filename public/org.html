@@ -658,11 +658,11 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       if(splashes.length>120)splashes.splice(0,splashes.length-120);
     }
     function updateRain(dt,sc,frame){
-      var density = W < 760 ? 0.12 : 0.16;
+      var density = W < 760 ? 0.06 : 0.08;
       rainAcc += dt*W*density;
       while(rainAcc>1){
         rainAcc--;
-        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:560+Math.random()*430,drift:-35+Math.random()*32,depth:0.55+Math.random()*0.75,opacity:0.10+Math.random()*0.17});
+        rain.push({x:Math.random()*W,y:-40,len:22+Math.random()*34,spd:520+Math.random()*360,drift:-35+Math.random()*32,depth:0.46+Math.random()*0.52,opacity:0.055+Math.random()*0.095});
       }
       for(var i=rain.length-1;i>=0;i--){
         var rn=rain[i], px=rn.x, py=rn.y;
@@ -692,7 +692,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         var rn=rain[ri], a=rn.opacity*rn.depth;
         if(hitUmbrella(frame,rn.x,rn.y) || hitUmbrella(frame,rn.x-3,rn.y-rn.len*0.45))continue;
         ctx.strokeStyle='rgba(213,190,232,'+a+')';
-        ctx.lineWidth=Math.max(0.7,rn.depth);
+        ctx.lineWidth=Math.max(0.45,rn.depth*0.72);
         ctx.beginPath();
         ctx.moveTo(rn.x,rn.y);
         ctx.lineTo(rn.x+rn.drift*0.028-5,rn.y-rn.len);
