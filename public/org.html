@@ -981,9 +981,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       {p:4.9,x:.68,y:.21,vx:0,vy:0,flower:58,mode:'fly',rest:0,speed:.056}
     ];
     var skyButterflies=[
-      {p:.25,s:.31,rx:.48,ry:.17,size:.028,c:'#ff9d2e',c2:'#ffd84d',spot:'#fff2b0',edge:'#2b1722'},
-      {p:2.35,s:.27,rx:.56,ry:.2,size:.032,c:'#25c9ff',c2:'#6350ff',spot:'#eafcff',edge:'#17142f'},
-      {p:4.55,s:.34,rx:.42,ry:.23,size:.03,c:'#ff68c5',c2:'#914fff',spot:'#ffe8f8',edge:'#321634'}
+      {p:.25,s:.31,rx:.48,ry:.17,size:.0224,c:'#ff9d2e',c2:'#ffd84d',spot:'#fff2b0',edge:'#2b1722'},
+      {p:2.35,s:.27,rx:.56,ry:.2,size:.0256,c:'#25c9ff',c2:'#6350ff',spot:'#eafcff',edge:'#17142f'},
+      {p:4.55,s:.34,rx:.42,ry:.23,size:.024,c:'#ff68c5',c2:'#914fff',spot:'#ffe8f8',edge:'#321634'}
     ];
     var flowerColors=['#fff176','#ff5fc8','#ffffff','#55d7ff','#d28cff','#ff6b6b','#ffad3d','#78ffed'];
     var sub=function(a,b){return{x:a.x-b.x,y:a.y-b.y,z:a.z-b.z}};
@@ -1014,7 +1014,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var dx = aim.x - sc.cx;
       var dy = aim.y - sc.cy;
       targetAngle = Math.atan2(dx, Math.max(90, -dy + sc.scale*0.72));
-      targetAngle = -1.20 + Math.max(-0.20, Math.min(0.20, targetAngle));
+      targetAngle = -1.20 + Math.max(-0.30, Math.min(0.30, targetAngle));
       angle += wrapAngle(targetAngle-angle) * Math.min(1, dt*1.875);
       tilt = -0.46 + Math.max(-0.06, Math.min(0.06, dy/Math.max(H,1)*0.20));
     }
@@ -1295,13 +1295,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var scale=sc.scale,anchor=meadowAnchor(sc),rx=scale*1.28;
       ctx.save();
       ctx.translate(anchor.x,anchor.y-scale*.075);
-      ctx.scale(1,.34);
+      ctx.scale(1,.55);
       ctx.globalCompositeOperation='screen';
-      var gold=ctx.createRadialGradient(0,0,0,0,0,rx*1.04);
-      gold.addColorStop(0,'rgba(255,216,92,.34)');
-      gold.addColorStop(.42,'rgba(245,184,62,.18)');
+      var gold=ctx.createRadialGradient(0,0,0,0,0,rx*1.85);
+      gold.addColorStop(0,'rgba(255,216,92,.68)');
+      gold.addColorStop(.18,'rgba(252,203,78,.48)');
+      gold.addColorStop(.42,'rgba(245,184,62,.36)');
+      gold.addColorStop(.68,'rgba(238,170,50,.12)');
+      gold.addColorStop(.86,'rgba(234,163,45,.035)');
       gold.addColorStop(1,'rgba(232,158,43,0)');
-      ctx.fillStyle=gold;ctx.beginPath();ctx.arc(0,0,rx*1.04,0,6.29);ctx.fill();
+      ctx.fillStyle=gold;ctx.beginPath();ctx.arc(0,0,rx*1.85,0,6.29);ctx.fill();
       ctx.restore();
     }
     function drawMeadowSoil(sc){
