@@ -13,6 +13,7 @@
     --line:rgba(54,31,72,.14); --line-2:rgba(54,31,72,.08);
     --shadow:0 1px 2px rgba(54,31,72,.06), 0 12px 32px -18px rgba(54,31,72,.3);
     --interactive-glow:0 12px 28px -12px color-mix(in srgb,var(--amber) 74%,transparent);
+    --hero-seam:#3a2149;
     --maxw:1120px;
     --serif:Georgia,'Iowan Old Style','Times New Roman',serif;
     --sans:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
@@ -147,6 +148,14 @@
   #cursor-rain{position:fixed;inset:0;width:100%;height:100%;z-index:46;pointer-events:none}
   @media(prefers-reduced-motion:reduce){#rainall,#cursor-rain{display:none}}
   @media(max-width:760px){#cursor-rain{display:none}}
+  .hero::before{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;
+    height:clamp(160px,18vw,215px);pointer-events:none;
+    background:
+      radial-gradient(ellipse 40% 180px at 77% 100%,
+        rgba(58,33,73,.5) 0%,rgba(58,33,73,.28) 48%,rgba(58,33,73,0) 100%),
+      linear-gradient(180deg,
+        rgba(58,33,73,0) 0%,rgba(58,33,73,.05) 18%,rgba(58,33,73,.16) 36%,
+        rgba(58,33,73,.4) 58%,rgba(58,33,73,.7) 76%,rgba(58,33,73,.9) 91%,var(--hero-seam) 100%)}
   .hero::after{content:"";position:absolute;inset:0;z-index:-1;
     background:linear-gradient(180deg,transparent 55%,rgba(28,14,38,.56) 100%)}
   .hero .eyebrow{color:#dfc2f1}
@@ -211,7 +220,16 @@
   .havensec .feat li{font-size:.92rem;font-weight:600;color:var(--forest-deep);
     background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px}
   .havensec .cta-row{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .about{background:var(--surface)}
+  .about{background-color:var(--surface);
+    background-image:linear-gradient(180deg,var(--hero-seam) 0,
+      color-mix(in srgb,var(--hero-seam) 82%,var(--surface)) 44px,
+      color-mix(in srgb,var(--hero-seam) 58%,var(--surface)) 104px,
+      color-mix(in srgb,var(--hero-seam) 28%,var(--surface)) 172px,
+      var(--surface) 230px);
+    padding-top:clamp(150px,14vw,205px)}
+  .about::before{top:0;-webkit-mask-image:linear-gradient(180deg,transparent 0,transparent 116px,#000 260px);
+    mask-image:linear-gradient(180deg,transparent 0,transparent 116px,#000 260px)}
+  .about::after{display:none}
   .about-intro{border-bottom:1px solid var(--line-2);
     padding-bottom:clamp(36px,5vw,56px);margin-bottom:clamp(36px,5vw,56px)}
   .about-intro h2{font-size:clamp(1.7rem,3.2vw,2.5rem);letter-spacing:-.015em;margin-top:12px;max-width:24ch}
@@ -398,7 +416,10 @@
     :where(section){padding:58px 0}
     .visual-section::before,.visual-section::after{display:none}
     /* Each band blends into the next, so the page reads as one continuous scroll. */
-    .about{background:linear-gradient(180deg,#47275c 0%,color-mix(in srgb,var(--surface) 72%,#76509a) 28%,var(--surface) 100%)}
+    .hero::before{height:100px;background:linear-gradient(180deg,rgba(58,33,73,0),rgba(58,33,73,.62) 62%,var(--hero-seam))}
+    .about{background-image:linear-gradient(180deg,var(--hero-seam) 0,
+      color-mix(in srgb,var(--hero-seam) 58%,var(--surface)) 64px,var(--surface) 150px);
+      padding-top:clamp(104px,24vw,132px)}
     .havensec{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
     .goals{background:linear-gradient(180deg,var(--surface-2) 0%,var(--paper) 100%)}
     .products{background:linear-gradient(180deg,var(--paper) 0%,var(--surface) 100%)}
