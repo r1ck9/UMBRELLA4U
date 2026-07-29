@@ -1067,15 +1067,15 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       if(splashes.length>120)splashes.splice(0,splashes.length-120);
     }
     function createMeadowSplash(x,y,strong){
-      var count=(strong?5:2)+(Math.random()*(strong?4:3)|0);
+      var count=2*((strong?5:2)+(Math.random()*(strong?4:3)|0));
       for(var i=0;i<count;i++){
         splashes.push({
           x:x,y:y,px:x,py:y,age:0,life:.21+Math.random()*.17,
-          vx:-72+Math.random()*128,vy:-62-Math.random()*104,
-          r:.68+Math.random()*.76,a:.3+Math.random()*.22,ground:true
+          vx:-144+Math.random()*256,vy:-124-Math.random()*208,
+          r:1.36+Math.random()*1.52,a:.3+Math.random()*.22,ground:true
         });
       }
-      if(splashes.length>220)splashes.splice(0,splashes.length-220);
+      if(splashes.length>440)splashes.splice(0,splashes.length-440);
     }
     function rainHitMeadow(sc,x0,y0,x1,y1,rn){
       var anchor=meadowAnchor(sc),rx=sc.scale*1.28;
@@ -1298,8 +1298,8 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       ctx.scale(1,.34);
       ctx.globalCompositeOperation='screen';
       var gold=ctx.createRadialGradient(0,0,0,0,0,rx*1.04);
-      gold.addColorStop(0,'rgba(255,216,92,.17)');
-      gold.addColorStop(.42,'rgba(245,184,62,.09)');
+      gold.addColorStop(0,'rgba(255,216,92,.34)');
+      gold.addColorStop(.42,'rgba(245,184,62,.18)');
       gold.addColorStop(1,'rgba(232,158,43,0)');
       ctx.fillStyle=gold;ctx.beginPath();ctx.arc(0,0,rx*1.04,0,6.29);ctx.fill();
       ctx.restore();
@@ -1398,12 +1398,12 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var meadow=meadowAnchor(sc),grassTop=meadow.y-sc.scale*.19,canopyBottom=sc.cy+sc.scale*.02;
       var centerX=(meadow.x+sc.cx)*.5,centerY=(grassTop+canopyBottom)*.5;
       for(var i=0;i<skyButterflies.length;i++){
-        var bf=skyButterflies[i],a=tt*bf.s+bf.p;
+        var bf=skyButterflies[i],motion=bf.s*1.8,a=tt*motion+bf.p;
         bf.x=centerX+sc.scale*(Math.cos(a)*bf.rx+Math.sin(a*.53+bf.p)*.12);
         bf.y=centerY+sc.scale*(Math.sin(a*.83)*bf.ry+Math.cos(a*1.41+bf.p)*.055);
         bf.z=Math.sin(a*.61+bf.p*1.7)*.76;
-        var vx=sc.scale*(-Math.sin(a)*bf.rx*bf.s+Math.cos(a*.53+bf.p)*.12*bf.s*.53);
-        var vy=sc.scale*(Math.cos(a*.83)*bf.ry*bf.s*.83-Math.sin(a*1.41+bf.p)*.055*bf.s*1.41);
+        var vx=sc.scale*(-Math.sin(a)*bf.rx*motion+Math.cos(a*.53+bf.p)*.12*motion*.53);
+        var vy=sc.scale*(Math.cos(a*.83)*bf.ry*motion*.83-Math.sin(a*1.41+bf.p)*.055*motion*1.41);
         bf.heading=Math.atan2(vy,vx);
         bf.bank=Math.max(-.55,Math.min(.55,Math.sin(a*.91+bf.p)*.42+bf.z*.16));
         bf.perspective=.84+(bf.z+.76)/1.52*.28;
