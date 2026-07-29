@@ -1066,23 +1066,23 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
       if(splashes.length>120)splashes.splice(0,splashes.length-120);
     }
-    function createMeadowSplash(x,y){
-      var count=3+(Math.random()*4|0);
+    function createMeadowSplash(x,y,strong){
+      var count=(strong?5:2)+(Math.random()*(strong?4:3)|0);
       for(var i=0;i<count;i++){
         splashes.push({
-          x:x,y:y,px:x,py:y,age:0,life:.16+Math.random()*.16,
-          vx:-55+Math.random()*95,vy:-38-Math.random()*88,
-          r:.4+Math.random()*.7,a:.18+Math.random()*.2,ground:true
+          x:x,y:y,px:x,py:y,age:0,life:.21+Math.random()*.17,
+          vx:-72+Math.random()*128,vy:-62-Math.random()*104,
+          r:.68+Math.random()*.76,a:.3+Math.random()*.22,ground:true
         });
       }
-      if(splashes.length>150)splashes.splice(0,splashes.length-150);
+      if(splashes.length>220)splashes.splice(0,splashes.length-220);
     }
     function rainHitMeadow(sc,x0,y0,x1,y1,rn){
       var anchor=meadowAnchor(sc),rx=sc.scale*1.28;
       for(var i=1;i<=8;i++){
         var t=i/8,x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,u=(x-anchor.x)/rx;
         if(Math.abs(u)>1)continue;
-        var edge=meadowTaper(u);if(edge<.035)continue;
+        var edge=meadowTaper(u);
         var surface=soilTopY(u,sc.scale,anchor.y);
         if(rn.meadowSeed<Math.min(.92,edge*.96)){
           surface-=sc.scale*(.022+rn.grassLevel*.078)*(.28+edge*.72);
@@ -1090,6 +1090,12 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         if(y>=surface&&y0<surface)return {x:x,y:surface};
       }
       return null;
+    }
+    function rainHitGround(x0,y0,x1,y1){
+      var groundY=H*.982;
+      if(y1<groundY||y0>=groundY)return null;
+      var t=(groundY-y0)/(y1-y0||1);
+      return {x:x0+(x1-x0)*t,y:groundY};
     }
     function updateRain(dt,sc,frame){
       var density = W < 760 ? 0.09 : 0.12;
@@ -1114,7 +1120,13 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         }
         var meadowHit=rainHitMeadow(sc,px,py,rn.x,rn.y,rn);
         if(meadowHit){
-          createMeadowSplash(meadowHit.x,meadowHit.y);
+          createMeadowSplash(meadowHit.x,meadowHit.y,true);
+          rain.splice(i,1);
+          continue;
+        }
+        var groundHit=rainHitGround(px,py,rn.x,rn.y);
+        if(groundHit){
+          createMeadowSplash(groundHit.x,groundHit.y,false);
           rain.splice(i,1);
           continue;
         }
@@ -1144,12 +1156,13 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         ctx.stroke();
       }
     }
-    function drawSplashes(){
+    function drawSplashes(groundPass){
       ctx.lineCap='round';
       for(var si=0;si<splashes.length;si++){
-        var sp=splashes[si], t=sp.age/sp.life, fade=1-t;
-        ctx.strokeStyle='rgba(232,211,248,'+(0.24*fade)+')';
-        ctx.lineWidth=Math.max(.35,sp.r*.34);
+        var sp=splashes[si];if(!!sp.ground!==groundPass)continue;
+        var t=sp.age/sp.life, fade=1-t;
+        ctx.strokeStyle='rgba(232,211,248,'+((sp.ground?.4:.24)*fade)+')';
+        ctx.lineWidth=Math.max(.35,sp.r*(sp.ground?.52:.34));
         ctx.beginPath(); ctx.moveTo(sp.px,sp.py); ctx.lineTo(sp.x,sp.y); ctx.stroke();
         ctx.fillStyle='rgba(238,221,252,'+(sp.a*fade)+')';
         ctx.beginPath(); ctx.arc(sp.x,sp.y,sp.r*fade,0,6.29); ctx.fill();
@@ -1167,10 +1180,10 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     function meadowTaper(x){
       var edge=Math.abs(x),fringe=Math.max(0,Math.min(1,(edge-.38)/.62));
       if(!fringe)return 1;
-      var base=Math.pow(Math.max(0,(1-edge)/.62),1.08);
-      var clumps=Math.sin(x*18.3+.6)*.34+Math.sin(x*46.7-1.4)*.22+Math.sin(x*112.9+2.1)*.12;
-      var bites=Math.pow(Math.max(0,Math.sin(x*31.1+1.8)),4)*.23;
-      return Math.max(0,Math.min(1,base+fringe*clumps-fringe*bites));
+      var envelope=Math.pow(Math.max(0,(1-edge)/.62),.86);
+      var clumps=Math.sin(x*18.3+.6)*.5+Math.sin(x*46.7-1.4)*.3+Math.sin(x*112.9+2.1)*.18;
+      var bites=Math.pow(Math.max(0,Math.sin(x*31.1+1.8)),4)*.48;
+      return Math.max(0,Math.min(1,envelope*Math.max(0,1+fringe*clumps-fringe*bites)));
     }
     function makeGrassField(points,scale,dt){
       var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
@@ -1274,6 +1287,10 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var edge=meadowTaper(u);
       return my-scale*(.014+.19*edge+(Math.sin(u*10.7)+Math.sin(u*24.1)*.45)*.005*edge);
     }
+    function soilBottomY(u,scale,my){
+      var envelope=Math.pow(Math.max(0,1-Math.abs(u)),.56),edge=meadowTaper(u);
+      return soilTopY(u,scale,my)+scale*.24*envelope*(.28+.72*edge);
+    }
     function drawMeadowGlow(sc){
       var scale=sc.scale,anchor=meadowAnchor(sc),rx=scale*1.28;
       ctx.save();
@@ -1296,15 +1313,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         var u=-1+i/steps*2,x=mx+u*rx,y=soilTopY(u,scale,my);
         if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
       }
-      ctx.quadraticCurveTo(mx+rx*1.01,my+scale*.05,mx+rx*.82,H+scale*.12);
-      ctx.lineTo(mx-rx*.82,H+scale*.12);
-      ctx.quadraticCurveTo(mx-rx*1.01,my+scale*.05,mx-rx,soilTopY(-1,scale,my));
+      for(var i=steps;i>=0;i--){
+        var u=-1+i/steps*2;
+        ctx.lineTo(mx+u*rx,soilBottomY(u,scale,my));
+      }
       ctx.closePath();
       ctx.fillStyle=soil;ctx.fill();
       var dirtColors=['rgba(205,116,57,.28)','rgba(61,25,17,.24)','rgba(151,72,35,.3)','rgba(229,142,73,.18)'];
       for(var si=0;si<soilMottles.length;si++){
-        var sp=soilMottles[si],sx=mx+sp.x*rx,top=soilTopY(sp.x,scale,my);
-        var sy=top+(H-top)*(.12+sp.y*.78);
+        var sp=soilMottles[si],sx=mx+sp.x*rx,top=soilTopY(sp.x,scale,my),bottom=soilBottomY(sp.x,scale,my);
+        var sy=top+(bottom-top)*(.1+sp.y*.8);
         ctx.fillStyle=dirtColors[sp.c];ctx.beginPath();ctx.ellipse(sx,sy,sp.rx,sp.ry,sp.x*.35,0,6.29);ctx.fill();
       }
     }
@@ -1475,8 +1493,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         else if(it.kind==='finial'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); ctx.lineTo(p[1].x,p[1].y); ctx.strokeStyle='#c6a0dc'; ctx.lineWidth=Math.max(1.4,scale*0.011); ctx.lineCap='round'; ctx.stroke(); }
       }
       drawSkyButterflies(sc,true);
-      drawSplashes();
+      drawSplashes(false);
       drawMeadowLife(sc,grassField,dt);
+      drawSplashes(true);
     }
     function loop(ts){ raf=0; if(!visible){last=null;return;} if(last===null)last=ts; var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
       var sc=scene(); aimUmbrella(sc,dt); var frame=buildFrame(sc); updateRain(dt,sc,frame);
