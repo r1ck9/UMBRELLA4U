@@ -378,6 +378,14 @@
     .wrap{padding-left:18px;padding-right:18px}
     :where(section){padding:58px 0}
     .visual-section::before,.visual-section::after{display:none}
+    /* Each band blends into the next, so the page reads as one continuous scroll. */
+    .about{background:linear-gradient(180deg,#47275c 0%,color-mix(in srgb,var(--surface) 72%,#76509a) 28%,var(--surface) 100%)}
+    .havensec{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
+    .goals{background:linear-gradient(180deg,var(--surface-2) 0%,var(--paper) 100%)}
+    .products{background:linear-gradient(180deg,var(--paper) 0%,var(--surface) 100%)}
+    .chapters{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
+    .story-wall{background:linear-gradient(180deg,var(--surface-2) 0%,#76509a 100%)}
+    .cta{background:linear-gradient(180deg,#76509a 0%,#54356c 48%,#2a1838 100%)}
     .eyebrow{font-size:.65rem;letter-spacing:.14em}.eyebrow::before{width:1.5em;height:1.5em;margin-right:.45em}
     .hero{min-height:0;padding:96px 0 58px;align-items:flex-start}
     .hero canvas,.stormflash,#rainall,.cta-rain{display:none}
