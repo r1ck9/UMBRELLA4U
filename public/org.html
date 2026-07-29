@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Haven, a place to be heard · an Umbrella4U product</title>
+<script src="/site-fit.js"></script>
 <style>
   :root{
     --paper:#faf7ff; --surface:#ffffff; --surface-2:#f0e8f8;
@@ -45,7 +46,7 @@
 
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
-    font-size:1.06rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+    font-size:1.06rem;line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden;zoom:var(--site-fit,1)}
   h1,h2,h3{font-family:var(--serif);font-weight:700;line-height:1.08;text-wrap:balance;margin:0}
   p{margin:0}
   a{color:inherit;text-decoration:none}
@@ -116,16 +117,15 @@
       radial-gradient(circle at 72% 50%,rgba(191,141,226,.15),transparent 48%),
       radial-gradient(circle at 50% 34%,rgba(166,127,199,.13),transparent 62%),
       linear-gradient(180deg,#110b19 0%,#281737 55%,#47275c 100%);
-    min-height:100vh;min-height:100svh;display:flex;align-items:center;
+    min-height:var(--site-viewport-height,100svh);display:flex;align-items:center;
     padding:clamp(64px,10vw,110px) 0 clamp(96px,12vw,140px)}
   .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
     display:flex;flex-direction:column;align-items:center;gap:3px;color:#d7c2e5;opacity:.85;
     font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
   .scroll-cue i{font-style:normal;font-size:1.35rem;line-height:1;animation:scrollbob 1.8s ease-in-out infinite}
-  .hero-fps{position:fixed;top:84px;right:18px;z-index:70;min-width:70px;padding:7px 10px;border-radius:10px;
-    border:1px solid rgba(235,215,248,.2);background:rgba(20,11,29,.9);color:#eadbf4;
-    font:700 .72rem/1 var(--sans);letter-spacing:.06em;text-align:center;
-    box-shadow:0 5px 18px rgba(8,3,13,.18);pointer-events:none;font-variant-numeric:tabular-nums}
+  .hero-fps{position:fixed;top:84px;right:18px;z-index:70;color:#20e86d;
+    font:800 .72rem/1 ui-monospace,'SFMono-Regular',Consolas,monospace;letter-spacing:.02em;
+    pointer-events:none;font-variant-numeric:tabular-nums}
   @keyframes scrollbob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
   @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
   .hero canvas{position:absolute;inset:0;z-index:-2;width:100%;height:100%;opacity:1}
@@ -158,7 +158,7 @@
   /* words to the left, like the original home page */
   .hero .wrap{max-width:560px;margin-left:clamp(24px,8vw,110px);margin-right:auto;padding-right:24px}
   @media(max-width:760px){
-    .hero-fps{top:72px;right:10px;min-width:62px;padding:6px 8px;font-size:.65rem}
+    .hero-fps{top:72px;right:10px;font-size:.65rem}
     .hero .wrap{margin:0 auto;text-align:center;max-width:600px}
     .hero .cta-row{justify-content:center}
     .hero .lede{margin-left:auto;margin-right:auto}
@@ -885,7 +885,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       ctx.setTransform(DPR,0,0,DPR,0,0);
       updateActive();
     }
-    function updateActive(){pageRainActive=!hero||hero.getBoundingClientRect().bottom<H-1;}
+    function updateActive(){pageRainActive=!hero||hero.getBoundingClientRect().bottom<window.innerHeight-1;}
     var mq = window.matchMedia('(prefers-color-scheme:dark)');
     function isDark(){
       var t = document.documentElement.getAttribute('data-theme');
@@ -1714,7 +1714,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     function start(){if(!visible || raf || reduce)return;last=null;raf=requestAnimationFrame(loop)}
     window.addEventListener('pointermove',function(e){
       var r=canvas.getBoundingClientRect();
-      pointer.x=e.clientX-r.left; pointer.y=e.clientY-r.top; pointer.active=true;
+      pointer.x=(e.clientX-r.left)*W/Math.max(r.width,1);
+      pointer.y=(e.clientY-r.top)*H/Math.max(r.height,1);
+      pointer.active=true;
     },{passive:true});
     window.addEventListener('pointerleave',function(){ pointer.active=false; },{passive:true});
     resize(); window.addEventListener('resize', resize);
