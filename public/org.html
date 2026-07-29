@@ -132,8 +132,6 @@
   #cursor-rain{position:fixed;inset:0;width:100%;height:100%;z-index:46;pointer-events:none}
   @media(prefers-reduced-motion:reduce){#rainall,#cursor-rain{display:none}}
   @media(max-width:760px){#cursor-rain{display:none}}
-  .hero::before{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:clamp(150px,21vh,235px);pointer-events:none;
-    background:linear-gradient(180deg,transparent 0%,rgba(71,39,92,.08) 24%,rgba(71,39,92,.22) 58%,rgba(71,39,92,.42) 100%)}
   .hero::after{content:"";position:absolute;inset:0;z-index:-1;
     background:linear-gradient(180deg,transparent 55%,rgba(28,14,38,.56) 100%)}
   .hero .eyebrow{color:#dfc2f1}
@@ -197,10 +195,7 @@
   .havensec .feat li{font-size:.92rem;font-weight:600;color:var(--forest-deep);
     background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px}
   .havensec .cta-row{margin-top:28px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-  .about{background:
-    radial-gradient(ellipse 38vw 230px at 72% 0,
-      rgba(57,255,73,.46) 0%,rgba(88,235,78,.3) 24%,rgba(104,194,103,.14) 48%,rgba(118,80,154,.06) 70%,transparent 100%),
-    linear-gradient(180deg,#47275c 0,color-mix(in srgb,var(--surface) 48%,#76509a) 105px,var(--surface) 245px,var(--surface) 100%)}
+  .about{background:var(--surface)}
   .about-intro{border-bottom:1px solid var(--line-2);
     padding-bottom:clamp(36px,5vw,56px);margin-bottom:clamp(36px,5vw,56px)}
   .about-intro h2{font-size:clamp(1.7rem,3.2vw,2.5rem);letter-spacing:-.015em;margin-top:12px;max-width:24ch}
@@ -1001,6 +996,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var r=34+(112-34)*lum+rim*128, g=23+(73-23)*lum+rim*92, b=45+(137-45)*lum+rim*118;
       return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
     var angle=-1.20, targetAngle=-1.20, last=null, tt=0, rain=[], rainAcc=0, splashes=[],lastHandleCenter=null,lastGrassPointer=null;
+    var meadowLayoutKey='',meadowLayout=null,beeGrassBounds={active:false};
     var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
     function scene(){
       var narrow = W < 760;
@@ -1028,14 +1024,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var bob=Math.sin(tt*0.8)*0.05;
       var tf=function(p){ var y1=p.y*ct-p.z*st, z1=p.y*st+p.z*ct, x1=p.x; var x2=x1*ca+z1*sa, z2=-x1*sa+z1*ca; return {x:x2,y:y1+bob,z:z2}; };
       var pr=function(P){ var f=fov/(camZ-P.z); return {x:sc.cx+P.x*f*sc.scale, y:sc.cy-P.y*f*sc.scale, z:P.z}; };
-      var hitSurfaces=[];
+      var hitSurfaces=[],minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
       for(var pi=0;pi<panels.length;pi++){
         var tv=panels[pi].vs.map(tf), zc=0;
         for(var vi=0;vi<tv.length;vi++)zc+=tv[vi].z;
-        hitSurfaces.push({z:zc/tv.length,pts:tv.map(pr)});
+        var pts=tv.map(pr);
+        for(var vi=0;vi<pts.length;vi++){minX=Math.min(minX,pts[vi].x);maxX=Math.max(maxX,pts[vi].x);minY=Math.min(minY,pts[vi].y);maxY=Math.max(maxY,pts[vi].y);}
+        hitSurfaces.push({z:zc/tv.length,pts:pts});
       }
       hitSurfaces.sort(function(a,b){return b.z-a.z;});
-      return {tf:tf,pr:pr,hitSurfaces:hitSurfaces,handlePts:handle.map(tf).map(pr)};
+      return {tf:tf,pr:pr,hitSurfaces:hitSurfaces,hitBounds:{minX:minX,maxX:maxX,minY:minY,maxY:maxY},handlePts:handle.map(tf).map(pr)};
     }
     function pointInPoly(x,y,pts){
       var inside=false;
@@ -1046,12 +1044,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       return inside;
     }
     function hitUmbrella(frame,x,y){
+      var bounds=frame.hitBounds;
+      if(x<bounds.minX||x>bounds.maxX||y<bounds.minY||y>bounds.maxY)return false;
       for(var i=0;i<frame.hitSurfaces.length;i++){
         if(pointInPoly(x,y,frame.hitSurfaces[i].pts))return true;
       }
       return false;
     }
     function rainHit(frame,x0,y0,x1,y1){
+      var bounds=frame.hitBounds;
+      if(Math.max(x0,x1)<bounds.minX||Math.min(x0,x1)>bounds.maxX||Math.max(y0,y1)<bounds.minY||Math.min(y0,y1)>bounds.maxY)return null;
       if(hitUmbrella(frame,x0,y0))return null;
       for(var i=1;i<=8;i++){
         var t=i/8, x=x0+(x1-x0)*t, y=y0+(y1-y0)*t;
@@ -1190,13 +1192,54 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var bites=Math.pow(Math.max(0,Math.sin(x*31.1+1.8)),4)*.48;
       return Math.max(0,Math.min(1,envelope*Math.max(0,1+fringe*clumps-fringe*bites)));
     }
+    function prepareMeadow(sc){
+      var anchor=meadowAnchor(sc),scale=sc.scale,mx=anchor.x,my=anchor.y,rx=scale*1.28;
+      var key=W+'|'+H+'|'+scale.toFixed(3)+'|'+mx.toFixed(2)+'|'+my.toFixed(2);
+      if(key===meadowLayoutKey)return meadowLayout;
+      meadowLayoutKey=key;meadowLayout={scale:scale,mx:mx,my:my,rx:rx};
+      for(var band=0;band<backGrass.length;band++){
+        var group=backGrass[band];
+        for(var i=0;i<group.length;i++){
+          var g=group[i],edge=meadowTaper(g.x);g.edge=edge;g.visible=g.q<=edge;if(!g.visible)continue;
+          g.gx=mx+g.x*rx;g.gy=my-scale*(.012+edge*(.035+g.y*.13+(Math.sin(g.p*1.3)+1)*.008));
+          g.gh=scale*(.052+.052*g.h)*(.15+.85*Math.pow(edge,.7));
+          g.bw=Math.max(1.8,scale*.013)*(.55+.45*edge);g.windPhase=g.p+g.x;
+        }
+      }
+      for(var band=0;band<grassBlades.length;band++){
+        var group=grassBlades[band];
+        for(var i=0;i<group.length;i++){
+          var g=group[i],edge=meadowTaper(g.x);g.edge=edge;g.visible=g.q<=edge;if(!g.visible)continue;
+          g.gx=mx+g.x*rx;g.gy=my-scale*(.01+edge*(g.y*.145+(Math.sin(g.p*1.7)+1)*.009));
+          g.gh=scale*(g.t?.052+.055*g.h:.013+.029*g.h)*(.12+.88*Math.pow(edge,.7));
+          g.bw=Math.max(1.7,scale*(g.t?.015:.011))*(.55+.45*edge);g.windPhase=g.p+g.x*1.5;
+        }
+      }
+      for(var band=0;band<shortGrass.length;band++){
+        var group=shortGrass[band];
+        for(var i=0;i<group.length;i++){
+          var g=group[i],edge=meadowTaper(g.x);g.edge=edge;g.visible=g.q<=edge;if(!g.visible)continue;
+          g.gx=mx+g.x*rx;g.gy=my-scale*(.008+edge*(g.y*.1+(Math.cos(g.p*1.9)+1)*.008));
+          g.gh=scale*(.02+.0135*g.h)*(.16+.84*Math.pow(edge,.7));
+          g.bw=Math.max(1.6,scale*.012)*(.55+.45*edge);g.windPhase=g.p+g.x;
+        }
+      }
+      for(var i=0;i<meadowFlowers.length;i++){
+        var fl=meadowFlowers[i],edge=meadowTaper(fl.x);fl.edge=edge;
+        fl.fx=mx+fl.x*rx;fl.fy=my-scale*(.01+edge*fl.y*.1);
+        fl.stem=scale*(.032+.019*fl.h);fl.pr=Math.max(1.4,scale*.0095*fl.h);fl.petals=[];
+        for(var pet=0;pet<5;pet++){var pa=pet/5*6.29+fl.p*.08;fl.petals.push({x:Math.cos(pa)*fl.pr*1.2,y:Math.sin(pa)*fl.pr*1.2,a:pa});}
+      }
+      return meadowLayout;
+    }
     function makeGrassField(points,scale,dt){
       var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
       for(var i=0;i<points.length;i++){minX=Math.min(minX,points[i].x);maxX=Math.max(maxX,points[i].x);minY=Math.min(minY,points[i].y);maxY=Math.max(maxY,points[i].y);}
       var cx=0,cy=0;for(var i=0;i<points.length;i++){cx+=points[i].x;cy+=points[i].y;}cx/=points.length;cy/=points.length;
       var dx=lastHandleCenter?cx-lastHandleCenter.x:0,dy=lastHandleCenter?cy-lastHandleCenter.y:0;
       lastHandleCenter={x:cx,y:cy};
-      return {pts:points,reach:Math.max(10,scale*.055),minX:minX,maxX:maxX,minY:minY,maxY:maxY,dx:dx,dy:dy,speed:Math.hypot(dx,dy)/Math.max(dt,.016)};
+      return {pts:points,reach:Math.max(10,scale*.055),minX:minX,maxX:maxX,minY:minY,maxY:maxY,dx:dx,dy:dy,
+        speed:Math.hypot(dx,dy)/Math.max(dt,.016),springStep:58*dt,decay:Math.exp(-8.5*dt)};
     }
     function grassPush(x,y,h,blade,field,dt){
       var py=y-h*.48,r=field.reach,best=r,nearestX=x,contact=false;
@@ -1216,7 +1259,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         blade.handleHit=true;
       }else if(!contact)blade.handleHit=false;
       var bend=blade.bend||0,vel=blade.bendV||0;
-      vel+=-bend*58*dt;vel*=Math.exp(-8.5*dt);bend+=vel*dt;
+      vel+=-bend*field.springStep;vel*=field.decay;bend+=vel*dt;
       var limit=h*.82;if(bend>limit){bend=limit;vel*=.25}else if(bend<-limit){bend=-limit;vel*=.25}
       if(Math.abs(bend)<.025&&Math.abs(vel)<.12){bend=0;vel=0}
       blade.bend=bend;blade.bendV=vel;
@@ -1231,6 +1274,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     function cursorBladePush(x,y,h,sway,blade,field,dt){
       if(!field.active)return 0;
       var ax=x,ay=y,bx=x+sway,by=y-h,dx=bx-ax,dy=by-ay,den=dx*dx+dy*dy||1;
+      if(field.x<Math.min(ax,bx)-field.reach||field.x>Math.max(ax,bx)+field.reach||field.y<by-field.reach||field.y>ay+field.reach)return 0;
       var t=Math.max(0,Math.min(1,((field.x-ax)*dx+(field.y-ay)*dy)/den));
       var nx=ax+dx*t,ny=ay+dy*t,d=Math.hypot(field.x-nx,field.y-ny);
       if(d>=field.reach)return 0;
@@ -1243,7 +1287,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       return target*.06;
     }
     function flowerLanding(fl){
-      var edge=meadowTaper(fl.x);
+      var edge=fl.edge===undefined?meadowTaper(fl.x):fl.edge;
       return {x:fl.x,y:.01+edge*fl.y*.1+.032+.019*fl.h};
     }
     function chooseBeeFlower(bee,index){
@@ -1257,6 +1301,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function updateMeadowBees(sc,dt){
       var anchor=meadowAnchor(sc),rx=sc.scale*1.28;
+      var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,active=false;
       for(var i=0;i<meadowBees.length;i++){
         var bee=meadowBees[i],fl=meadowFlowers[bee.flower],target=flowerLanding(fl);
         if(bee.mode==='rest'){
@@ -1286,13 +1331,21 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
           bee.sx+=Math.sin(tt*.9+fl.p)*stem*.1;
         }
         bee.hitR=Math.max(4,sc.scale*.014);
+        if(bee.mode==='fly'){
+          active=true;minX=Math.min(minX,bee.sx-bee.hitR);maxX=Math.max(maxX,bee.sx+bee.hitR);
+          minY=Math.min(minY,bee.sy-bee.hitR);maxY=Math.max(maxY,bee.sy+bee.hitR);
+        }
       }
+      beeGrassBounds={active:active,minX:minX,maxX:maxX,minY:minY,maxY:maxY};
     }
     function beeBladePush(x,y,h,sway,blade){
       var oldMask=blade.beeMask||0,newMask=0,immediate=0;
       var ax=x,ay=y,bx=x+sway,by=y-h,dx=bx-ax,dy=by-ay,den=dx*dx+dy*dy||1;
+      var minX=Math.min(ax,bx),maxX=Math.max(ax,bx),minY=Math.min(ay,by),maxY=Math.max(ay,by),bounds=beeGrassBounds;
+      if(!bounds.active||maxX<bounds.minX||minX>bounds.maxX||maxY<bounds.minY||minY>bounds.maxY){blade.beeMask=0;return 0;}
       for(var i=0;i<meadowBees.length;i++){
         var bee=meadowBees[i];if(bee.mode!=='fly')continue;
+        if(bee.sx<minX-bee.hitR||bee.sx>maxX+bee.hitR||bee.sy<minY-bee.hitR||bee.sy>maxY+bee.hitR)continue;
         var t=Math.max(0,Math.min(1,((bee.sx-ax)*dx+(bee.sy-ay)*dy)/den));
         var nx=ax+dx*t,ny=ay+dy*t,d=Math.hypot(bee.sx-nx,bee.sy-ny);
         if(d<bee.hitR){
@@ -1355,50 +1408,40 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
     }
     function drawMeadowBack(sc,field,cursorField,dt){
-      var scale=sc.scale,anchor=meadowAnchor(sc),mx=anchor.x,my=anchor.y,rx=scale*1.28;
       for(var band=0;band<rearGreens.length;band++){
         ctx.beginPath();
         var group=backGrass[band];
         for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];
-          var edge=meadowTaper(g.x);if(g.q>edge)continue;
-          var gx=mx+g.x*rx,gy=my-scale*(.012+edge*(.035+g.y*.13+(Math.sin(g.p*1.3)+1)*.008));
-          var gh=scale*(.052+.052*g.h)*(.15+.85*Math.pow(edge,.7));
-          var sway=Math.sin(tt*.78+g.p+g.x)*gh*.12+grassPush(gx,gy,gh,g,field,dt);
-          sway+=beeBladePush(gx,gy,gh,sway,g);
-          sway+=cursorBladePush(gx,gy,gh,sway,g,cursorField,dt);
-          var bw=Math.max(1.8,scale*.013)*(.55+.45*edge);
-          bladePath(gx,gy,gh,sway,bw);
+          var g=group[gi];if(!g.visible)continue;
+          var sway=Math.sin(tt*.78+g.windPhase)*g.gh*.12+grassPush(g.gx,g.gy,g.gh,g,field,dt);
+          sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+          sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          bladePath(g.gx,g.gy,g.gh,sway,g.bw);
         }
         ctx.fillStyle=rearGreens[band];ctx.fill();
       }
     }
     function drawMeadowLife(sc,field,cursorField,dt){
-      var scale=sc.scale,anchor=meadowAnchor(sc),mx=anchor.x,my=anchor.y,rx=scale*1.28;
+      var scale=sc.scale;
       ctx.lineCap='round';
       for(var band=0;band<vividGreens.length;band++){
         ctx.beginPath();
         var group=grassBlades[band];
         for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];
-          var edge=meadowTaper(g.x);if(g.q>edge)continue;
-          var gx=mx+g.x*rx,gy=my-scale*(.01+edge*(g.y*.145+(Math.sin(g.p*1.7)+1)*.009));
-          var gh=scale*(g.t ? .052+.055*g.h : .013+.029*g.h)*(.12+.88*Math.pow(edge,.7));
-          var sway=Math.sin(tt*.92+g.p+g.x*1.5)*gh*(g.t?.14:.09)+grassPush(gx,gy,gh,g,field,dt);
-          sway+=beeBladePush(gx,gy,gh,sway,g);
-          sway+=cursorBladePush(gx,gy,gh,sway,g,cursorField,dt);
-          var bw=Math.max(1.7,scale*(g.t?.015:.011))*(.55+.45*edge);
-          bladePath(gx,gy,gh,sway,bw);
+          var g=group[gi];if(!g.visible)continue;
+          var sway=Math.sin(tt*.92+g.windPhase)*g.gh*(g.t?.14:.09)+grassPush(g.gx,g.gy,g.gh,g,field,dt);
+          sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+          sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          bladePath(g.gx,g.gy,g.gh,sway,g.bw);
         }
         ctx.fillStyle=vividGreens[band];ctx.fill();
       }
       for(var fi=0;fi<meadowFlowers.length;fi++){
-        var fl=meadowFlowers[fi],fedge=meadowTaper(fl.x),fx=mx+fl.x*rx,fy=my-scale*(.01+fedge*fl.y*.1);
-        var stem=scale*(.032+.019*fl.h),fsway=Math.sin(tt*.9+fl.p)*stem*.1,tx=fx+fsway,ty=fy-stem;
-        ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(fx,fy);ctx.quadraticCurveTo(fx+fsway*.35,fy-stem*.55,tx,ty);ctx.stroke();
-        var pr=Math.max(1.4,scale*.0095*fl.h);ctx.fillStyle=flowerColors[fl.c];
-        for(var pet=0;pet<5;pet++){var pa=pet/5*6.29+fl.p*.08;ctx.beginPath();ctx.ellipse(tx+Math.cos(pa)*pr*1.2,ty+Math.sin(pa)*pr*1.2,pr,pr*.62,pa,0,6.29);ctx.fill();}
-        ctx.fillStyle='#f4c84e';ctx.beginPath();ctx.arc(tx,ty,pr*.65,0,6.29);ctx.fill();
+        var fl=meadowFlowers[fi],fsway=Math.sin(tt*.9+fl.p)*fl.stem*.1,tx=fl.fx+fsway,ty=fl.fy-fl.stem;
+        ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(fl.fx,fl.fy);ctx.quadraticCurveTo(fl.fx+fsway*.35,fl.fy-fl.stem*.55,tx,ty);ctx.stroke();
+        ctx.fillStyle=flowerColors[fl.c];
+        for(var pet=0;pet<fl.petals.length;pet++){var pp=fl.petals[pet];ctx.beginPath();ctx.ellipse(tx+pp.x,ty+pp.y,fl.pr,fl.pr*.62,pp.a,0,6.29);ctx.fill();}
+        ctx.fillStyle='#f4c84e';ctx.beginPath();ctx.arc(tx,ty,fl.pr*.65,0,6.29);ctx.fill();
       }
       // A separate foreground carpet of pure short grass, about one quarter of
       // the tall-grass height, to make the base feel fully grown-in.
@@ -1406,13 +1449,11 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         ctx.beginPath();
         var shortGroup=shortGrass[sb];
         for(var sgi=0;sgi<shortGroup.length;sgi++){
-          var sg=shortGroup[sgi];
-          var sedge=meadowTaper(sg.x);if(sg.q>sedge)continue;
-          var sx=mx+sg.x*rx,sy=my-scale*(.008+sedge*(sg.y*.1+(Math.cos(sg.p*1.9)+1)*.008)),sh=scale*(.02+.0135*sg.h)*(.16+.84*Math.pow(sedge,.7));
-          var ss=Math.sin(tt*.86+sg.p+sg.x)*sh*.08+grassPush(sx,sy,sh,sg,field,dt);
-          ss+=beeBladePush(sx,sy,sh,ss,sg);
-          ss+=cursorBladePush(sx,sy,sh,ss,sg,cursorField,dt);
-          var sw=Math.max(1.6,scale*.012)*(.55+.45*sedge);bladePath(sx,sy,sh,ss,sw);
+          var sg=shortGroup[sgi];if(!sg.visible)continue;
+          var ss=Math.sin(tt*.86+sg.windPhase)*sg.gh*.08+grassPush(sg.gx,sg.gy,sg.gh,sg,field,dt);
+          ss+=beeBladePush(sg.gx,sg.gy,sg.gh,ss,sg);
+          ss+=cursorBladePush(sg.gx,sg.gy,sg.gh,ss,sg,cursorField,dt);
+          bladePath(sg.gx,sg.gy,sg.gh,ss,sg.bw);
         }
         ctx.fillStyle=vividGreens[(sb+4)%vividGreens.length];ctx.fill();
       }
@@ -1528,6 +1569,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       ctx.restore();
       var grassField=makeGrassField(frame.handlePts,scale,dt);
       var cursorField=makeCursorGrassField(sc,dt);
+      prepareMeadow(sc);
       var vg=ctx.createRadialGradient(W/2,H*0.4,Math.min(W,H)*0.35,W/2,H*0.4,Math.max(W,H)*0.78);
       vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.4)');
       ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
