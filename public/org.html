@@ -960,7 +960,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     for(var i=0;i<S;i++){ panels.push({vs:[apex,ring1[i],ring1[i+1]]}); panels.push({vs:[ring1[i],ring2[i],ring2[i+1],ring1[i+1]]}); }
     var ribs=[]; for(var i=0;i<=S;i++) ribs.push([apex,ring1[i],ring2[i]]);
     var poleBot=-h*2.9;
-    var pole=[{x:0,y:h*0.56,z:0},{x:0,y:poleBot,z:0}];
+    var pole=[{x:0,y:h*1.02,z:0},{x:0,y:poleBot,z:0}];
     var handle=[{x:0,y:poleBot,z:0},{x:-0.16,y:poleBot+0.07,z:0},{x:-0.24,y:poleBot+0.20,z:0},{x:-0.19,y:poleBot+0.30,z:0}];
     var finial=[{x:0,y:h,z:0},{x:0,y:h*1.16,z:0}];
     var motes=[]; for(var i=0;i<30;i++) motes.push({x:(Math.random()*2-1)*2.4,y:(Math.random()*2-1)*1.6,z:(Math.random()*2-1)*2.4,p:Math.random()*6.28});
@@ -1055,12 +1055,37 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
       if(splashes.length>120)splashes.splice(0,splashes.length-120);
     }
+    function createMeadowSplash(x,y){
+      var count=3+(Math.random()*4|0);
+      for(var i=0;i<count;i++){
+        splashes.push({
+          x:x,y:y,px:x,py:y,age:0,life:.16+Math.random()*.16,
+          vx:-55+Math.random()*95,vy:-38-Math.random()*88,
+          r:.4+Math.random()*.7,a:.18+Math.random()*.2,ground:true
+        });
+      }
+      if(splashes.length>150)splashes.splice(0,splashes.length-150);
+    }
+    function rainHitMeadow(sc,x0,y0,x1,y1,rn){
+      var anchor=meadowAnchor(sc),rx=sc.scale*1.28;
+      for(var i=1;i<=8;i++){
+        var t=i/8,x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,u=(x-anchor.x)/rx;
+        if(Math.abs(u)>1)continue;
+        var edge=meadowTaper(u);if(edge<.035)continue;
+        var surface=soilTopY(u,sc.scale,anchor.y);
+        if(rn.meadowSeed<Math.min(.92,edge*.96)){
+          surface-=sc.scale*(.022+rn.grassLevel*.078)*(.28+edge*.72);
+        }
+        if(y>=surface&&y0<surface)return {x:x,y:surface};
+      }
+      return null;
+    }
     function updateRain(dt,sc,frame){
       var density = W < 760 ? 0.09 : 0.12;
       rainAcc += dt*W*density;
       while(rainAcc>1){
         rainAcc--;
-        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.58+Math.random()*0.68,opacity:0.115+Math.random()*0.16});
+        rain.push({x:Math.random()*W,y:-40,len:28+Math.random()*44,spd:540+Math.random()*390,drift:-35+Math.random()*32,depth:0.58+Math.random()*0.68,opacity:0.115+Math.random()*0.16,meadowSeed:Math.random(),grassLevel:Math.random()});
       }
       for(var i=rain.length-1;i>=0;i--){
         var rn=rain[i], px=rn.x, py=rn.y;
@@ -1073,6 +1098,12 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         if(hit || hitUmbrella(frame,rn.x,rn.y)){
           if(!hit)hit={x:rn.x,y:rn.y,nx:(rn.x-W*0.5)/Math.max(W*0.5,1)};
           createSplash(hit.x,hit.y,hit.nx);
+          rain.splice(i,1);
+          continue;
+        }
+        var meadowHit=rainHitMeadow(sc,px,py,rn.x,rn.y,rn);
+        if(meadowHit){
+          createMeadowSplash(meadowHit.x,meadowHit.y);
           rain.splice(i,1);
           continue;
         }
@@ -1123,12 +1154,12 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       ctx.lineTo(tx+top,y-h);ctx.quadraticCurveTo(cx+w*.18,cy,x+w*.5,y);ctx.closePath();
     }
     function meadowTaper(x){
-      var edge=Math.abs(x),fringe=Math.max(0,Math.min(1,(edge-.42)/.58));
+      var edge=Math.abs(x),fringe=Math.max(0,Math.min(1,(edge-.38)/.62));
       if(!fringe)return 1;
-      var base=Math.pow(Math.max(0,(1-edge)/.58),1.55);
-      var rough=1+fringe*(Math.sin(x*34.7+.8)*.17+Math.sin(x*79.3-1.1)*.1+Math.sin(x*143.9+2.2)*.06);
-      var chipped=fringe*(.5+.5*Math.sin(x*51.2+2.6))*.045;
-      return Math.max(0,Math.min(1,base*rough-chipped));
+      var base=Math.pow(Math.max(0,(1-edge)/.62),1.08);
+      var clumps=Math.sin(x*18.3+.6)*.34+Math.sin(x*46.7-1.4)*.22+Math.sin(x*112.9+2.1)*.12;
+      var bites=Math.pow(Math.max(0,Math.sin(x*31.1+1.8)),4)*.23;
+      return Math.max(0,Math.min(1,base+fringe*clumps-fringe*bites));
     }
     function makeGrassField(points,scale,dt){
       var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
@@ -1165,6 +1196,19 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     function soilTopY(u,scale,my){
       var edge=meadowTaper(u);
       return my-scale*(.014+.19*edge+(Math.sin(u*10.7)+Math.sin(u*24.1)*.45)*.005*edge);
+    }
+    function drawMeadowGlow(sc){
+      var scale=sc.scale,anchor=meadowAnchor(sc),rx=scale*1.28;
+      ctx.save();
+      ctx.translate(anchor.x,anchor.y-scale*.075);
+      ctx.scale(1,.34);
+      ctx.globalCompositeOperation='screen';
+      var gold=ctx.createRadialGradient(0,0,0,0,0,rx*1.04);
+      gold.addColorStop(0,'rgba(255,216,92,.17)');
+      gold.addColorStop(.42,'rgba(245,184,62,.09)');
+      gold.addColorStop(1,'rgba(232,158,43,0)');
+      ctx.fillStyle=gold;ctx.beginPath();ctx.arc(0,0,rx*1.04,0,6.29);ctx.fill();
+      ctx.restore();
     }
     function drawMeadowSoil(sc){
       var scale=sc.scale,anchor=meadowAnchor(sc),mx=anchor.x,my=anchor.y,rx=scale*1.28,steps=42;
@@ -1277,6 +1321,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var vg=ctx.createRadialGradient(W/2,H*0.4,Math.min(W,H)*0.35,W/2,H*0.4,Math.max(W,H)*0.78);
       vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(0,0,0,.4)');
       ctx.fillStyle=vg; ctx.fillRect(0,0,W,H);
+      drawMeadowGlow(sc);
       drawMeadowSoil(sc);
       drawMeadowBack(sc,grassField,dt);
       for(var mi=0;mi<motes.length;mi++){ var mo=motes[mi]; var Pm=pr(tf(mo)); if(Pm.z<0.4){ var tw=0.10+0.10*Math.sin(tt+mo.p); ctx.fillStyle='rgba(224,205,238,'+tw+')'; ctx.beginPath(); ctx.arc(Pm.x,Pm.y,1.3,0,6.29); ctx.fill(); } }
