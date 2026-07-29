@@ -1092,7 +1092,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       return null;
     }
     function rainHitGround(x0,y0,x1,y1){
-      var groundY=H*.982;
+      var groundY=H*.999;
       if(y1<groundY||y0>=groundY)return null;
       var t=(groundY-y0)/(y1-y0||1);
       return {x:x0+(x1-x0)*t,y:groundY};
@@ -1170,7 +1170,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function meadowAnchor(sc){
       // Fixed at the bottom-right hero boundary; it never follows umbrella movement.
-      return {x:Math.min(W-sc.scale*1.30,sc.cx-sc.scale*.08),y:H*.995};
+      return {x:Math.min(W-sc.scale*1.30,sc.cx-sc.scale*.08),y:H*1.012};
     }
     function bladePath(x,y,h,sway,w){
       var tx=x+sway,top=w*.08,cx=x+sway*.3,cy=y-h*.52;
