@@ -1093,7 +1093,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var meadowLayerDPR=1,meadowLayerAcc=1,meadowLayersReady=false;
     var meadowStaticReady=false,meadowIdleHandle=0,meadowPending=null,meadowLayerGeneration=0;
     var meadowBackRect={x:0,y:0,w:1,h:1},meadowFrontRect={x:0,y:0,w:1,h:1};
-    var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
+    var pointer={x:0,y:0,active:false,lastMove:0}, aim={x:0,y:0,ready:false};
     function resizeMeadowLayers(){
       meadowLayerDPR=Math.min(DPR||1,.82);
       var sc=scene(),anchor=meadowAnchor(sc),rx=sc.scale*1.28;
@@ -1667,6 +1667,19 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function updateMeadowLayers(sc,frame,dt){
       meadowLayerAcc+=dt;
+      var cursorMoving=pointer.active&&pointer.lastMove&&performance.now()-pointer.lastMove<400&&
+        pointer.x>=meadowBackRect.x&&pointer.x<=meadowBackRect.x+meadowBackRect.w&&
+        pointer.y>=meadowBackRect.y&&pointer.y<=meadowBackRect.y+meadowBackRect.h;
+      if(cursorMoving){
+        meadowPending={sc:sc,frame:frame,dt:Math.min(.08,Math.max(dt,meadowLayerAcc)),generation:meadowLayerGeneration};
+        if(meadowIdleHandle){
+          if('cancelIdleCallback' in window)cancelIdleCallback(meadowIdleHandle);
+          else clearTimeout(meadowIdleHandle);
+          meadowIdleHandle=0;
+        }
+        runMeadowUpdate(null);
+        return;
+      }
       if(meadowLayersReady&&meadowLayerAcc<.05)return;
       meadowPending={sc:sc,frame:frame,dt:Math.min(.08,Math.max(dt,meadowLayerAcc)),generation:meadowLayerGeneration};
       if(meadowIdleHandle)return;
@@ -1800,6 +1813,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       pointer.x=(e.clientX-r.left)*W/Math.max(r.width,1);
       pointer.y=(e.clientY-r.top)*H/Math.max(r.height,1);
       pointer.active=true;
+      pointer.lastMove=performance.now();
     },{passive:true});
     window.addEventListener('pointerleave',function(){ pointer.active=false; },{passive:true});
     resize(); window.addEventListener('resize', resize);
