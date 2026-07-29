@@ -1783,7 +1783,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       for(var li=0;li<list.length;li++){ var it=list[li], p=it.pts;
         if(it.kind==='fill'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.closePath(); ctx.fillStyle=it.color; ctx.fill(); }
         else if(it.kind==='rib'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle='rgba(8,9,12,.5)'; ctx.lineWidth=1.1; ctx.lineJoin='round'; ctx.stroke(); }
-        else if(it.kind==='pole'||it.kind==='handle'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle=it.kind==='pole'?'#57445f':'#6a4a72'; ctx.lineWidth=Math.max(1.4,scale*0.011); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); }
+        else if(it.kind==='pole'||it.kind==='handle'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle=it.kind==='pole'?'#57445f':'#6a4a72'; ctx.lineWidth=Math.max(4.2,scale*0.033); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); }
         else if(it.kind==='finial'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); ctx.lineTo(p[1].x,p[1].y); ctx.strokeStyle='#c6a0dc'; ctx.lineWidth=Math.max(1.4,scale*0.011); ctx.lineCap='round'; ctx.stroke(); }
       }
       drawSkyButterflies(sc,true);
