@@ -75,9 +75,12 @@
   /* ---------- nav ---------- */
   header.nav{position:fixed;top:0;left:0;right:0;z-index:50;
     background:transparent;border-bottom:1px solid transparent;
-    transition:background .25s ease,border-color .25s ease,backdrop-filter .25s ease}
-  header.nav.scrolled{backdrop-filter:blur(10px);
-    background:color-mix(in srgb,var(--paper) 82%,transparent);border-bottom-color:var(--line-2)}
+    transform:translate3d(0,0,0);will-change:transform;
+    transition:transform .24s cubic-bezier(.22,.7,.25,1),background .25s ease,border-color .25s ease}
+  header.nav.nav-hidden{transform:translate3d(0,calc(-100% - 6px),0);pointer-events:none}
+  @media(prefers-reduced-motion:reduce){header.nav{transition-duration:0s}}
+  header.nav.scrolled{background:color-mix(in srgb,var(--paper) 95%,transparent);
+    border-bottom-color:var(--line-2);box-shadow:0 8px 24px -22px rgba(32,14,44,.42)}
   .nav .wrap{max-width:none;margin:0;padding-left:clamp(24px,8vw,110px);padding-right:clamp(24px,5vw,48px);display:flex;align-items:center;gap:28px;height:74px}
   .brand{display:flex;align-items:center;gap:13px;font-family:var(--serif);font-weight:700;font-size:1.72rem;letter-spacing:-.01em}
   .brand .mark{width:46px;height:46px;flex:0 0 auto}
@@ -125,6 +128,7 @@
   .scroll-cue i{font-style:normal;font-size:1.35rem;line-height:1;animation:scrollbob 1.8s ease-in-out infinite}
   .hero-fps{position:fixed;top:84px;right:18px;z-index:70;color:#20e86d;
     font:800 .72rem/1 ui-monospace,'SFMono-Regular',Consolas,monospace;letter-spacing:.02em;
+    width:6.5ch;text-align:right;contain:layout paint style;
     pointer-events:none;font-variant-numeric:tabular-nums}
   @keyframes scrollbob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
   @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
@@ -132,7 +136,7 @@
   .hero canvas.meadow-canvas{inset:auto;width:auto;height:auto;pointer-events:none}
   #meadow-back{z-index:-3}
   #meadow-front{z-index:-1}
-  .stormflash{position:absolute;inset:0;z-index:0;pointer-events:none;mix-blend-mode:screen;opacity:0;
+  .stormflash{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
     background:linear-gradient(116deg,transparent 43%,rgba(211,165,255,.42) 49%,transparent 53%),
       radial-gradient(ellipse at 72% 22%,rgba(194,134,244,.48),transparent 24%);animation:purpleLightning 13s steps(1,end) infinite}
   .hero .wrap,.hero .scroll-cue{position:relative;z-index:1}
@@ -149,7 +153,7 @@
   .hero h1{font-size:clamp(2.7rem,6.4vw,5rem);letter-spacing:-.02em;margin:16px 0 0;max-width:15ch}
   .hero .lede{margin-top:22px;max-width:52ch;font-size:clamp(1.1rem,1.7vw,1.32rem);color:#e2d3ec;line-height:1.55}
   .mobile-app-note{display:inline-flex;align-items:center;gap:11px;margin-top:20px;padding:9px 13px;border-radius:14px;
-    color:#eee2f6;background:rgba(255,255,255,.08);border:1px solid rgba(230,205,244,.2);backdrop-filter:blur(8px);text-align:left}
+    color:#eee2f6;background:rgba(255,255,255,.13);border:1px solid rgba(230,205,244,.2);text-align:left}
   .mobile-app-note i{font-style:normal;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:rgba(208,166,235,.2);font-size:1rem}
   .mobile-app-note b{display:block;font-size:.82rem;line-height:1.15}.mobile-app-note span{display:block;margin-top:2px;font-size:.73rem;color:#d8c4e5;line-height:1.25}
   .hero .cta-row{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
@@ -261,10 +265,9 @@
   .tag.soon{color:var(--ink-3)}
   .prod.flagship .dsc{max-width:60ch;font-size:1.12rem}
 
-  /* glass cards */
-  .goal,.prod,.role-card,.apply-cta,.map-panel,.map-placeholder,.pillars{backdrop-filter:blur(12px) saturate(1.08)}
-  .goal,.role-card{background:color-mix(in srgb,var(--surface) 86%,transparent)}
-  .prod{background:color-mix(in srgb,var(--paper) 84%,transparent)}
+  /* translucent cards without live backdrop sampling */
+  .goal,.role-card{background:color-mix(in srgb,var(--surface) 95%,transparent)}
+  .prod{background:color-mix(in srgb,var(--paper) 94%,transparent)}
   /* real-story placeholders: intentionally no invented testimonials */
   .story-wall{position:relative;z-index:41;padding:clamp(54px,7vw,90px) 0;overflow:hidden;
     background:linear-gradient(135deg,color-mix(in srgb,var(--surface-2) 72%,var(--paper)),var(--surface))}
@@ -320,13 +323,13 @@
     background:linear-gradient(rgba(255,255,255,.24) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);
     background-size:54px 54px;opacity:.42}
   .map-placeholder{position:relative;z-index:2;max-width:42ch;padding:28px;border-radius:18px;
-    background:color-mix(in srgb,var(--surface) 72%,transparent);border:1px solid rgba(255,255,255,.42);
-    backdrop-filter:blur(5px);box-shadow:0 18px 45px rgba(43,24,58,.18)}
+    background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid rgba(255,255,255,.42);
+    box-shadow:0 18px 45px rgba(43,24,58,.18)}
   .map-placeholder .mark{width:62px;height:62px;border-radius:20px;margin:0 auto 16px;display:grid;place-items:center;
     background:linear-gradient(135deg,#f6eaff,#b58add);color:#4a236c;font-size:2rem;box-shadow:0 16px 32px rgba(76,35,108,.22)}
   .map-placeholder b{display:block;font-family:var(--serif);font-size:1.35rem}
   .map-placeholder p{margin-top:8px;color:var(--ink-2);font-size:.98rem;line-height:1.5}
-  .map-panel{border:1px solid var(--line);border-radius:18px;padding:22px;background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(5px)}
+  .map-panel{border:1px solid var(--line);border-radius:18px;padding:22px;background:color-mix(in srgb,var(--surface) 94%,transparent)}
   .map-panel .tagm{font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
   .map-panel b{display:block;font-family:var(--serif);font-size:1.45rem;margin-top:8px}
   .map-panel p{color:var(--ink-2);margin-top:8px;font-size:.98rem;line-height:1.55}
@@ -467,9 +470,29 @@
   </div>
 </header>
 <script>
-(function(){var n=document.querySelector('header.nav');if(!n)return;
-var f=function(){n.classList.toggle('scrolled',(window.scrollY||0)>40)};
-f();addEventListener('scroll',f,{passive:true});})();
+(function(){
+  var n=document.querySelector('header.nav');if(!n)return;
+  var lastY=Math.max(0,window.scrollY||0),travel=0,direction=0,scheduled=false;
+  function show(){travel=0;n.classList.remove('nav-hidden')}
+  function update(){
+    scheduled=false;
+    var max=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+    var y=Math.max(0,Math.min(window.scrollY||0,max)),delta=y-lastY;
+    var nextDirection=delta>0?1:delta<0?-1:direction;
+    if(nextDirection!==direction){travel=0;direction=nextDirection}
+    travel+=delta;
+    n.classList.toggle('scrolled',y>40);
+    if(y<=72||n.matches(':focus-within'))show();
+    else if(travel>12){travel=0;n.classList.add('nav-hidden')}
+    else if(travel<-8)show();
+    lastY=y;
+  }
+  function queue(){if(!scheduled){scheduled=true;requestAnimationFrame(update)}}
+  update();
+  addEventListener('scroll',queue,{passive:true});
+  n.addEventListener('focusin',show);
+  addEventListener('pointermove',function(e){if(e.clientY<12)show()},{passive:true});
+})();
 (function(){var s=document.getElementById('splash');if(!s)return;
 var m=["Umbrella4U FOREVER!","Break the social norm!","Welcome to this version!","100% anonymous!","Free, forever!",
 "Welcome in from the rain!","There at 2 a.m.!","No name needed!","Made with youth!",
@@ -806,15 +829,18 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
     var ctx=canvas.getContext('2d'), W=0,H=0,DPR=1,last=null,open=0,target=0,acc=0,drops=[],visible=false,running=false;
     function resize(){
-      DPR=Math.min(window.devicePixelRatio||1,2);
+      DPR=Math.min(window.devicePixelRatio||1,1.5)*(window.__siteFit||1);
       W=canvas.clientWidth; H=canvas.clientHeight;
       canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
       ctx.setTransform(DPR,0,0,DPR,0,0);
     }
+    function setTarget(next){
+      target=next?1:0;
+      cta.classList.toggle('is-open',!!target);
+    }
     function updateState(){
       var r=cta.getBoundingClientRect();
-      target=(r.top<window.innerHeight*.80 && r.bottom>window.innerHeight*.12)?1:0;
-      cta.classList.toggle('is-open',!!target);
+      setTarget(r.top<window.innerHeight*.80 && r.bottom>window.innerHeight*.12);
     }
     function spawn(y){
       drops.push({x:Math.random()*(W+190)-20,y:y,len:24+Math.random()*42,
@@ -859,8 +885,16 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function start(){if(!visible || running || reduced)return;running=true;last=null;requestAnimationFrame(loop)}
     resize(); updateState();
-    window.addEventListener('resize',function(){resize();updateState()},{passive:true});
-    window.addEventListener('scroll',updateState,{passive:true});
+    var targetObserver=null;
+    if(!reduced && 'IntersectionObserver' in window){
+      targetObserver=new IntersectionObserver(function(entries){
+        setTarget(entries[0].isIntersecting);
+      },{rootMargin:'-12% 0px -20% 0px',threshold:0});
+      targetObserver.observe(cta);
+    }else if(!reduced){
+      window.addEventListener('scroll',updateState,{passive:true});
+    }
+    window.addEventListener('resize',function(){resize();if(!targetObserver)updateState()},{passive:true});
     if(reduced){target=1;open=1;cta.classList.add('is-open');for(var i=0;i<55;i++)spawn(Math.random()*H);draw();}
     else {
       for(var j=0;j<55;j++)spawn(Math.random()*H);
@@ -877,15 +911,30 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     if(window.innerWidth<=760) return;
     if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
     var ctx = canvas.getContext('2d');
-    var W=0,H=0,DPR=1,tt=0,last=null,acc=0,drops=[],hero=document.querySelector('.hero'),pageRainActive=true,wasPageRainActive=true;
+    var W=0,H=0,DPR=1,tt=0,last=null,raf=0,acc=0,drops=[],hero=document.querySelector('.hero'),activationY=0,pageRainActive=false,wasPageRainActive=false;
     function resize(){
-      DPR = Math.min(window.devicePixelRatio || 1, 1);
+      DPR = Math.min(window.devicePixelRatio || 1, 1)*(window.__siteFit||1);
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W*DPR); canvas.height = Math.round(H*DPR);
       ctx.setTransform(DPR,0,0,DPR,0,0);
+      updateThreshold();
+    }
+    function updateThreshold(){
+      if(hero){
+        var r=hero.getBoundingClientRect();
+        activationY=(window.scrollY||0)+r.bottom-window.innerHeight+1;
+      }
       updateActive();
     }
-    function updateActive(){pageRainActive=!hero||hero.getBoundingClientRect().bottom<window.innerHeight-1;}
+    function updateActive(){
+      var next=!hero||(window.scrollY||0)>activationY;
+      if(next===pageRainActive)return;
+      pageRainActive=next;
+      if(next){start();return;}
+      if(raf){cancelAnimationFrame(raf);raf=0;}
+      if(wasPageRainActive)ctx.clearRect(0,0,W,H);
+      wasPageRainActive=false;last=null;
+    }
     var mq = window.matchMedia('(prefers-color-scheme:dark)');
     function isDark(){
       var t = document.documentElement.getAttribute('data-theme');
@@ -940,21 +989,23 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
     }
     function loop(ts){
+      raf=0;
       if(last===null)last=ts;
       if(!pageRainActive){
         if(wasPageRainActive)ctx.clearRect(0,0,W,H);
-        wasPageRainActive=false;last=ts;requestAnimationFrame(loop);return;
+        wasPageRainActive=false;last=null;return;
       }
       wasPageRainActive=true;
-      if(ts-last<32){requestAnimationFrame(loop);return;}
+      if(ts-last<32){raf=requestAnimationFrame(loop);return;}
       var dt=Math.min((ts-last)/1000,0.05); last=ts; tt+=dt;
       update(dt); draw();
-      requestAnimationFrame(loop);
+      raf=requestAnimationFrame(loop);
     }
+    function start(){if(pageRainActive&&!raf){last=null;raf=requestAnimationFrame(loop);}}
     resize();
     window.addEventListener('resize',resize);
     window.addEventListener('scroll',updateActive,{passive:true});
-    requestAnimationFrame(loop);
+    start();
   })();
 
   // A restrained desktop pointer trail: small raindrops drift away from the cursor.
@@ -981,7 +1032,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     var W, H, DPR, raf=0, visible=true;
     function resize(){
-      DPR = Math.min(window.devicePixelRatio || 1, 1);
+      DPR = Math.min(window.devicePixelRatio || 1, 1)*(window.__siteFit||1);
       W = canvas.clientWidth; H = canvas.clientHeight;
       canvas.width = Math.round(W*DPR); canvas.height = Math.round(H*DPR);
       ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -1033,13 +1084,14 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
     var angle=-1.20, targetAngle=-1.20, last=null, tt=0, rain=[], rainAcc=0, splashes=[],lastHandleCenter=null,lastGrassPointer=null;
     var rainDrawBuckets=[[],[],[],[],[],[]];
+    var splashDrawBuckets=[[],[],[],[],[]];
     var meadowLayoutKey='',meadowLayout=null,beeGrassBounds={active:false};
     var meadowBackLayer=document.getElementById('meadow-back'),meadowFrontLayer=document.getElementById('meadow-front');
     var meadowBackCtx=meadowBackLayer.getContext('2d',{alpha:true}),meadowFrontCtx=meadowFrontLayer.getContext('2d',{alpha:true});
     var meadowStaticBack=document.createElement('canvas'),meadowStaticFront=document.createElement('canvas');
     var meadowStaticBackCtx=meadowStaticBack.getContext('2d',{alpha:true}),meadowStaticFrontCtx=meadowStaticFront.getContext('2d',{alpha:true});
     var meadowLayerDPR=1,meadowLayerAcc=1,meadowLayersReady=false;
-    var meadowStaticReady=false;
+    var meadowStaticReady=false,meadowIdleHandle=0,meadowPending=null,meadowLayerGeneration=0;
     var meadowBackRect={x:0,y:0,w:1,h:1},meadowFrontRect={x:0,y:0,w:1,h:1};
     var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
     function resizeMeadowLayers(){
@@ -1065,6 +1117,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         staticContexts[i].setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-rects[i].x*meadowLayerDPR,-rects[i].y*meadowLayerDPR);
       }
       meadowLayerAcc=1;meadowLayersReady=false;meadowStaticReady=false;
+      meadowLayerGeneration++;meadowPending=null;
     }
     function scene(){
       var narrow = W < 760;
@@ -1246,14 +1299,28 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function drawSplashes(groundPass){
       ctx.lineCap='round';
+      for(var bi=0;bi<splashDrawBuckets.length;bi++)splashDrawBuckets[bi].length=0;
       for(var si=0;si<splashes.length;si++){
         var sp=splashes[si];if(!!sp.ground!==groundPass)continue;
         var t=sp.age/sp.life, fade=1-t;
-        ctx.strokeStyle='rgba(232,211,248,'+((sp.ground?.4:.24)*fade)+')';
-        ctx.lineWidth=Math.max(.35,sp.r*(sp.ground?.52:.34));
-        ctx.beginPath(); ctx.moveTo(sp.px,sp.py); ctx.lineTo(sp.x,sp.y); ctx.stroke();
-        ctx.fillStyle='rgba(238,221,252,'+(sp.a*fade)+')';
-        ctx.beginPath(); ctx.arc(sp.x,sp.y,sp.r*fade,0,6.29); ctx.fill();
+        splashDrawBuckets[Math.max(0,Math.min(4,(fade*5)|0))].push(sp);
+      }
+      for(var bi=0;bi<splashDrawBuckets.length;bi++){
+        var bucket=splashDrawBuckets[bi];if(!bucket.length)continue;
+        var fade=(bi+.5)/5,radiusTotal=0;
+        ctx.beginPath();
+        for(var si=0;si<bucket.length;si++){
+          var sp=bucket[si];radiusTotal+=sp.r;
+          ctx.moveTo(sp.px,sp.py);ctx.lineTo(sp.x,sp.y);
+        }
+        ctx.strokeStyle='rgba(232,211,248,'+((groundPass?.4:.24)*fade)+')';
+        ctx.lineWidth=Math.max(.35,radiusTotal/bucket.length*(groundPass?.52:.34));ctx.stroke();
+        ctx.beginPath();
+        for(var si=0;si<bucket.length;si++){
+          var sp=bucket[si],particleFade=1-sp.age/sp.life;
+          ctx.moveTo(sp.x+sp.r*particleFade,sp.y);ctx.arc(sp.x,sp.y,sp.r*particleFade,0,6.29);
+        }
+        ctx.fillStyle='rgba(238,221,252,'+((groundPass?.42:.33)*fade)+')';ctx.fill();
       }
     }
     function meadowAnchor(sc){
@@ -1573,12 +1640,11 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       drawMeadowLife(sc,null,null,0,false);
       ctx=mainCtx;meadowStaticReady=true;
     }
-    function updateMeadowLayers(sc,frame,dt){
-      meadowLayerAcc+=dt;
-      if(meadowLayersReady&&meadowLayerAcc<.05)return;
-      var layerDt=Math.min(.08,Math.max(dt,meadowLayerAcc)),grassField=makeGrassField(frame.handlePts,sc.scale,layerDt);
+    function paintMeadowLayers(pending){
+      if(!pending||pending.generation!==meadowLayerGeneration)return;
+      var sc=pending.sc,frame=pending.frame,layerDt=pending.dt;
+      var grassField=makeGrassField(frame.handlePts,sc.scale,layerDt);
       var cursorField=makeCursorGrassField(sc,layerDt),mainCtx=ctx;
-      meadowLayerAcc=0;
       renderStaticMeadow(sc);
       ctx=meadowBackCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowBackLayer.width,meadowBackLayer.height);
       ctx.drawImage(meadowStaticBack,0,0);
@@ -1589,6 +1655,23 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowFrontRect.x*meadowLayerDPR,-meadowFrontRect.y*meadowLayerDPR);
       drawMeadowLife(sc,grassField,cursorField,layerDt,true);
       ctx=mainCtx;meadowLayersReady=true;
+    }
+    function runMeadowUpdate(deadline){
+      meadowIdleHandle=0;
+      if(!meadowPending)return;
+      if(deadline&&!deadline.didTimeout&&deadline.timeRemaining()<6){
+        meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:72});return;
+      }
+      var pending=meadowPending;meadowPending=null;meadowLayerAcc=0;
+      paintMeadowLayers(pending);
+    }
+    function updateMeadowLayers(sc,frame,dt){
+      meadowLayerAcc+=dt;
+      if(meadowLayersReady&&meadowLayerAcc<.05)return;
+      meadowPending={sc:sc,frame:frame,dt:Math.min(.08,Math.max(dt,meadowLayerAcc)),generation:meadowLayerGeneration};
+      if(meadowIdleHandle)return;
+      if('requestIdleCallback' in window)meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:72});
+      else meadowIdleHandle=setTimeout(function(){runMeadowUpdate(null)},0);
     }
     function updateSkyButterflies(sc){
       var meadow=meadowAnchor(sc),grassTop=meadow.y-sc.scale*.19,canopyBottom=sc.cy+sc.scale*.02;
