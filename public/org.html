@@ -1004,9 +1004,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var rearGreens=['#0bf23b','#39f50f','#6cf500','#a4f800','#d0fa24','#00f25f','#00f58e','#16f4b4','#59f47d','#8cf337','#bcf64c','#e1fa62'];
     var grassBlades=[],shortGrass=[],backGrass=[];
     for(var gb=0;gb<vividGreens.length;gb++){grassBlades.push([]);shortGrass.push([]);backGrass.push([]);}
-    for(var i=0;i<1050;i++){var tall=Math.random()<.62;grassBlades[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:tall?.8+Math.random()*.9:.22+Math.random()*.54,p:Math.random()*6.28,t:tall,q:Math.random()});}
-    for(var i=0;i<800;i++)shortGrass[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:.45+Math.random()*.55,p:Math.random()*6.28,q:Math.random()});
-    for(var i=0;i<600;i++)backGrass[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:.62+Math.random()*.7,p:Math.random()*6.28,q:Math.random()});
+    for(var i=0;i<1050;i++){var tall=Math.random()<.62;grassBlades[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:tall?.8+Math.random()*.9:.22+Math.random()*.54,p:Math.random()*6.28,t:tall,q:Math.random(),d:Math.random()<(tall?.55:.26)});}
+    for(var i=0;i<800;i++)shortGrass[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:.45+Math.random()*.55,p:Math.random()*6.28,q:Math.random(),d:Math.random()<.28});
+    for(var i=0;i<600;i++)backGrass[i%vividGreens.length].push({x:Math.random()*2-1,y:Math.random(),h:.62+Math.random()*.7,p:Math.random()*6.28,q:Math.random(),d:Math.random()<.22});
     var soilMottles=[];for(var i=0;i<58;i++)soilMottles.push({x:Math.random()*1.76-.88,y:Math.random(),rx:2.5+Math.random()*7,ry:1.8+Math.random()*4,c:i%4});
     var meadowFlowers=[]; for(var i=0;i<68;i++)meadowFlowers.push({x:Math.random()*1.68-.84,y:.08+Math.random()*.84,h:.65+Math.random()*.72,p:Math.random()*6.28,c:i%8});
     var meadowBees=[
@@ -1036,11 +1036,14 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var meadowLayoutKey='',meadowLayout=null,beeGrassBounds={active:false};
     var meadowBackLayer=document.getElementById('meadow-back'),meadowFrontLayer=document.getElementById('meadow-front');
     var meadowBackCtx=meadowBackLayer.getContext('2d',{alpha:true}),meadowFrontCtx=meadowFrontLayer.getContext('2d',{alpha:true});
+    var meadowStaticBack=document.createElement('canvas'),meadowStaticFront=document.createElement('canvas');
+    var meadowStaticBackCtx=meadowStaticBack.getContext('2d',{alpha:true}),meadowStaticFrontCtx=meadowStaticFront.getContext('2d',{alpha:true});
     var meadowLayerDPR=1,meadowLayerAcc=1,meadowLayersReady=false;
+    var meadowStaticReady=false;
     var meadowBackRect={x:0,y:0,w:1,h:1},meadowFrontRect={x:0,y:0,w:1,h:1};
     var pointer={x:0,y:0,active:false}, aim={x:0,y:0,ready:false};
     function resizeMeadowLayers(){
-      meadowLayerDPR=Math.min(DPR||1,1);
+      meadowLayerDPR=Math.min(DPR||1,.82);
       var sc=scene(),anchor=meadowAnchor(sc),rx=sc.scale*1.28;
       function crop(x,y,right,bottom){
         x=Math.max(0,Math.floor(x));y=Math.max(0,Math.floor(y));
@@ -1056,7 +1059,12 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         layers[i].style.width=rects[i].w+'px';layers[i].style.height=rects[i].h+'px';
         contexts[i].setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-rects[i].x*meadowLayerDPR,-rects[i].y*meadowLayerDPR);
       }
-      meadowLayerAcc=1;meadowLayersReady=false;
+      var staticLayers=[meadowStaticBack,meadowStaticFront],staticContexts=[meadowStaticBackCtx,meadowStaticFrontCtx];
+      for(var i=0;i<staticLayers.length;i++){
+        staticLayers[i].width=Math.round(rects[i].w*meadowLayerDPR);staticLayers[i].height=Math.round(rects[i].h*meadowLayerDPR);
+        staticContexts[i].setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-rects[i].x*meadowLayerDPR,-rects[i].y*meadowLayerDPR);
+      }
+      meadowLayerAcc=1;meadowLayersReady=false;meadowStaticReady=false;
     }
     function scene(){
       var narrow = W < 760;
@@ -1270,6 +1278,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var key=W+'|'+H+'|'+scale.toFixed(3)+'|'+mx.toFixed(2)+'|'+my.toFixed(2);
       if(key===meadowLayoutKey)return meadowLayout;
       meadowLayoutKey=key;meadowLayout={scale:scale,mx:mx,my:my,rx:rx};
+      meadowStaticReady=false;
       for(var band=0;band<backGrass.length;band++){
         var group=backGrass[band];
         for(var i=0;i<group.length;i++){
@@ -1481,41 +1490,49 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         ctx.fillStyle=dirtColors[sp.c];ctx.beginPath();ctx.ellipse(sx,sy,sp.rx,sp.ry,sp.x*.35,0,6.29);ctx.fill();
       }
     }
-    function drawMeadowBack(sc,field,cursorField,dt){
+    function drawMeadowBack(sc,field,cursorField,dt,dynamicPass){
       for(var band=0;band<rearGreens.length;band++){
         ctx.beginPath();
         var group=backGrass[band];
         for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];if(!g.visible)continue;
-          var sway=Math.sin(tt*.78+g.windPhase)*g.gh*.12+grassPush(g.gx,g.gy,g.gh,g,field,dt);
-          sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
-          sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
+          var sway=Math.sin(tt*.78+g.windPhase)*g.gh*.12;
+          if(dynamicPass){
+            sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
+            sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+            sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          }
           bladePath(g.gx,g.gy,g.gh,sway,g.bw);
         }
         ctx.fillStyle=rearGreens[band];ctx.fill();
       }
     }
-    function drawMeadowLife(sc,field,cursorField,dt){
+    function drawMeadowLife(sc,field,cursorField,dt,dynamicPass){
       var scale=sc.scale;
       ctx.lineCap='round';
       for(var band=0;band<vividGreens.length;band++){
         ctx.beginPath();
         var group=grassBlades[band];
         for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];if(!g.visible)continue;
-          var sway=Math.sin(tt*.92+g.windPhase)*g.gh*(g.t?.14:.09)+grassPush(g.gx,g.gy,g.gh,g,field,dt);
-          sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
-          sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
+          var sway=Math.sin(tt*.92+g.windPhase)*g.gh*(g.t?.14:.09);
+          if(dynamicPass){
+            sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
+            sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+            sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+          }
           bladePath(g.gx,g.gy,g.gh,sway,g.bw);
         }
         ctx.fillStyle=vividGreens[band];ctx.fill();
       }
-      for(var fi=0;fi<meadowFlowers.length;fi++){
-        var fl=meadowFlowers[fi],fsway=Math.sin(tt*.9+fl.p)*fl.stem*.1,tx=fl.fx+fsway,ty=fl.fy-fl.stem;
-        ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(fl.fx,fl.fy);ctx.quadraticCurveTo(fl.fx+fsway*.35,fl.fy-fl.stem*.55,tx,ty);ctx.stroke();
-        ctx.fillStyle=flowerColors[fl.c];
-        for(var pet=0;pet<fl.petals.length;pet++){var pp=fl.petals[pet];ctx.beginPath();ctx.ellipse(tx+pp.x,ty+pp.y,fl.pr,fl.pr*.62,pp.a,0,6.29);ctx.fill();}
-        ctx.fillStyle='#f4c84e';ctx.beginPath();ctx.arc(tx,ty,fl.pr*.65,0,6.29);ctx.fill();
+      if(dynamicPass){
+        for(var fi=0;fi<meadowFlowers.length;fi++){
+          var fl=meadowFlowers[fi],fsway=Math.sin(tt*.9+fl.p)*fl.stem*.1,tx=fl.fx+fsway,ty=fl.fy-fl.stem;
+          ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(fl.fx,fl.fy);ctx.quadraticCurveTo(fl.fx+fsway*.35,fl.fy-fl.stem*.55,tx,ty);ctx.stroke();
+          ctx.fillStyle=flowerColors[fl.c];
+          for(var pet=0;pet<fl.petals.length;pet++){var pp=fl.petals[pet];ctx.beginPath();ctx.ellipse(tx+pp.x,ty+pp.y,fl.pr,fl.pr*.62,pp.a,0,6.29);ctx.fill();}
+          ctx.fillStyle='#f4c84e';ctx.beginPath();ctx.arc(tx,ty,fl.pr*.65,0,6.29);ctx.fill();
+        }
       }
       // A separate foreground carpet of pure short grass, about one quarter of
       // the tall-grass height, to make the base feel fully grown-in.
@@ -1523,22 +1540,38 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         ctx.beginPath();
         var shortGroup=shortGrass[sb];
         for(var sgi=0;sgi<shortGroup.length;sgi++){
-          var sg=shortGroup[sgi];if(!sg.visible)continue;
-          var ss=Math.sin(tt*.86+sg.windPhase)*sg.gh*.08+grassPush(sg.gx,sg.gy,sg.gh,sg,field,dt);
-          ss+=beeBladePush(sg.gx,sg.gy,sg.gh,ss,sg);
-          ss+=cursorBladePush(sg.gx,sg.gy,sg.gh,ss,sg,cursorField,dt);
+          var sg=shortGroup[sgi];if(!sg.visible||sg.d!==dynamicPass)continue;
+          var ss=Math.sin(tt*.86+sg.windPhase)*sg.gh*.08;
+          if(dynamicPass){
+            ss+=grassPush(sg.gx,sg.gy,sg.gh,sg,field,dt);
+            ss+=beeBladePush(sg.gx,sg.gy,sg.gh,ss,sg);
+            ss+=cursorBladePush(sg.gx,sg.gy,sg.gh,ss,sg,cursorField,dt);
+          }
           bladePath(sg.gx,sg.gy,sg.gh,ss,sg.bw);
         }
         ctx.fillStyle=vividGreens[(sb+4)%vividGreens.length];ctx.fill();
       }
-      for(var bi=0;bi<meadowBees.length;bi++){
-        var bee=meadowBees[bi],bx=bee.sx,by=bee.sy,resting=bee.mode==='rest';
-        var bs=Math.max(2.2,scale*.012),flap=.25+.75*Math.abs(Math.sin(tt*(resting?3.2:10.5)+bee.p));ctx.save();ctx.translate(bx,by);ctx.rotate(resting?0:Math.atan2(bee.svy,bee.svx)*.16);
-        ctx.fillStyle='rgba(235,238,255,.72)';ctx.beginPath();ctx.ellipse(-bs*.25,-bs*(.4+.32*flap),bs*.72,bs*(.2+.18*flap),-.35,0,6.29);ctx.ellipse(bs*.35,-bs*(.38+.3*flap),bs*.72,bs*(.2+.18*flap),.35,0,6.29);ctx.fill();
-        ctx.fillStyle='#f3bf35';ctx.beginPath();ctx.ellipse(0,0,bs*1.12,bs*.64,0,0,6.29);ctx.fill();
-        ctx.strokeStyle='#332134';ctx.lineWidth=Math.max(.7,bs*.22);ctx.beginPath();ctx.moveTo(-bs*.35,-bs*.5);ctx.lineTo(-bs*.35,bs*.5);ctx.moveTo(bs*.3,-bs*.5);ctx.lineTo(bs*.3,bs*.5);ctx.stroke();
-        ctx.fillStyle='#241729';ctx.beginPath();ctx.arc(bs*.92,0,bs*.38,0,6.29);ctx.fill();ctx.restore();
+      if(dynamicPass){
+        for(var bi=0;bi<meadowBees.length;bi++){
+          var bee=meadowBees[bi],bx=bee.sx,by=bee.sy,resting=bee.mode==='rest';
+          var bs=Math.max(2.2,scale*.012),flap=.25+.75*Math.abs(Math.sin(tt*(resting?3.2:10.5)+bee.p));ctx.save();ctx.translate(bx,by);ctx.rotate(resting?0:Math.atan2(bee.svy,bee.svx)*.16);
+          ctx.fillStyle='rgba(235,238,255,.72)';ctx.beginPath();ctx.ellipse(-bs*.25,-bs*(.4+.32*flap),bs*.72,bs*(.2+.18*flap),-.35,0,6.29);ctx.ellipse(bs*.35,-bs*(.38+.3*flap),bs*.72,bs*(.2+.18*flap),.35,0,6.29);ctx.fill();
+          ctx.fillStyle='#f3bf35';ctx.beginPath();ctx.ellipse(0,0,bs*1.12,bs*.64,0,0,6.29);ctx.fill();
+          ctx.strokeStyle='#332134';ctx.lineWidth=Math.max(.7,bs*.22);ctx.beginPath();ctx.moveTo(-bs*.35,-bs*.5);ctx.lineTo(-bs*.35,bs*.5);ctx.moveTo(bs*.3,-bs*.5);ctx.lineTo(bs*.3,bs*.5);ctx.stroke();
+          ctx.fillStyle='#241729';ctx.beginPath();ctx.arc(bs*.92,0,bs*.38,0,6.29);ctx.fill();ctx.restore();
+        }
       }
+    }
+    function renderStaticMeadow(sc){
+      if(meadowStaticReady)return;
+      var mainCtx=ctx;
+      ctx=meadowStaticBackCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowStaticBack.width,meadowStaticBack.height);
+      ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowBackRect.x*meadowLayerDPR,-meadowBackRect.y*meadowLayerDPR);
+      drawMeadowGlow(sc);drawMeadowSoil(sc);drawMeadowBack(sc,null,null,0,false);
+      ctx=meadowStaticFrontCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowStaticFront.width,meadowStaticFront.height);
+      ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowFrontRect.x*meadowLayerDPR,-meadowFrontRect.y*meadowLayerDPR);
+      drawMeadowLife(sc,null,null,0,false);
+      ctx=mainCtx;meadowStaticReady=true;
     }
     function updateMeadowLayers(sc,frame,dt){
       meadowLayerAcc+=dt;
@@ -1546,12 +1579,15 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var layerDt=Math.min(.08,Math.max(dt,meadowLayerAcc)),grassField=makeGrassField(frame.handlePts,sc.scale,layerDt);
       var cursorField=makeCursorGrassField(sc,layerDt),mainCtx=ctx;
       meadowLayerAcc=0;
+      renderStaticMeadow(sc);
       ctx=meadowBackCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowBackLayer.width,meadowBackLayer.height);
+      ctx.drawImage(meadowStaticBack,0,0);
       ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowBackRect.x*meadowLayerDPR,-meadowBackRect.y*meadowLayerDPR);
-      drawMeadowGlow(sc);drawMeadowSoil(sc);drawMeadowBack(sc,grassField,cursorField,layerDt);
+      drawMeadowBack(sc,grassField,cursorField,layerDt,true);
       ctx=meadowFrontCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowFrontLayer.width,meadowFrontLayer.height);
+      ctx.drawImage(meadowStaticFront,0,0);
       ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowFrontRect.x*meadowLayerDPR,-meadowFrontRect.y*meadowLayerDPR);
-      drawMeadowLife(sc,grassField,cursorField,layerDt);
+      drawMeadowLife(sc,grassField,cursorField,layerDt,true);
       ctx=mainCtx;meadowLayersReady=true;
     }
     function updateSkyButterflies(sc){
