@@ -964,9 +964,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     var handle=[{x:0,y:poleBot,z:0},{x:-0.16,y:poleBot+0.07,z:0},{x:-0.24,y:poleBot+0.20,z:0},{x:-0.19,y:poleBot+0.30,z:0}];
     var finial=[{x:0,y:h,z:0},{x:0,y:h*1.16,z:0}];
     var motes=[]; for(var i=0;i<30;i++) motes.push({x:(Math.random()*2-1)*2.4,y:(Math.random()*2-1)*1.6,z:(Math.random()*2-1)*2.4,p:Math.random()*6.28});
-    var grassBlades=[]; for(var i=0;i<820;i++){var tall=Math.random()<.38;grassBlades.push({x:Math.random()*2-1,y:Math.random(),h:tall?.8+Math.random()*.9:.22+Math.random()*.54,p:Math.random()*6.28,c:i%5,t:tall});}
-    var shortGrass=[]; for(var i=0;i<720;i++)shortGrass.push({x:Math.random()*2-1,y:Math.random(),h:.45+Math.random()*.55,p:Math.random()*6.28,c:i%5});
-    var meadowFlowers=[]; for(var i=0;i<44;i++)meadowFlowers.push({x:Math.random()*1.86-.93,y:.08+Math.random()*.84,h:.65+Math.random()*.72,p:Math.random()*6.28,c:i%5});
+    var grassBlades=[]; for(var i=0;i<920;i++){var tall=Math.random()<.62;grassBlades.push({x:Math.random()*2-1,y:Math.random(),h:tall?.8+Math.random()*.9:.22+Math.random()*.54,p:Math.random()*6.28,c:i%5,t:tall,q:Math.random()});}
+    var shortGrass=[]; for(var i=0;i<760;i++)shortGrass.push({x:Math.random()*2-1,y:Math.random(),h:.45+Math.random()*.55,p:Math.random()*6.28,c:i%5,q:Math.random()});
+    var meadowFlowers=[]; for(var i=0;i<44;i++)meadowFlowers.push({x:Math.random()*1.68-.84,y:.08+Math.random()*.84,h:.65+Math.random()*.72,p:Math.random()*6.28,c:i%5});
     var meadowBees=[{p:.4,r:.48},{p:1.6,r:.72},{p:2.6,r:.62},{p:3.8,r:.52},{p:4.9,r:.36}];
     var flowerColors=['#fff4a8','#f4a6da','#f7f4ff','#9bdcf3','#c9a5f0'];
     var sub=function(a,b){return{x:a.x-b.x,y:a.y-b.y,z:a.z-b.z}};
@@ -1109,23 +1109,27 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     }
     function meadowAnchor(sc){
       // Fixed at the bottom-right hero boundary; it never follows umbrella movement.
-      return {x:Math.min(W-sc.scale*1.05,sc.cx+sc.scale*.18),y:H*.992};
+      return {x:Math.min(W-sc.scale*1.05,sc.cx-sc.scale*.06),y:H*.992};
     }
     function drawMeadowLife(sc){
       var scale=sc.scale,anchor=meadowAnchor(sc),mx=anchor.x,my=anchor.y,rx=scale*1.02;
-      var greens=['#13b844','#20cf50','#36e35d','#59f071','#86f785'];
+      var greens=['#20ef50','#35ff5e','#52ff70','#75ff82','#9aff91'];
+      var taper=function(x){var edge=Math.abs(x);return edge<.67?1:Math.max(0,(1-edge)/.33)};
       ctx.lineCap='round';
+      ctx.save();ctx.globalCompositeOperation='screen';
       for(var band=0;band<5;band++){
         ctx.beginPath();
         for(var gi=0;gi<grassBlades.length;gi++){
           var g=grassBlades[gi];if(g.c!==band)continue;
-          var gx=mx+g.x*rx,gy=my-scale*(.008+g.y*.13);
-          var gh=scale*(g.t ? .105+.11*g.h : .025+.058*g.h);
+          var edge=taper(g.x);if(g.q>edge)continue;
+          var gx=mx+g.x*rx,gy=my-scale*(.018+g.y*.18+(Math.sin(g.p*1.7)+1)*.012);
+          var gh=scale*(g.t ? .105+.11*g.h : .025+.058*g.h)*(.35+.65*Math.sqrt(edge));
           var sway=Math.sin(tt*.92+g.p+g.x*1.5)*gh*(g.t?.14:.09);
           ctx.moveTo(gx,gy);ctx.quadraticCurveTo(gx+sway*.3,gy-gh*.52,gx+sway,gy-gh);
         }
         ctx.strokeStyle=greens[band];ctx.lineWidth=1.15+(band%2)*.55;ctx.stroke();
       }
+      ctx.restore();
       for(var fi=0;fi<meadowFlowers.length;fi++){
         var fl=meadowFlowers[fi],fx=mx+fl.x*rx,fy=my-scale*(.018+fl.y*.12);
         var stem=scale*(.064+.038*fl.h),fsway=Math.sin(tt*.9+fl.p)*stem*.1,tx=fx+fsway,ty=fy-stem;
@@ -1136,16 +1140,19 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
       // A separate foreground carpet of pure short grass, about one quarter of
       // the tall-grass height, to make the base feel fully grown-in.
+      ctx.save();ctx.globalCompositeOperation='screen';
       for(var sb=0;sb<5;sb++){
         ctx.beginPath();
         for(var sgi=0;sgi<shortGrass.length;sgi++){
           var sg=shortGrass[sgi];if(sg.c!==sb)continue;
-          var sx=mx+sg.x*rx,sy=my-scale*(sg.y*.045),sh=scale*(.04+.027*sg.h);
+          var sedge=taper(sg.x);if(sg.q>sedge)continue;
+          var sx=mx+sg.x*rx,sy=my-scale*(.012+sg.y*.13+(Math.cos(sg.p*1.9)+1)*.01),sh=scale*(.04+.027*sg.h)*(.42+.58*Math.sqrt(sedge));
           var ss=Math.sin(tt*.86+sg.p+sg.x)*sh*.08;
           ctx.moveTo(sx,sy);ctx.quadraticCurveTo(sx+ss*.25,sy-sh*.52,sx+ss,sy-sh);
         }
         ctx.strokeStyle=greens[(sb+2)%5];ctx.lineWidth=1.2+(sb%2)*.5;ctx.stroke();
       }
+      ctx.restore();
       for(var bi=0;bi<meadowBees.length;bi++){
         var bee=meadowBees[bi],bx=mx+Math.sin(tt*.48+bee.p)*rx*bee.r,by=my-scale*(.28+bee.r*.16)+Math.sin(tt*1.05+bee.p*1.7)*scale*.052;
         var bs=Math.max(2.2,scale*.012);ctx.save();ctx.translate(bx,by);ctx.rotate(Math.cos(tt*.54+bee.p)*.22);
