@@ -149,13 +149,11 @@
   @media(prefers-reduced-motion:reduce){#rainall,#cursor-rain{display:none}}
   @media(max-width:760px){#cursor-rain{display:none}}
   .hero::before{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;
-    height:clamp(160px,18vw,215px);pointer-events:none;
-    background:
-      radial-gradient(ellipse 40% 180px at 77% 100%,
-        rgba(58,33,73,.5) 0%,rgba(58,33,73,.28) 48%,rgba(58,33,73,0) 100%),
-      linear-gradient(180deg,
-        rgba(58,33,73,0) 0%,rgba(58,33,73,.05) 18%,rgba(58,33,73,.16) 36%,
-        rgba(58,33,73,.4) 58%,rgba(58,33,73,.7) 76%,rgba(58,33,73,.9) 91%,var(--hero-seam) 100%)}
+    height:clamp(96px,11vw,140px);pointer-events:none;
+    background:linear-gradient(180deg,
+      rgba(58,33,73,0) 0%,rgba(58,33,73,0) 18%,rgba(58,33,73,.04) 35%,
+      rgba(58,33,73,.12) 52%,rgba(58,33,73,.3) 68%,rgba(58,33,73,.58) 82%,
+      rgba(58,33,73,.82) 92%,var(--hero-seam) 100%)}
   .hero::after{content:"";position:absolute;inset:0;z-index:-1;
     background:linear-gradient(180deg,transparent 55%,rgba(28,14,38,.56) 100%)}
   .hero .eyebrow{color:#dfc2f1}
