@@ -150,7 +150,6 @@ header.nav.scrolled{box-shadow:0 8px 24px -22px color-mix(in srgb,var(--ui-plum)
 .hero-keys li{border-color:color-mix(in srgb,var(--ui-cloud) 22%,transparent);background:color-mix(in srgb,var(--ui-cloud) 7%,transparent)}
 .haven-title .haven-mark{filter:drop-shadow(0 6px 18px color-mix(in srgb,var(--ui-plum) 25%,transparent))}
 .splash{text-shadow:2px 2px 0 color-mix(in srgb,var(--ui-plum) 70%,transparent)}
-.hero-fps{color:var(--ui-lilac)}
 .btn.light{background:var(--ui-cloud);color:var(--ui-plum)}
 .hero .btn.ghost{color:var(--ui-cloud)!important;border-color:color-mix(in srgb,var(--ui-cloud) 42%,transparent)!important}
 
@@ -202,7 +201,6 @@ footer::before{
 footer .brand,footer a:hover,footer a:focus-visible{color:var(--ui-cloud)}
 footer .fine{color:var(--ui-lilac)}
 footer .fine{border-color:color-mix(in srgb,var(--ui-cloud) 10%,transparent)}
-.font-style-toast{background:color-mix(in srgb,var(--ui-plum) 94%,transparent);color:var(--ui-cloud);border-color:color-mix(in srgb,var(--ui-cloud) 25%,transparent)}
 
 @media(max-width:640px){
   .site-nav{gap:10px;padding:10px 14px}

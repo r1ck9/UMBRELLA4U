@@ -1,0 +1,18 @@
+:root{
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+html :is(h1,h2,h3,h4,h5,h6){
+  font-family:var(--serif)!important;
+}
+body{
+  font-family:var(--sans);
+}
+button,input,textarea,select{
+  font-family:var(--sans);
+}
+.splash{
+  font-family:var(--serif)!important;
+  font-style:italic;
+}
