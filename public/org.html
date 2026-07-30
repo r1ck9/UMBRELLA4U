@@ -529,12 +529,32 @@
     "Rewrite the rules!",
     "Acceptance starts here!",
     "Be the real you!",
-    "Change the norm!"
+    "Change the norm!",
+    "Let your colors show!",
+    "Authentic looks good on you!",
+    "Be unapologetically you!",
+    "Belong without blending in!",
+    "Your difference is power!",
+    "Speak your whole truth!",
+    "Make weird the norm!",
+    "Show up as yourself!",
+    "Leave the labels behind!",
+    "Let kindness lead!",
+    "Be bold. Be gentle.",
+    "Every voice deserves room!",
+    "You were never too much!",
+    "Keep being unmistakably you!",
+    "Celebrate every shade!",
+    "Find your people!",
+    "Dare to be genuine!",
+    "Make space for honesty!",
+    "Nobody else is you!",
+    "The norm needs changing!"
   ];
   function setSplash(){
     var splash=document.getElementById('splash');
     if(!splash)return;
-    var isRare=true;
+    var isRare=Math.floor(Math.random()*1000)===0;
     splash.textContent=isRare
       ?"this message is 1/1000! lucky you!"
       :messages[Math.floor(Math.random()*messages.length)];
