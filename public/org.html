@@ -185,6 +185,11 @@
     color:#e7c9f5;text-shadow:2px 2px 0 rgba(58,28,75,.7);
     transform:rotate(-14deg);transform-origin:left center;
     animation:mcbob .9s ease-in-out infinite;pointer-events:none}
+  .splash.is-rare{
+    background:linear-gradient(90deg,#ff4d6d,#ff9f1c,#ffe45e,#2ecf78,#35baf6,#705df2,#d94cff);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    text-shadow:none;filter:drop-shadow(2px 2px 0 rgba(58,28,75,.7))}
   @keyframes mcbob{0%,100%{transform:rotate(-14deg) scale(1)}50%{transform:rotate(-14deg) scale(1.13)}}
   @media(prefers-reduced-motion:reduce){.splash{animation:none}}
   @media(max-width:760px){
@@ -529,7 +534,7 @@
   function setSplash(){
     var splash=document.getElementById('splash');
     if(!splash)return;
-    var isRare=Math.floor(Math.random()*1000)===0;
+    var isRare=true;
     splash.textContent=isRare
       ?"this message is 1/1000! lucky you!"
       :messages[Math.floor(Math.random()*messages.length)];
