@@ -8,8 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
 import { earnedBadges } from '@/lib/badges'
-
-const ACCENTS = ['#76509a', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#a978cf']
+import { PALETTE, PROFILE_ACCENTS, accentStyle, normalizeAccent } from '@/lib/palette'
 
 // Rotating example bios, a fresh one is picked each time the page opens.
 const BIO_EXAMPLES = [
@@ -47,7 +46,7 @@ export default function Profile() {
   const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES) }))
   const [p, setP] = useState({
     username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
-    accent_color: '#76509a', avatar_url: '', banner_theme: 'rain', tags: []
+    accent_color: PALETTE.violet, avatar_url: '', banner_theme: 'rain', tags: []
   })
 
   useEffect(() => {
@@ -60,7 +59,7 @@ export default function Profile() {
       if (prof) setP({
         username: prof.username || '', display_name: prof.display_name || '', pronouns: prof.pronouns || '',
         status_weather: prof.status_weather || '', about_me: prof.about_me || '',
-        accent_color: prof.accent_color || '#76509a', avatar_url: prof.avatar_url || '',
+        accent_color: normalizeAccent(prof.accent_color), avatar_url: prof.avatar_url || '',
         banner_theme: prof.banner_theme || 'rain', tags: prof.tags || []
       })
       if (prof) setStreak(prof.streak_count || 0)
@@ -87,7 +86,7 @@ export default function Profile() {
   async function save() {
     const { error } = await supabase.from('profiles').update({
       display_name: p.display_name, pronouns: p.pronouns, status_weather: p.status_weather,
-      about_me: p.about_me, accent_color: p.accent_color, avatar_url: p.avatar_url,
+      about_me: p.about_me, accent_color: normalizeAccent(p.accent_color), avatar_url: p.avatar_url,
       banner_theme: p.banner_theme, tags: p.tags
     }).eq('id', user.id)
     if (error) {
@@ -106,7 +105,7 @@ export default function Profile() {
   // avatar_url holds either "emoji:X" (preset) or a real URL (legacy uploads)
   const isEmoji = p.avatar_url.startsWith('emoji:')
   const isImg = /^https?:/.test(p.avatar_url)
-  const avStyle = isImg ? { backgroundImage: `url(${p.avatar_url})` } : { background: p.accent_color }
+  const avStyle = isImg ? { backgroundImage: `url(${p.avatar_url})` } : accentStyle(p.accent_color)
   const avInner = isEmoji ? p.avatar_url.slice(6) : (isImg ? '' : initial)
   const badges = earnedBadges({ streak, posts: stats.stories, umbrellasSent: stats.sent })
 
@@ -161,8 +160,8 @@ export default function Profile() {
               <p className="privacy-note">🔒 Don&apos;t put your real name, school, or address here. Combining identifying details can reveal who you are.</p>
               <label>Accent color
                 <div className="swatches">
-                  {ACCENTS.map((c) => (
-                    <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={{ background: c }} onClick={() => set('accent_color', c)} aria-label={c} />
+                  {PROFILE_ACCENTS.map((c) => (
+                    <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} aria-label={c} />
                   ))}
                 </div>
               </label>

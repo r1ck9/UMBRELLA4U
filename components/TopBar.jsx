@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import MobileMenu from '@/components/MobileMenu'
+import { accentStyle } from '@/lib/palette'
 
 export default function TopBar() {
   const router = useRouter()
@@ -59,7 +60,7 @@ export default function TopBar() {
   const isEmoji = url.startsWith('emoji:')
   const isImg = /^https?:/.test(url)
   const initial = (av?.username || email || '☂').trim().charAt(0).toUpperCase()
-  const avStyle = isImg ? { backgroundImage: `url(${url})` } : { background: av?.accent_color || 'var(--shelter)' }
+  const avStyle = isImg ? { backgroundImage: `url(${url})` } : accentStyle(av?.accent_color)
 
   return (
     <header className="topbar">

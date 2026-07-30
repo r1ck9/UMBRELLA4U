@@ -8,7 +8,7 @@ export default function Rain() {
     const c = ref.current, x = c.getContext('2d')
     let W, H, drops = [], raf
     const reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches
-    const col = (getComputedStyle(document.documentElement).getPropertyValue('--rainc') || 'rgba(140,160,185,.3)').trim()
+    const col = (getComputedStyle(document.documentElement).getPropertyValue('--rainc') || 'rgba(118,80,154,.3)').trim()
     function size() {
       W = c.width = window.innerWidth; H = c.height = window.innerHeight; drops = []
       const n = Math.round(W / 14)

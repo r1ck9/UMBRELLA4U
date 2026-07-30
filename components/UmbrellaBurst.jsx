@@ -39,16 +39,16 @@ export default function UmbrellaBurst() {
       <svg className="cele-umb" viewBox="0 0 200 210" aria-hidden="true">
         <defs>
           <linearGradient id="celeG" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#cfa7e9" />
-              <stop offset="1" stopColor="#734392" />
+              <stop offset="0" stopColor="#c49aea" />
+              <stop offset="1" stopColor="#76509a" />
           </linearGradient>
         </defs>
-          <line x1="100" y1="95" x2="100" y2="172" stroke="#d8c1e6" strokeWidth="4" strokeLinecap="round" />
-          <path d="M100 172 a13 13 0 0 1 -26 0" fill="none" stroke="#d8c1e6" strokeWidth="4" strokeLinecap="round" />
+          <line x1="100" y1="95" x2="100" y2="172" stroke="#d8b6f4" strokeWidth="4" strokeLinecap="round" />
+          <path d="M100 172 a13 13 0 0 1 -26 0" fill="none" stroke="#d8b6f4" strokeWidth="4" strokeLinecap="round" />
         <g className="cele-canopy">
           <path d="M20 95 Q33 109 46 95 Q60 109 74 95 Q87 109 100 95 Q113 109 126 95 Q140 109 154 95 Q167 109 180 95 A82 66 0 0 0 20 95 Z" fill="url(#celeG)" />
-            <line x1="100" y1="33" x2="100" y2="16" stroke="#d9b8ee" strokeWidth="3" strokeLinecap="round" />
-            <g stroke="rgba(44,20,57,.2)" strokeWidth="1.2">
+            <line x1="100" y1="33" x2="100" y2="16" stroke="#faf7ff" strokeWidth="3" strokeLinecap="round" />
+            <g stroke="rgba(36,24,47,.2)" strokeWidth="1.2">
             <line x1="100" y1="34" x2="46" y2="95" /><line x1="100" y1="34" x2="74" y2="95" />
             <line x1="100" y1="34" x2="126" y2="95" /><line x1="100" y1="34" x2="154" y2="95" />
           </g>

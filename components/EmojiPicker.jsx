@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { EMOJI_GROUPS } from '@/lib/emojis'
+import { accentStyle } from '@/lib/palette'
 
 // Avatar-emoji chooser. Shows the current pick; tap it to open a scrollable
 // grid of the full set. `value` is the stored "emoji:X" string.
@@ -11,7 +12,7 @@ export default function EmojiPicker({ value, accent, onSelect }) {
   return (
     <div className="emoji-pick">
       <div className="emoji-row">
-        <button type="button" className="emoji-current" style={{ background: accent || 'var(--shelter)' }}
+        <button type="button" className="emoji-current" style={accentStyle(accent)}
           onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label="Choose your emoji">
           {current || '☂'}
         </button>

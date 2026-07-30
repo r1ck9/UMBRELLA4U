@@ -1,8 +1,14 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { PALETTE } from '@/lib/palette'
 
 const TAU = Math.PI * 2
+const PALETTE_RGB = Object.fromEntries(Object.entries(PALETTE).map(([name, hex]) => [
+  name,
+  [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16)),
+]))
+const paletteAlpha = (name, alpha) => `rgba(${PALETTE_RGB[name].join(',')},${alpha})`
 
 const clamp = (value, min = 0, max = 1) => Math.min(max, Math.max(min, value))
 const smoothstep = (value) => {
@@ -109,8 +115,8 @@ export default function InvisibleShelter() {
         coolY,
         Math.max(width, height) * 0.68,
       )
-      ambient.addColorStop(0, 'rgba(166, 127, 199, 0.13)')
-      ambient.addColorStop(1, 'rgba(166, 127, 199, 0)')
+      ambient.addColorStop(0, paletteAlpha('violet', 0.13))
+      ambient.addColorStop(1, paletteAlpha('violet', 0))
       ctx.fillStyle = ambient
       ctx.fillRect(0, 0, width, height)
 
@@ -122,9 +128,9 @@ export default function InvisibleShelter() {
         shelter.y,
         shelter.radiusX * 1.85,
       )
-      violetGlow.addColorStop(0, 'rgba(194, 146, 230, 0.2)')
-      violetGlow.addColorStop(0.48, 'rgba(143, 87, 181, 0.08)')
-      violetGlow.addColorStop(1, 'rgba(143, 87, 181, 0)')
+      violetGlow.addColorStop(0, paletteAlpha('lilac', 0.2))
+      violetGlow.addColorStop(0.48, paletteAlpha('violet', 0.08))
+      violetGlow.addColorStop(1, paletteAlpha('violet', 0))
       ctx.fillStyle = violetGlow
       ctx.fillRect(0, 0, width, height)
     }
@@ -157,7 +163,7 @@ export default function InvisibleShelter() {
         const fadeAtEdge = clamp((nextDistance - 0.88) / 0.2)
 
         if (fadeAtEdge > 0.015) {
-          ctx.strokeStyle = `rgba(184, 207, 238, ${drop.opacity * fadeAtEdge})`
+          ctx.strokeStyle = paletteAlpha('lavender', drop.opacity * fadeAtEdge)
           ctx.lineWidth = drop.width
           ctx.beginPath()
           ctx.moveTo(drop.x, drop.y)
@@ -189,9 +195,9 @@ export default function InvisibleShelter() {
         floorY,
         shelter.radiusX * 1.05,
       )
-      floorGlow.addColorStop(0, 'rgba(205, 164, 235, 0.17)')
-      floorGlow.addColorStop(0.55, 'rgba(205, 164, 235, 0.055)')
-      floorGlow.addColorStop(1, 'rgba(205, 164, 235, 0)')
+      floorGlow.addColorStop(0, paletteAlpha('lilac', 0.17))
+      floorGlow.addColorStop(0.55, paletteAlpha('lilac', 0.055))
+      floorGlow.addColorStop(1, paletteAlpha('lilac', 0))
       ctx.fillStyle = floorGlow
       ctx.beginPath()
       ctx.ellipse(
@@ -208,9 +214,9 @@ export default function InvisibleShelter() {
       // The shelter is only suggested by a dim upper rim, never drawn as an umbrella.
       const pulse = 0.5 + Math.sin(time * 0.7) * 0.5
       ctx.save()
-      ctx.strokeStyle = `rgba(211, 171, 239, ${0.12 + pulse * 0.05})`
+      ctx.strokeStyle = paletteAlpha('lavender', 0.12 + pulse * 0.05)
       ctx.lineWidth = 1.2
-      ctx.shadowColor = 'rgba(181, 126, 222, 0.38)'
+      ctx.shadowColor = paletteAlpha('lilac', 0.38)
       ctx.shadowBlur = 18 + pulse * 8
       ctx.beginPath()
       ctx.ellipse(
@@ -238,14 +244,14 @@ export default function InvisibleShelter() {
         const haloRadius = person.size * (4.5 + shimmer)
 
         const halo = ctx.createRadialGradient(x, y, 0, x, y, haloRadius)
-        halo.addColorStop(0, `rgba(229, 202, 248, ${0.44 * visibility})`)
-        halo.addColorStop(1, 'rgba(193, 148, 226, 0)')
+        halo.addColorStop(0, paletteAlpha('lavender', 0.44 * visibility))
+        halo.addColorStop(1, paletteAlpha('lilac', 0))
         ctx.fillStyle = halo
         ctx.beginPath()
         ctx.arc(x, y, haloRadius, 0, TAU)
         ctx.fill()
 
-        ctx.fillStyle = `rgba(241, 222, 253, ${(0.72 + shimmer * 0.18) * visibility})`
+        ctx.fillStyle = paletteAlpha('cloud', (0.72 + shimmer * 0.18) * visibility)
         ctx.beginPath()
         ctx.arc(x, y, person.size, 0, TAU)
         ctx.fill()
@@ -261,8 +267,8 @@ export default function InvisibleShelter() {
         height * 0.42,
         Math.max(width, height) * 0.82,
       )
-      vignette.addColorStop(0, 'rgba(0, 0, 0, 0)')
-      vignette.addColorStop(1, 'rgba(0, 0, 0, 0.42)')
+      vignette.addColorStop(0, paletteAlpha('plum', 0))
+      vignette.addColorStop(1, paletteAlpha('plum', 0.42))
       ctx.fillStyle = vignette
       ctx.fillRect(0, 0, width, height)
     }

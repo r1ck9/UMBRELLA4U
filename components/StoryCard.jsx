@@ -7,6 +7,7 @@ import { DAILY_UMBRELLA_LIMIT } from '@/lib/config'
 import { getMe, getMyStoryIds } from '@/lib/me'
 import { earnedBadges } from '@/lib/badges'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
+import { accentStyle } from '@/lib/palette'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -63,7 +64,7 @@ function HugAvatar({ h }) {
   const isEmoji = url.startsWith('emoji:')
   const isImg = /^https?:/.test(url)
   const initial = (h.username || '☂').trim().charAt(0).toUpperCase()
-  const style = isImg ? { backgroundImage: `url(${url})` } : { background: h.accent_color || 'var(--shelter)' }
+  const style = isImg ? { backgroundImage: `url(${url})` } : accentStyle(h.accent_color)
   return <span className="hug-av" style={style} title={'@' + h.username}>{isEmoji ? url.slice(6) : (isImg ? '' : initial)}</span>
 }
 const NOTE_PROMPT = {

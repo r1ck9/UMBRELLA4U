@@ -7,11 +7,11 @@ import { getMe } from '@/lib/me'
 // Colors are the validated categorical slots 1–3 (blue / aqua / yellow); a
 // legend plus direct end-labels satisfy the light-mode low-contrast relief.
 const SERIES = [
-  { key: 'views', label: 'Views', color: 'var(--s-views)' },
-  { key: 'stories', label: 'Posts', color: 'var(--s-posts)' },
-  { key: 'umbrellas', label: 'Umbrellas', color: 'var(--s-umb)' },
-  { key: 'active_users', label: 'Active users', color: 'var(--s-active)' },
-  { key: 'registrations', label: 'Registrations', color: 'var(--s-reg)' }
+  { key: 'views', label: 'Views', color: 'var(--s-views)', dash: '', legend: 'solid' },
+  { key: 'stories', label: 'Posts', color: 'var(--s-posts)', dash: '8 4', legend: 'dashed' },
+  { key: 'umbrellas', label: 'Umbrellas', color: 'var(--s-umb)', dash: '2 4', legend: 'dotted' },
+  { key: 'active_users', label: 'Active users', color: 'var(--s-active)', dash: '12 4 2 4', legend: 'double' },
+  { key: 'registrations', label: 'Registrations', color: 'var(--s-reg)', dash: '1 3 8 3', legend: 'dashed' }
 ]
 const RANGES = [7, 30, 90]
 const W = 720, H = 280, PAD = { t: 16, r: 66, b: 34, l: 40 }
@@ -83,7 +83,7 @@ export default function ActivityChart() {
       <div className="legend">
         {SERIES.map((s) => (
           <span className="legend-item" key={s.key}>
-            <span className="legend-swatch" style={{ background: s.color }} />{s.label}
+            <span className="legend-swatch" style={{ borderTop: `3px ${s.legend} ${s.color}` }} />{s.label}
           </span>
         ))}
       </div>
@@ -114,10 +114,11 @@ export default function ActivityChart() {
             {geom.lines.map((ln) => (
               <g key={ln.key}>
                 <polyline points={ln.pts.map((p) => p.join(',')).join(' ')} fill="none"
-                  stroke={ln.color} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+                  stroke={ln.color} strokeWidth="2" strokeDasharray={ln.dash || undefined}
+                  strokeLinejoin="round" strokeLinecap="round" />
                 <circle cx={ln.pts[ln.pts.length - 1][0]} cy={ln.pts[ln.pts.length - 1][1]} r="3" fill={ln.color} />
                 <text x={ln.pts[ln.pts.length - 1][0] + 6} y={ln.pts[ln.pts.length - 1][1] + 4}
-                  className="end-lbl" style={{ fill: ln.color }}>{ln.last}</text>
+                  className="end-lbl">{ln.last}</text>
                 {hover != null && (
                   <circle cx={ln.pts[hover][0]} cy={ln.pts[hover][1]} r="3.5" fill={ln.color}
                     stroke="var(--panel)" strokeWidth="1.5" />

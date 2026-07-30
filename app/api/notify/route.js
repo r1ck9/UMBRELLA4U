@@ -1,6 +1,7 @@
 import { adminSupabase } from '@/lib/supabaseAdmin'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { sendPush } from '@/lib/push'
+import { PALETTE } from '@/lib/palette'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,14 +34,14 @@ async function sendEmail(to, subject, html) {
 }
 
 const shell = (body) =>
-  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a">
-     <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#76509a;margin-bottom:14px">☂ Umbrella</div>
+  `<div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:${PALETTE.plum};background:${PALETTE.cloud}">
+     <div style="font-family:Georgia,serif;font-size:20px;font-weight:bold;color:${PALETTE.violet};margin-bottom:14px">☂ Umbrella</div>
      ${body}
-     <p style="font-size:12px;color:#8a8a86;margin-top:22px">You get these because notifications are on. Turn them off anytime in Settings.</p>
+     <p style="font-size:12px;color:${PALETTE.violet};margin-top:22px">You get these because notifications are on. Turn them off anytime in Settings.</p>
    </div>`
 
-const btn = (href, label, color = '#76509a') =>
-  `<a href="${href}" style="display:inline-block;background:${color};color:#fff;text-decoration:none;padding:11px 22px;border-radius:999px;font-weight:bold;font-size:14px">${label}</a>`
+const btn = (href, label, color = PALETTE.violet) =>
+  `<a href="${href}" style="display:inline-block;background:${color};color:${PALETTE.cloud};text-decoration:none;padding:11px 22px;border-radius:999px;font-weight:bold;font-size:14px">${label}</a>`
 
 const digestHtml = (n) => shell(
   `<p style="font-size:15px;line-height:1.6">Someone stood with you. You have <b>${n}</b> new umbrella${n === '1' ? '' : 's'} waiting on your stories. 🫂</p>
@@ -48,7 +49,7 @@ const digestHtml = (n) => shell(
 
 const promptHtml = (text) => shell(
   `<p style="font-size:15px;line-height:1.6">This week’s prompt is up:</p>
-   <p style="font-size:16px;line-height:1.5;font-family:Georgia,serif;color:#24182f;border-left:3px solid #76509a;padding-left:12px;margin:12px 0">${text}</p>
+   <p style="font-size:16px;line-height:1.5;font-family:Georgia,serif;color:${PALETTE.plum};border-left:3px solid ${PALETTE.violet};padding-left:12px;margin:12px 0">${text}</p>
    <p style="font-size:15px;line-height:1.6">Share your answer — someone out there feels the same.</p>
    ${btn(`${SITE}/feed`, 'Answer this week’s prompt ☂')}`)
 
@@ -58,7 +59,7 @@ const reengageHtml = () => shell(
 
 const reportHtml = (n) => shell(
   `<p style="font-size:15px;line-height:1.6"><b>${n}</b> new report${n === 1 ? '' : 's'} need review on Umbrella.</p>
-   ${btn(`${SITE}/moderation`, 'Open the moderation queue 🛑', '#c0392b')}`)
+   ${btn(`${SITE}/moderation`, 'Open the moderation queue 🛑', PALETTE.plum)}`)
 
 export async function GET(request) {
   const secret = process.env.CRON_SECRET

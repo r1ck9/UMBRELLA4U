@@ -442,22 +442,23 @@
   :focus-visible{outline:2.5px solid var(--amber);outline-offset:3px;border-radius:6px}
 </style>
 <link rel="stylesheet" href="/font-themes.css">
+<link rel="stylesheet" href="/color-palette.css">
 
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Umbrella4U home">
       <svg class="mark" viewBox="0 0 200 200" aria-hidden="true">
-        <circle cx="100" cy="100" r="94" fill="#f0e7fa"/>
-        <circle cx="100" cy="100" r="90" fill="#e9ddf6"/>
-        <circle cx="100" cy="100" r="90" fill="none" stroke="#dcc9f0" stroke-width="1.5"/>
+        <circle cx="100" cy="100" r="94" fill="var(--ui-cloud)"/>
+        <circle cx="100" cy="100" r="90" fill="var(--ui-lavender)"/>
+        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--ui-lilac)" stroke-width="1.5"/>
         <g stroke-linecap="round" stroke-linejoin="round">
-          <path d="M100 96 V150 Q100 166 85 166 Q73 166 73 154" fill="none" stroke="#8e57a6" stroke-width="7"/>
-          <path d="M40 98 Q100 26 160 98 Q145 86 130 98 Q115 86 100 98 Q85 86 70 98 Q55 86 40 98 Z" fill="#8e57a6"/>
-          <g stroke="#7a4890" stroke-width="1.6" opacity=".55">
+          <path d="M100 96 V150 Q100 166 85 166 Q73 166 73 154" fill="none" stroke="var(--ui-violet)" stroke-width="7"/>
+          <path d="M40 98 Q100 26 160 98 Q145 86 130 98 Q115 86 100 98 Q85 86 70 98 Q55 86 40 98 Z" fill="var(--ui-violet)"/>
+          <g stroke="var(--ui-plum)" stroke-width="1.6" opacity=".55">
             <path d="M100 60 L40 98"/><path d="M100 60 L70 98"/><path d="M100 60 V98"/><path d="M100 60 L130 98"/><path d="M100 60 L160 98"/>
           </g>
-          <path d="M100 60 V50" stroke="#8e57a6" stroke-width="5"/>
-          <circle cx="100" cy="48" r="3.4" fill="#8e57a6"/>
+          <path d="M100 60 V50" stroke="var(--ui-violet)" stroke-width="5"/>
+          <circle cx="100" cy="48" r="3.4" fill="var(--ui-violet)"/>
         </g>
       </svg>
       Umbrella4U
@@ -553,7 +554,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       </ul>
       <div class="cta-row">
         <a class="btn light big" href="/feed">Enter Haven →</a>
-        <a class="btn ghost" href="#about" style="border-color:rgba(255,255,255,.3);color:#eef4fb">What we're about</a>
+        <a class="btn ghost" href="#about">What we're about</a>
       </div>
       <p class="dom">☂ Home of <b>Haven</b>, our anonymous peer-support app. &nbsp;·&nbsp; <b>umbrella4u.ca</b></p>
     </div>
@@ -770,13 +771,13 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       <svg class="cta-umbrella" viewBox="0 0 1200 620" role="presentation">
         <defs>
           <linearGradient id="cta-canopy" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#e4c7f7"/><stop offset=".32" stop-color="#a366c4"/><stop offset=".7" stop-color="#613278"/><stop offset="1" stop-color="#351947"/>
+            <stop offset="0" stop-color="var(--ui-lavender)"/><stop offset=".32" stop-color="var(--ui-lilac)"/><stop offset=".7" stop-color="var(--ui-violet)"/><stop offset="1" stop-color="var(--ui-plum)"/>
           </linearGradient>
           <linearGradient id="cta-under" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#3d2051"/><stop offset="1" stop-color="#1d1029"/>
+            <stop offset="0" stop-color="var(--ui-violet)"/><stop offset="1" stop-color="var(--ui-plum)"/>
           </linearGradient>
         </defs>
-        <ellipse cx="600" cy="505" rx="355" ry="34" fill="rgba(16,7,24,.26)"/>
+        <ellipse cx="600" cy="505" rx="355" ry="34" fill="rgba(36,24,47,.26)"/>
         <path class="pole" d="M600 280 L600 510 Q600 552 634 552 Q662 552 662 525 Q662 507 646 507"/>
         <path class="pole-hi" d="M596 287 L596 506 Q596 545 626 545"/>
         <path class="underside" d="M94 285 Q165 220 266 229 Q370 172 478 221 Q600 150 722 221 Q830 172 934 229 Q1035 220 1106 285 Q1037 324 962 300 Q868 343 762 302 Q600 350 438 302 Q332 343 238 300 Q163 324 94 285Z"/>
@@ -790,7 +791,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       <p class="reveal">Whether you're a school, a funder, a clinician, or a young person who wishes this had existed for you, there's a place for you under it.</p>
       <div class="cta-row reveal">
         <a class="btn primary" href="mailto:hello@umbrella4u.ca">Partner with us</a>
-        <a class="btn ghost" href="#products" style="border-color:rgba(255,255,255,.3);color:#eef4fb">Explore the products</a>
+        <a class="btn ghost" href="#products">Explore the products</a>
       </div>
     </div>
   </section>
@@ -876,7 +877,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
         var d=drops[i];
         if(blocked(d.x,d.y) || blocked(d.x-d.vx*.04,d.y-d.vy*.04)) continue;
         var speed=Math.hypot(d.vx,d.vy)||1;
-        ctx.strokeStyle='rgba(229,208,244,'+d.a+')'; ctx.lineWidth=1.05;
+        ctx.strokeStyle='rgba(216,182,244,'+d.a+')'; ctx.lineWidth=1.05;
         ctx.beginPath(); ctx.moveTo(d.x,d.y);
         ctx.lineTo(d.x-d.vx/speed*d.len,d.y-d.vy/speed*d.len); ctx.stroke();
       }
@@ -949,7 +950,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     function stroke(a){
       // light purple on dark backgrounds, deep purple on light ones, so the rain
       // stays readable across every section of the page.
-      return isDark() ? 'rgba(213,190,232,'+a+')' : 'rgba(86,49,113,'+a+')';
+      return isDark() ? 'rgba(216,182,244,'+a+')' : 'rgba(118,80,154,'+a+')';
     }
     function spawn(y){
       // seeded off the right edge as well, since the wind blows right-to-left
@@ -1023,7 +1024,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
     addEventListener('pointermove',function(e){var now=performance.now();if(now-lastDrop>32){lastDrop=now;add(e.clientX,e.clientY);start()}},{passive:true});
     function frame(ts){raf=0;if(last===null)last=ts;var dt=Math.min((ts-last)/1000,.05);last=ts;ctx.clearRect(0,0,W,H);
       for(var i=drops.length-1;i>=0;i--){var d=drops[i];d.age+=dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.vy+=23*dt;if(d.age>d.life){drops.splice(i,1);continue}var a=(1-d.age/d.life)*.48;
-        ctx.fillStyle='rgba(221,188,247,'+a+')';ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*.7,d.r*1.25,0,0,6.29);ctx.fill()}
+        ctx.fillStyle='rgba(216,182,244,'+a+')';ctx.beginPath();ctx.ellipse(d.x,d.y,d.r*.7,d.r*1.25,0,0,6.29);ctx.fill()}
       if(drops.length)raf=requestAnimationFrame(frame)}
     resize();addEventListener('resize',resize,{passive:true});
   })();
@@ -1299,7 +1300,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       }
       for(var bi=0;bi<rainDrawBuckets.length;bi++){
         var bucketDrops=rainDrawBuckets[bi];if(!bucketDrops.length)continue;
-        ctx.strokeStyle='rgba(213,190,232,'+(.075+bi*.05)+')';
+        ctx.strokeStyle='rgba(216,182,244,'+(.075+bi*.05)+')';
         ctx.lineWidth=.8+bi*.105;ctx.beginPath();
         for(var ri=0;ri<bucketDrops.length;ri++){
           var rn=bucketDrops[ri],vy=Math.max(1,rn.vy||rn.spd);
@@ -1326,14 +1327,14 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
           var sp=bucket[si];radiusTotal+=sp.r;
           ctx.moveTo(sp.px,sp.py);ctx.lineTo(sp.x,sp.y);
         }
-        ctx.strokeStyle='rgba(232,211,248,'+((groundPass?.4:.24)*fade)+')';
+        ctx.strokeStyle='rgba(250,247,255,'+((groundPass?.4:.24)*fade)+')';
         ctx.lineWidth=Math.max(.35,radiusTotal/bucket.length*(groundPass?.52:.34));ctx.stroke();
         ctx.beginPath();
         for(var si=0;si<bucket.length;si++){
           var sp=bucket[si],particleFade=1-sp.age/sp.life;
           ctx.moveTo(sp.x+sp.r*particleFade,sp.y);ctx.arc(sp.x,sp.y,sp.r*particleFade,0,6.29);
         }
-        ctx.fillStyle='rgba(238,221,252,'+((groundPass?.42:.33)*fade)+')';ctx.fill();
+        ctx.fillStyle='rgba(216,182,244,'+((groundPass?.42:.33)*fade)+')';ctx.fill();
       }
     }
     function meadowAnchor(sc){
@@ -1888,7 +1889,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       drawRain(frame);
       var base=pr(tf({x:0,y:poleBot,z:0}));
       var sh=ctx.createRadialGradient(base.x,base.y+42,4,base.x,base.y+42,scale*.62);
-      sh.addColorStop(0,'rgba(0,0,0,.15)'); sh.addColorStop(.58,'rgba(0,0,0,.07)'); sh.addColorStop(1,'rgba(0,0,0,0)');
+      sh.addColorStop(0,'rgba(36,24,47,.15)'); sh.addColorStop(.58,'rgba(36,24,47,.07)'); sh.addColorStop(1,'rgba(36,24,47,0)');
       ctx.save();
       ctx.translate(base.x,base.y+42);
       ctx.fillStyle=sh;
@@ -1901,7 +1902,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       updateSkyButterflies(sc);
       updateMeadowLayers(sc,frame,dt);
       drawSkyButterflies(sc,false);
-      for(var mi=0;mi<motes.length;mi++){ var mo=motes[mi]; var Pm=pr(tf(mo)); if(Pm.z<0.4){ var tw=0.10+0.10*Math.sin(tt+mo.p); ctx.fillStyle='rgba(224,205,238,'+tw+')'; ctx.beginPath(); ctx.arc(Pm.x,Pm.y,1.3,0,6.29); ctx.fill(); } }
+      for(var mi=0;mi<motes.length;mi++){ var mo=motes[mi]; var Pm=pr(tf(mo)); if(Pm.z<0.4){ var tw=0.10+0.10*Math.sin(tt+mo.p); ctx.fillStyle='rgba(216,182,244,'+tw+')'; ctx.beginPath(); ctx.arc(Pm.x,Pm.y,1.3,0,6.29); ctx.fill(); } }
       var list=[];
       for(var pi=0;pi<frame.hitSurfaces.length;pi++){var surface=frame.hitSurfaces[pi];list.push({z:surface.z,kind:'fill',pts:surface.pts,color:surface.color});}
       for(var rbi=0;rbi<ribs.length;rbi++){ var tvp=ribs[rbi].map(tf); list.push({z:(tvp[0].z+tvp[1].z+tvp[2].z)/3-0.01,kind:'rib',pts:tvp.map(pr)}); }
@@ -1911,9 +1912,9 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       list.sort(function(a,b){return a.z-b.z;});
       for(var li=0;li<list.length;li++){ var it=list[li], p=it.pts;
         if(it.kind==='fill'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.closePath(); ctx.fillStyle=it.color; ctx.fill(); }
-        else if(it.kind==='rib'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle='rgba(8,9,12,.5)'; ctx.lineWidth=1.1; ctx.lineJoin='round'; ctx.stroke(); }
-        else if(it.kind==='pole'||it.kind==='handle'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle=it.kind==='pole'?'#57445f':'#6a4a72'; ctx.lineWidth=Math.max(4.2,scale*0.033); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); }
-        else if(it.kind==='finial'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); ctx.lineTo(p[1].x,p[1].y); ctx.strokeStyle='#c6a0dc'; ctx.lineWidth=Math.max(1.4,scale*0.011); ctx.lineCap='round'; ctx.stroke(); }
+        else if(it.kind==='rib'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle='rgba(36,24,47,.5)'; ctx.lineWidth=1.1; ctx.lineJoin='round'; ctx.stroke(); }
+        else if(it.kind==='pole'||it.kind==='handle'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); for(var k=1;k<p.length;k++)ctx.lineTo(p[k].x,p[k].y); ctx.strokeStyle='#76509a'; ctx.lineWidth=Math.max(4.2,scale*0.033); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.stroke(); }
+        else if(it.kind==='finial'){ ctx.beginPath(); ctx.moveTo(p[0].x,p[0].y); ctx.lineTo(p[1].x,p[1].y); ctx.strokeStyle='#d8b6f4'; ctx.lineWidth=Math.max(1.4,scale*0.011); ctx.lineCap='round'; ctx.stroke(); }
       }
       drawSkyButterflies(sc,true);
       drawSplashes(false);

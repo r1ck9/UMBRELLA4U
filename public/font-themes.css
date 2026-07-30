@@ -38,11 +38,11 @@ button,input,textarea,select{
   bottom:max(18px,env(safe-area-inset-bottom));
   max-width:calc(100vw - 28px);
   padding:9px 15px;
-  border:1px solid rgba(255,255,255,.2);
+  border:1px solid color-mix(in srgb,var(--ui-cloud) 20%,transparent);
   border-radius:999px;
-  background:rgba(28,15,38,.94);
-  color:#fff;
-  box-shadow:0 12px 34px -16px rgba(0,0,0,.75);
+  background:color-mix(in srgb,var(--ui-plum) 94%,transparent);
+  color:var(--ui-cloud);
+  box-shadow:0 12px 34px -16px color-mix(in srgb,var(--ui-plum) 75%,transparent);
   font-family:var(--sans);
   font-size:.78rem;
   font-weight:700;

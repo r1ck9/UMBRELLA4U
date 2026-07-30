@@ -8,8 +8,8 @@ import { BANNERS, bannerStyle } from '@/lib/banners'
 import { GUIDELINES } from '@/lib/guidelines'
 import EmojiPicker from '@/components/EmojiPicker'
 import { track } from '@/lib/analytics'
+import { PALETTE, PROFILE_ACCENTS, accentStyle, normalizeAccent } from '@/lib/palette'
 
-const ACCENTS = ['#76509a', '#e0655e', '#c8506a', '#8b6fc9', '#3f9d9d', '#3f9d78', '#a978cf']
 const USERNAME_IDEAS = ['rainy_owl', 'quiet_fern', 'soft_static', 'paper_boats', 'moonlit_kid', 'still_water', 'little_lighthouse', 'warm_socks', 'cloud_nine', 'half_asleep', 'tiny_thunder', 'sunday_dust']
 const SUGGESTED_TAGS = ['art', 'music', 'gaming', 'anime', 'books', 'poetry', 'film', 'photography', 'coding', 'sports', 'volleyball', 'skating', 'dance', 'coffee', 'plants', 'baking', 'anxiety', 'mental health', 'lgbtq+', 'newcomer', 'faith', 'languages', 'studying', 'night owl', 'introvert', 'overthinker', 'trying my best']
 const BIO_EXAMPLES = [
@@ -35,7 +35,7 @@ export default function Onboarding() {
   const [err, setErr] = useState('')
   const [p, setP] = useState({
     username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
-    accent_color: '#76509a', avatar_url: 'emoji:☂', banner_theme: 'rain', tags: []
+    accent_color: PALETTE.violet, avatar_url: 'emoji:☂', banner_theme: 'rain', tags: []
   })
   const [tagInput, setTagInput] = useState('')
   const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES), names: [...USERNAME_IDEAS].sort(() => Math.random() - 0.5).slice(0, 4) }))
@@ -51,7 +51,7 @@ export default function Onboarding() {
       if (prof) setP((prev) => ({
         ...prev,
         username: prof.username || '', display_name: prof.display_name || '',
-        avatar_url: prof.avatar_url || 'emoji:☂', accent_color: prof.accent_color || '#76509a'
+        avatar_url: prof.avatar_url || 'emoji:☂', accent_color: normalizeAccent(prof.accent_color)
       }))
       setLoading(false)
     })()
@@ -70,7 +70,7 @@ export default function Onboarding() {
     if (uname.length < 3) { setErr('Pick a username with at least 3 letters/numbers.'); setSaving(false); setStep(1); return }
     const { error } = await supabase.from('profiles').update({
       username: uname, display_name: p.display_name || uname, pronouns: p.pronouns,
-      status_weather: p.status_weather, about_me: p.about_me, accent_color: p.accent_color,
+      status_weather: p.status_weather, about_me: p.about_me, accent_color: normalizeAccent(p.accent_color),
       avatar_url: p.avatar_url, banner_theme: p.banner_theme, tags: p.tags, onboarded: true
     }).eq('id', user.id)
     setSaving(false)
@@ -133,14 +133,14 @@ export default function Onboarding() {
             <h1>Make it yours</h1>
             <div className="onb-preview">
               <div className="pf-banner" style={bannerStyle(p.banner_theme)} />
-              <div className="pf-avatar" style={{ background: p.accent_color }}>{avInner}</div>
+              <div className="pf-avatar" style={accentStyle(p.accent_color)}>{avInner}</div>
             </div>
             <label>Avatar
               <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
             </label>
             <label>Accent
               <div className="swatches">
-                {ACCENTS.map((c) => <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={{ background: c }} onClick={() => set('accent_color', c)} />)}
+                {PROFILE_ACCENTS.map((c) => <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} />)}
               </div>
             </label>
             <label>Banner

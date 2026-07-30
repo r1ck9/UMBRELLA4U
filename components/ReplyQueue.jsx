@@ -69,7 +69,7 @@ export default function ReplyQueue() {
             onChange={(e) => setDraft((d) => ({ ...d, [it.story_id]: e.target.value }))}
             rows={2}
             style={{ width: '100%', resize: 'vertical', padding: '8px', borderRadius: '8px',
-                     border: '1px solid var(--line, #ccc)', font: 'inherit' }}
+                     border: '1px solid var(--line)', font: 'inherit' }}
           />
           <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
             <button className="btn" disabled={busy === it.story_id} onClick={() => sendReply(it.story_id)}>

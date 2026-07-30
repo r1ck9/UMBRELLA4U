@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 
 function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '…' : t }
-const statusColor = { complete: '#2e9e6b', 'on track': '#76509a', behind: '#8b5bb5' }
+const statusColor = { complete: 'var(--ink-1)', 'on track': 'var(--shelter)', behind: 'var(--ink-2)' }
 function nextLabel(secs) {
   if (secs == null) return 'done'
   const n = Number(secs)
@@ -26,10 +26,10 @@ function Sparkline({ data, range }) {
         {counts.map((c, i) => (
           <div key={i} title={`${c} in that ${unit}`}
             style={{ flex: 1, height: Math.max(2, (c / max) * 46), borderRadius: 2,
-              background: i === counts.length - 1 ? '#a978cf' : '#76509a', opacity: c ? 1 : 0.35 }} />
+              background: i === counts.length - 1 ? 'var(--ink-1)' : 'var(--shelter)', opacity: c ? 1 : 0.35 }} />
         ))}
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '.7rem', color: 'var(--ink-3,#999)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '.7rem', color: 'var(--ink-3)' }}>
         <span>{range === 'week' ? '7d ago' : '24h ago'}</span>
         <span>{total} total</span>
         <span>now</span>
@@ -81,15 +81,15 @@ export default function BotReport() {
   const tab = (val, label) => (
     <button onClick={() => setRange(val)} style={{
       font: 'inherit', fontSize: '.78rem', fontWeight: 600, cursor: 'pointer', borderRadius: 999, padding: '4px 11px',
-      border: '1px solid ' + (range === val ? '#76509a' : 'var(--line,#ccc)'),
-      background: range === val ? '#76509a' : 'transparent',
-      color: range === val ? '#fff' : 'var(--ink-2,#555)' }}>{label}</button>
+      border: '1px solid ' + (range === val ? 'var(--shelter)' : 'var(--line)'),
+      background: range === val ? 'var(--shelter)' : 'transparent',
+      color: range === val ? 'var(--on-accent)' : 'var(--ink-2)' }}>{label}</button>
   )
 
   return (
-    <div style={{ border: '1px solid var(--line,#ddd)', borderRadius: 14, padding: '16px 18px', background: 'var(--card,transparent)' }}>
+    <div style={{ border: '1px solid var(--line)', borderRadius: 14, padding: '16px 18px', background: 'var(--card)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 10, flexWrap: 'wrap' }}>
-        <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3,#888)' }}>
+        <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
           Bot umbrellas
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
@@ -97,7 +97,7 @@ export default function BotReport() {
           {tab('week', '7d')}
           <button onClick={refresh} disabled={refreshing}
             style={{ font: 'inherit', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer',
-              border: '1px solid var(--line,#ccc)', background: 'transparent', color: 'var(--ink,#333)',
+              border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)',
               borderRadius: 999, padding: '4px 12px', opacity: refreshing ? 0.6 : 1 }}>
             {refreshing ? '…' : '↻'}
           </button>
@@ -111,12 +111,12 @@ export default function BotReport() {
           const isHead = /^, /.test(r.metric)
           return isHead ? (
             <div key={i} style={{ gridColumn: '1 / -1', marginTop: i ? 10 : 0, fontSize: '.72rem', fontWeight: 700,
-              letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3,#777)' }}>
+              letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
               {r.metric.replace(/, /g, '').trim()}
             </div>
           ) : (
             <Fragment key={i}>
-              <div style={{ color: 'var(--ink-2,#555)' }}>{r.metric}</div>
+              <div style={{ color: 'var(--ink-2)' }}>{r.metric}</div>
               <div style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, textAlign: 'right' }}>{r.value}</div>
             </Fragment>
           )
@@ -126,7 +126,7 @@ export default function BotReport() {
       <div style={{ marginTop: 16, overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '.88rem' }}>
           <thead>
-            <tr style={{ textAlign: 'left', color: 'var(--ink-3,#888)', fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>
+            <tr style={{ textAlign: 'left', color: 'var(--ink-3)', fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>
               <th style={{ padding: '6px 8px' }}>Post</th>
               <th style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>Bot likes</th>
               <th style={{ padding: '6px 8px', width: 120 }}>Fill</th>
@@ -137,24 +137,24 @@ export default function BotReport() {
           </thead>
           <tbody>
             {s.posts.map((p, i) => (
-              <tr key={i} style={{ borderTop: '1px solid var(--line-2,#eee)' }}>
+              <tr key={i} style={{ borderTop: '1px solid var(--line-2)' }}>
                 <td style={{ padding: '8px' }}>
                   {excerpt(p.post_excerpt)}
-                  <span style={{ color: 'var(--ink-3,#999)' }}> · {p.cat}{p.is_anon ? ' · anon' : ''}</span>
+                  <span style={{ color: 'var(--ink-3)' }}> · {p.cat}{p.is_anon ? ' · anon' : ''}</span>
                 </td>
                 <td style={{ padding: '8px', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
                   {p.bot_likes} / {p.target_n}
                 </td>
                 <td style={{ padding: '8px' }}>
-                  <div style={{ background: 'var(--line-2,#eee)', borderRadius: 999, height: 7, overflow: 'hidden' }}>
-                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.drip_status] || '#76509a' }} />
+                  <div style={{ background: 'var(--line-2)', borderRadius: 999, height: 7, overflow: 'hidden' }}>
+                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.drip_status] || 'var(--shelter)' }} />
                   </div>
                 </td>
-                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3,#888)' }}>{p.real_likes}</td>
+                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3)' }}>{p.real_likes}</td>
                 <td style={{ padding: '8px' }}>
-                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || '#76509a' }}>{p.drip_status}</span>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || 'var(--shelter)' }}>{p.drip_status}</span>
                 </td>
-                <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3,#888)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.next_secs)}</td>
+                <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.next_secs)}</td>
               </tr>
             ))}
           </tbody>
