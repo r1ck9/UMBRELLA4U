@@ -190,6 +190,7 @@
   @media(max-width:760px){
     .splash{position:static;display:block;margin:14px auto 0;transform:rotate(-7deg);
       transform-origin:center;text-align:center;animation-name:mcbobm}
+    .splash.is-rare{max-width:92vw;white-space:normal;line-height:1.2}
     @keyframes mcbobm{0%,100%{transform:rotate(-7deg) scale(1)}50%{transform:rotate(-7deg) scale(1.08)}}
   }
 
@@ -492,12 +493,51 @@
   n.addEventListener('focusin',show);
   addEventListener('pointermove',function(e){if(e.clientY<12)show()},{passive:true});
 })();
-(function(){var s=document.getElementById('splash');if(!s)return;
-var m=["Umbrella4U FOREVER!","Break the social norm!","Welcome to this version!","100% anonymous!","Free, forever!",
-"Welcome in from the rain!","There at 2 a.m.!","No name needed!","Made with youth!",
-"Every umbrella counts!","Also try journaling!","Skies clear here!","Peer support > algorithms!",
-"You matter here!","One umbrella at a time!"];
-s.textContent=m[Math.floor(Math.random()*m.length)];})();
+(function(){
+  var messages=[
+    "Break the social norm!",
+    "Be loudly yourself!",
+    "Drop the mask!",
+    "Weird is wonderful!",
+    "You belong here!",
+    "Come as you are!",
+    "Make acceptance normal!",
+    "Different looks good!",
+    "Stay wonderfully weird!",
+    "Your voice matters!",
+    "Be real, not perfect!",
+    "No labels needed!",
+    "Take up space!",
+    "Kindness is cool!",
+    "Let yourself shine!",
+    "Own your story!",
+    "Choose authenticity!",
+    "Normal is overrated!",
+    "Be seen. Be you.",
+    "Make room for everyone!",
+    "Unmute yourself!",
+    "Your truth belongs!",
+    "Be brave. Be honest.",
+    "Let people be people!",
+    "Stand out together!",
+    "No hiding required!",
+    "Rewrite the rules!",
+    "Acceptance starts here!",
+    "Be the real you!",
+    "Change the norm!"
+  ];
+  function setSplash(){
+    var splash=document.getElementById('splash');
+    if(!splash)return;
+    var isRare=Math.floor(Math.random()*1000)===0;
+    splash.textContent=isRare
+      ?"this message is 1/1000! lucky you!"
+      :messages[Math.floor(Math.random()*messages.length)];
+    splash.classList.toggle('is-rare',isRare);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setSplash,{once:true});
+  else setSplash();
+})();
 (function(){
   if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
   document.addEventListener('click',function(e){
