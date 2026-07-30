@@ -1816,7 +1816,7 @@ s.textContent=m[Math.floor(Math.random()*m.length)];})();
       var ordered=skyButterflies.slice().sort(function(a,b){return a.z-b.z;});
       for(var i=0;i<ordered.length;i++){
         var bf=ordered[i];if((bf.z>=0)!==front)continue;
-        var bs=Math.max(6,sc.scale*bf.size*1.1*bf.perspective);
+        var bs=Math.max(6,sc.scale*bf.size*1.32*bf.perspective);
         var flap=Math.sin(tt*(6.4+bf.s*2.5)*4+bf.p*2.4)*1.08;
         var flat=Math.abs(Math.cos(flap)),span=bs*(.5+1.1*flat),lift=-Math.sin(flap)*bs*.68;
         ctx.save();ctx.translate(bf.x,bf.y);ctx.rotate(bf.heading);
