@@ -400,23 +400,25 @@
     :where(section){padding:42px 0}
     .visual-section::before,.visual-section::after{display:none}
     /* Each band blends into the next, so the page reads as one continuous scroll. */
-    .havensec{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
+    .havensec{background:linear-gradient(180deg,#f8f4fb 0%,var(--surface) 18%,var(--surface-2) 100%)}
     .goals{background:linear-gradient(180deg,var(--surface-2) 0%,var(--paper) 100%)}
     .products{background:linear-gradient(180deg,var(--paper) 0%,var(--surface) 100%)}
     .chapters{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
     .story-wall{background:linear-gradient(180deg,var(--surface-2) 0%,#76509a 100%)}
     .cta{background:linear-gradient(180deg,#76509a 0%,#54356c 48%,#2a1838 100%)}
     .eyebrow{font-size:.58rem;letter-spacing:.115em}.eyebrow::before{width:1.35em;height:1.35em;margin-right:.38em}
-    .hero{min-height:0;padding:78px 0 42px;align-items:flex-start}
+    .hero{min-height:0;padding:78px 0 72px;align-items:flex-start}
+    .hero::before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:128px;z-index:0;pointer-events:none;
+      background:linear-gradient(180deg,rgba(61,37,78,0) 0%,rgba(122,82,156,.62) 36%,#f8f4fb 100%)}
     .hero canvas,.stormflash,#rainall,.cta-rain{display:none}
-    .hero .wrap{margin:0;text-align:left;max-width:430px;padding-right:18px}
-    .hero h1,.haven-title{font-size:clamp(1.82rem,9.2vw,2.34rem);margin-top:8px;max-width:12ch;line-height:.98}
+    .hero .wrap{margin:0 auto;text-align:center;max-width:430px;padding-right:16px}
+    .hero h1,.haven-title{font-size:clamp(1.82rem,9.2vw,2.34rem);margin:8px auto 0;max-width:12ch;line-height:.98}
     .splash{font-size:.56rem;margin-top:7px;letter-spacing:.08em}
-    .hero .lede{margin:13px 0 0;font-size:.88rem;line-height:1.46;max-width:35ch}
-    .mobile-app-note{margin-top:13px;padding:7px 9px;gap:8px;border-radius:12px;max-width:310px}.mobile-app-note i{width:24px;height:24px;font-size:.86rem}.mobile-app-note b{font-size:.68rem}.mobile-app-note span{font-size:.61rem}
-    .hero-keys{margin-top:14px;gap:6px;justify-content:flex-start;max-width:310px}
+    .hero .lede{margin:13px auto 0;font-size:.88rem;line-height:1.46;max-width:35ch}
+    .mobile-app-note{margin:13px auto 0;padding:7px 9px;gap:8px;border-radius:12px;max-width:310px}.mobile-app-note i{width:24px;height:24px;font-size:.86rem}.mobile-app-note b{font-size:.68rem}.mobile-app-note span{font-size:.61rem}
+    .hero-keys{display:none}
     .hero-keys li{font-size:.64rem;padding:4px 7px}
-    .hero .cta-row{margin-top:18px;gap:8px;justify-content:flex-start}
+    .hero .cta-row{margin-top:18px;gap:8px;justify-content:center}
     .btn{font-size:.82rem;padding:8px 14px}
     .btn.big{font-size:.86rem;padding:10px 16px}.hero .cta-row .btn.light{width:auto;min-width:0;justify-content:center}
     .sec-head h2,.about-intro h2,.havensec h2{font-size:clamp(1.38rem,6.4vw,1.72rem);line-height:1.14}
