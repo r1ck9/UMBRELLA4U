@@ -257,6 +257,26 @@ export default function StoryCard({ story }) {
     window.dispatchEvent(new CustomEvent('umbrella:burst', { detail: { variant: 'open', message: 'You opened your umbrella for them. ☂' } }))
   }
 
+  async function notifyUmbrellaOpened(storyId) {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+      if (!token) return
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 5000)
+      try {
+        await fetch('/api/push/umbrella', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ story_id: storyId }),
+          signal: controller.signal
+        })
+      } finally {
+        clearTimeout(timeout)
+      }
+    } catch {}
+  }
+
   async function openUmbrella(note) {
     if (opened || isOwn) return
     if (note && CRISIS.test(note)) { alert(CRISIS_MESSAGE); return }
@@ -284,6 +304,7 @@ export default function StoryCard({ story }) {
       }
     } else {
       fireBurst()
+      void notifyUmbrellaOpened(story.id)
       // tell the rail to refresh its live counts (umbrellas left today + community total)
       window.dispatchEvent(new CustomEvent('umbrella:opened'))
       // opening an umbrella also gives them a hug
