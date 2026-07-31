@@ -29,6 +29,11 @@ const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
 const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
 const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous, no full names, schools, addresses, or contact info. 💛"
 
+const withTimeout = (promise, ms, message) => Promise.race([
+  promise,
+  new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
+])
+
 export default function Composer() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -95,7 +100,12 @@ export default function Composer() {
   }
 
   async function doPost() {
-    const { data } = await supabase.auth.getUser()
+    let data
+    try {
+      ({ data } = await withTimeout(supabase.auth.getUser(), 10000, 'Authentication timed out. Please refresh and try again.'))
+    } catch (e) {
+      setBusy(false); setConfirming(false); alert(e.message); return
+    }
     if (!data.user) { router.push('/signup'); return }
     setBusy(true)
 
@@ -116,9 +126,13 @@ export default function Composer() {
     const insertTimeout = setTimeout(() => insertController.abort(), 15000)
     let created, error
     try {
-      ({ data: created, error } = await supabase.from('stories')
-        .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
-        .select('id').single().abortSignal(insertController.signal))
+      ({ data: created, error } = await withTimeout(
+        supabase.from('stories')
+          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
+          .select('id').single().abortSignal(insertController.signal),
+        15000,
+        'Story posting timed out. Please run the database fallback SQL and try again.'
+      ))
     } catch (e) {
       error = e
     } finally {
