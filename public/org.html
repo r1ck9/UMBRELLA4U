@@ -135,6 +135,7 @@
   @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
   .hero canvas{position:absolute;inset:0;z-index:-2;width:100%;height:100%;opacity:1}
   .hero canvas.meadow-canvas{inset:auto;width:auto;height:auto;pointer-events:none}
+  #mobile-hero-rain{display:none}
   #meadow-back{z-index:-3}
   #meadow-front{z-index:-1}
   .stormflash{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
@@ -421,13 +422,19 @@
     .story-wall{background:linear-gradient(180deg,var(--surface-2) 0%,#76509a 100%)}
     .cta{background:linear-gradient(180deg,#76509a 0%,#54356c 48%,#2a1838 100%)}
     .eyebrow{font-size:.58rem;letter-spacing:.115em}.eyebrow::before{width:1.35em;height:1.35em;margin-right:.38em}
-    .hero{min-height:0;padding:78px 0 72px;align-items:flex-start}
+    .nav .wrap{height:54px;padding-left:12px;padding-right:12px}
+    .nav .brand{font-size:.68rem;gap:5px;letter-spacing:0}.nav .brand .mark{width:20px;height:20px}
+    .nav nav a.cta-link:not(.btn){font-size:.68rem;padding:6px 8px}
+    .hero{min-height:0;padding:90px 0 82px;align-items:flex-start}
     .hero::before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:128px;z-index:0;pointer-events:none;
       background:linear-gradient(180deg,rgba(61,37,78,0) 0%,rgba(122,82,156,.62) 36%,#f8f4fb 100%)}
-    .hero canvas,.stormflash,#rainall,.cta-rain{display:none}
-    .hero .wrap{margin:0 auto;text-align:center;max-width:430px;padding-right:16px}
-    .hero h1,.haven-title{font-size:clamp(1.82rem,9.2vw,2.34rem);margin:8px auto 0;max-width:12ch;line-height:.98}
-    .splash{font-size:.56rem;margin-top:7px;letter-spacing:.08em}
+    .hero canvas:not(#mobile-hero-rain),.stormflash,#rainall,.cta-rain{display:none}
+    #mobile-hero-rain{display:block;position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+    .hero .wrap{margin:0 auto;text-align:center;max-width:430px;padding:0 20px}
+    .hero h1,.haven-title{justify-content:center;font-size:clamp(3.15rem,16vw,4.65rem);margin:4px auto 0;max-width:none;line-height:.86;text-align:center}
+    .haven-title span{display:inline-block}
+    .splash{position:absolute;left:auto;right:-1.65rem;top:-1rem;margin:0;font-size:.62rem;letter-spacing:.06em;transform:rotate(-12deg);animation-name:mcbobtitle}
+    @keyframes mcbobtitle{0%,100%{transform:rotate(-12deg) scale(1)}50%{transform:rotate(-12deg) scale(1.08)}}
     .hero .lede{margin:13px auto 0;font-size:.88rem;line-height:1.46;max-width:35ch}
     .mobile-app-note{margin:13px auto 0;padding:7px 9px;gap:8px;border-radius:12px;max-width:310px}.mobile-app-note i{width:24px;height:24px;font-size:.86rem}.mobile-app-note b{font-size:.68rem}.mobile-app-note span{font-size:.61rem}
     .hero-keys{display:none}
@@ -600,6 +607,7 @@
     <canvas id="meadow-back" class="meadow-canvas" aria-hidden="true"></canvas>
     <canvas id="umb3d" aria-hidden="true"></canvas>
     <canvas id="meadow-front" class="meadow-canvas" aria-hidden="true"></canvas>
+    <canvas id="mobile-hero-rain" aria-hidden="true"></canvas>
     <div class="stormflash" aria-hidden="true"></div>
     <div class="wrap">
       <h1 class="haven-title"><span>Umbrella4U<i class="splash" id="splash">Break the social norm!</i></span></h1>
@@ -965,6 +973,81 @@
       if('IntersectionObserver' in window){new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();else ctx.clearRect(0,0,W,H)},{threshold:.03}).observe(cta)}
       else {visible=true;start();}
     }
+  })();
+
+  // Mobile hero rain only: confined to the purple first screen and splashing at the transition.
+  (function(){
+    var canvas=document.getElementById('mobile-hero-rain');
+    var hero=document.querySelector('.hero');
+    if(!canvas || !hero) return;
+    if(window.innerWidth>760) return;
+    if(window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var ctx=canvas.getContext('2d',{alpha:true});
+    var W=0,H=0,DPR=1,last=null,raf=0,acc=0,drops=[],splashes=[];
+    function resize(){
+      DPR=Math.min(window.devicePixelRatio||1,1.5)*(window.__siteFit||1);
+      W=canvas.clientWidth; H=canvas.clientHeight;
+      canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
+      ctx.setTransform(DPR,0,0,DPR,0,0);
+    }
+    function groundY(){return Math.max(80,H-24);}
+    function spawnDrop(y){
+      drops.push({
+        x:Math.random()*(W+120)+20,y:y,len:18+Math.random()*30,
+        vx:-58-Math.random()*38,vy:420+Math.random()*230,
+        a:.22+Math.random()*.22,w:.9+Math.random()*.7
+      });
+    }
+    function splash(x,y){
+      var n=3+(Math.random()*4|0);
+      for(var i=0;i<n;i++){
+        splashes.push({
+          x:x,y:y,age:0,life:.18+Math.random()*.16,
+          vx:-74+Math.random()*148,vy:-64-Math.random()*88,
+          r:.8+Math.random()*1.2,a:.24+Math.random()*.22
+        });
+      }
+      if(splashes.length>90)splashes.splice(0,splashes.length-90);
+    }
+    function tick(dt){
+      var gy=groundY();
+      acc+=dt*W*.16;
+      while(acc>1){acc--;spawnDrop(-50-Math.random()*80);}
+      for(var i=drops.length-1;i>=0;i--){
+        var d=drops[i],px=d.x,py=d.y;
+        d.x+=d.vx*dt; d.y+=d.vy*dt;
+        if(py<gy && d.y>=gy){splash(px+(d.x-px)*((gy-py)/(d.y-py||1)),gy);drops.splice(i,1);continue;}
+        if(d.y>H+d.len || d.x<-130)drops.splice(i,1);
+      }
+      for(var s=splashes.length-1;s>=0;s--){
+        var sp=splashes[s]; sp.age+=dt; sp.vy+=420*dt; sp.vx*=Math.pow(.86,dt*60);
+        sp.x+=sp.vx*dt; sp.y+=sp.vy*dt;
+        if(sp.age>sp.life)splashes.splice(s,1);
+      }
+    }
+    function draw(){
+      var gy=groundY();
+      ctx.clearRect(0,0,W,H);
+      ctx.lineCap='round';
+      for(var i=0;i<drops.length;i++){
+        var d=drops[i],speed=Math.max(1,Math.hypot(d.vx,d.vy)),dx=d.vx/speed*d.len,dy=d.vy/speed*d.len;
+        ctx.strokeStyle='rgba(216,182,244,'+d.a+')'; ctx.lineWidth=d.w;
+        ctx.beginPath(); ctx.moveTo(d.x,d.y); ctx.lineTo(d.x-dx,d.y-dy); ctx.stroke();
+      }
+      ctx.strokeStyle='rgba(216,182,244,.16)'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,gy+.5); ctx.lineTo(W,gy+.5); ctx.stroke();
+      for(var s=0;s<splashes.length;s++){
+        var sp=splashes[s],fade=1-sp.age/sp.life;
+        ctx.fillStyle='rgba(216,182,244,'+(sp.a*fade)+')';
+        ctx.beginPath(); ctx.ellipse(sp.x,sp.y,sp.r*(1.3+fade),sp.r*.7,0,0,6.29); ctx.fill();
+      }
+    }
+    function frame(ts){
+      raf=0;if(last===null)last=ts;var dt=Math.min((ts-last)/1000,.05);last=ts;
+      tick(dt);draw();raf=requestAnimationFrame(frame);
+    }
+    resize(); window.addEventListener('resize',resize,{passive:true});
+    raf=requestAnimationFrame(frame);
   })();
 
   // Page-wide rain: a fixed layer so the rain keeps falling over every section,
