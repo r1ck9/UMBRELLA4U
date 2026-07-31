@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { GUIDELINES } from '@/lib/guidelines'
@@ -292,7 +293,7 @@ export default function Composer() {
         </div>
       )}
 
-      {confirming && (
+      {confirming && typeof document !== 'undefined' && createPortal((
         <div className="modal-scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirming(false) }}>
           <div className="modal-box" role="dialog" aria-label="Agree to community guidelines">
             <h2>Before you share</h2>
@@ -311,7 +312,7 @@ export default function Composer() {
             </div>
           </div>
         </div>
-      )}
+      ), document.body)}
 
     </>
   )
