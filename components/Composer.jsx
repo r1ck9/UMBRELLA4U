@@ -101,17 +101,29 @@ export default function Composer() {
 
     // AI moderation check (server-side; no-ops until ANTHROPIC_API_KEY is set)
     try {
+      const moderationController = new AbortController()
+      const moderationTimeout = setTimeout(() => moderationController.abort(), 8000)
       const res = await fetch('/api/moderate', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text.trim() })
+        body: JSON.stringify({ text: text.trim() }), signal: moderationController.signal
       })
+      clearTimeout(moderationTimeout)
       const mod = await res.json()
       if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(mod.reason === 'doxxing' ? DOX_MSG : REJECT_MSG); return }
     } catch { /* network hiccup, fall through; the DB keyword trigger still guards */ }
 
-    const { data: created, error } = await supabase.from('stories')
-      .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
-      .select('id').single()
+    const insertController = new AbortController()
+    const insertTimeout = setTimeout(() => insertController.abort(), 15000)
+    let created, error
+    try {
+      ({ data: created, error } = await supabase.from('stories')
+        .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
+        .select('id').single().abortSignal(insertController.signal))
+    } catch (e) {
+      error = e
+    } finally {
+      clearTimeout(insertTimeout)
+    }
     if (error) {
       setBusy(false)
       setConfirming(false)
