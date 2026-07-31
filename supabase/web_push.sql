@@ -66,6 +66,9 @@ begin
   msg := case when new.note is not null and btrim(new.note) <> ''
               then 'Someone left you a word 💬'
               else 'Someone opened an umbrella on your story ☂' end;
+  -- Push delivery is optional; never make posting depend on pg_net.
+  -- The guard prevents a missing `net` schema from aborting this trigger.
+  if to_regnamespace('net') is null then return new; end if;
   perform net.http_post(
     url := nurl || '/api/push/notify',
     headers := jsonb_build_object('Content-Type','application/json'),
