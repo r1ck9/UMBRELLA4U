@@ -33,6 +33,6 @@ begin
   return new;
 end $$;
 
+-- Do not recreate the trigger unless pg_net is confirmed available. The
+-- notification feature is optional; story posting must remain independent.
 drop trigger if exists trg_push_umbrella on umbrellas;
-create trigger trg_push_umbrella after insert on umbrellas
-for each row execute function notify_push_on_umbrella();
