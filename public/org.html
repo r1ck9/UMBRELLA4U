@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&amp;family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.css" rel="stylesheet">
+<script defer src="https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.js"></script>
 <style>
   :root{
     --paper:#faf7ff; --surface:#ffffff; --surface-2:#f0e8f8;
@@ -332,6 +334,19 @@
     background:linear-gradient(135deg,#f6eaff,#b58add);color:#4a236c;font-size:2rem;box-shadow:0 16px 32px rgba(76,35,108,.22)}
   .map-placeholder b{display:block;font-family:var(--serif);font-size:1.35rem}
   .map-placeholder p{margin-top:8px;color:var(--ink-2);font-size:.98rem;line-height:1.5}
+  .map-board.has-map{display:block;padding:0;text-align:left;transform:none;background:#2a1838}
+  #chapter-map{position:absolute;inset:0;z-index:1}
+  .map-board.has-map .map-placeholder{position:absolute;z-index:3;left:18px;bottom:18px;max-width:min(310px,calc(100% - 36px));padding:16px;text-align:left;pointer-events:none}
+  .map-board.has-map .map-placeholder .mark{width:42px;height:42px;margin:0 0 10px;font-size:1.35rem;border-radius:14px}
+  .map-board.has-map .map-placeholder b{font-size:1.08rem}
+  .map-board.has-map .map-placeholder p{font-size:.86rem}
+  .map-board.map-ready .map-placeholder{display:none}
+  .chapter-pin{position:relative;width:22px;height:22px;border-radius:999px;background:#c49aea;border:3px solid #fff;box-shadow:0 0 0 8px rgba(196,154,234,.22),0 0 28px rgba(196,154,234,.75);cursor:pointer}
+  .chapter-pin::after{content:"";position:absolute;left:50%;top:50%;width:42px;height:42px;border-radius:999px;border:1px solid rgba(216,182,244,.5);transform:translate(-50%,-50%);animation:pinPulse 1.9s ease-out infinite}
+  @keyframes pinPulse{to{opacity:0;transform:translate(-50%,-50%) scale(1.9)}}
+  .mapboxgl-popup-content{font-family:var(--sans);color:#24182f;border-radius:12px;padding:12px 14px;box-shadow:0 16px 38px rgba(36,24,47,.24)}
+  .mapboxgl-popup-content b{font-family:var(--serif);font-size:1rem;color:#4a236c}
+  .mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib{opacity:.72}
   .map-panel{border:1px solid var(--line);border-radius:18px;padding:22px;background:color-mix(in srgb,var(--surface) 94%,transparent)}
   .map-panel .tagm{font-family:var(--sans);font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
   .map-panel b{display:block;font-family:var(--serif);font-size:1.45rem;margin-top:8px}
@@ -726,18 +741,19 @@
 
       <div class="mapwrap reveal" aria-label="Current Umbrella4U team map">
         <div class="map-stage">
-          <div class="map-board" aria-label="Chapter map placeholder">
+          <div class="map-board has-map" aria-label="Interactive chapter map">
+            <div id="chapter-map" aria-hidden="true"></div>
             <div class="map-placeholder">
               <div class="mark" aria-hidden="true">⌖</div>
-              <b>Interactive chapter map</b>
-              <p>Placeholder reserved for the full map experience. The current team locations stay listed beside it.</p>
+              <b>Loading the chapter map</b>
+              <p>West Vancouver Secondary School is the first live pin. More team locations can be added next.</p>
             </div>
           </div>
 
           <div class="map-panel">
             <span class="tagm">Current team map</span>
             <b>Dots mark where our team is based.</b>
-            <p>The map is temporarily placeholder-only, but these are the current schools and cities connected to the Umbrella4U team.</p>
+            <p>The first live pin is West Vancouver Secondary School. The rest of the team locations stay listed here until we add exact public coordinates for each one.</p>
             <ul class="map-list">
               <li><i></i><span><strong>West Vancouver Secondary School</strong>Sophie and Norman</span></li>
               <li><i></i><span><strong>St. George's School, Vancouver</strong>Ricky</span></li>
@@ -1982,5 +1998,62 @@
     if(reduce){ var sc=scene(); aimUmbrella(sc,0); var frame=buildFrame(sc); updateRain(0.016,sc,frame); render(sc,frame,.016); }
     else if('IntersectionObserver' in window){new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();else if(raf){cancelAnimationFrame(raf);raf=0;last=null;}},{threshold:.03}).observe(canvas)}
     else start();
+  })();
+</script>
+<script>
+  (function(){
+    var board=document.querySelector('.map-board.has-map');
+    var el=document.getElementById('chapter-map');
+    if(!board||!el)return;
+
+    var wvss={name:'West Vancouver Secondary School',people:'Sophie and Norman',lng:-123.1602,lat:49.3295};
+
+    function waitForMapbox(){
+      return new Promise(function(resolve,reject){
+        var tries=0;
+        (function check(){
+          if(window.mapboxgl)return resolve(window.mapboxgl);
+          if(++tries>80)return reject(new Error('mapbox_unavailable'));
+          setTimeout(check,100);
+        })();
+      });
+    }
+
+    Promise.all([
+      fetch('/api/mapbox-token',{cache:'no-store'}).then(function(r){return r.json();}),
+      waitForMapbox()
+    ]).then(function(parts){
+      var token=parts[0]&&parts[0].token;
+      var mapboxgl=parts[1];
+      if(!token)throw new Error('missing_mapbox_token');
+      mapboxgl.accessToken=token;
+
+      var map=new mapboxgl.Map({
+        container:el,
+        style:'mapbox://styles/mapbox/dark-v11',
+        center:[wvss.lng,wvss.lat],
+        zoom:10.8,
+        pitch:42,
+        bearing:-18,
+        attributionControl:true
+      });
+      map.addControl(new mapboxgl.NavigationControl({showCompass:false}),'top-right');
+
+      var marker=document.createElement('button');
+      marker.className='chapter-pin';
+      marker.type='button';
+      marker.setAttribute('aria-label',wvss.name);
+
+      new mapboxgl.Marker({element:marker,anchor:'center'})
+        .setLngLat([wvss.lng,wvss.lat])
+        .setPopup(new mapboxgl.Popup({offset:22}).setHTML('<b>'+wvss.name+'</b><br>'+wvss.people))
+        .addTo(map);
+
+      map.on('load',function(){board.classList.add('map-ready');});
+    }).catch(function(){
+      board.classList.remove('map-ready');
+      var msg=board.querySelector('.map-placeholder p');
+      if(msg)msg.textContent='Mapbox is not configured yet. Check NEXT_PUBLIC_MAPBOX_TOKEN in Vercel, then redeploy.';
+    });
   })();
 </script>
