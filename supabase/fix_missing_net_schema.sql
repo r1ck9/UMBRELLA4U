@@ -27,7 +27,7 @@ begin
       using nurl || '/api/push/notify',
             jsonb_build_object('Content-Type','application/json'),
             jsonb_build_object('user_id', a, 'title', 'Haven', 'body', msg, 'url', '/inbox', 'secret', sec);
-  exception when undefined_function or undefined_schema or invalid_schema_name then
+  exception when undefined_function or invalid_schema_name then
     null;
   end;
   return new;
