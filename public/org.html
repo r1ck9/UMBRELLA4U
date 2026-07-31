@@ -753,7 +753,6 @@
           <div class="map-panel">
             <span class="tagm">Current team map</span>
             <b>Dots mark current public locations.</b>
-            <p>School pins are shown at public campus locations only. No personal locations are listed.</p>
             <ul class="map-list">
               <li><i></i><span><strong>West Vancouver Secondary School</strong>West Vancouver, BC</span></li>
               <li><i></i><span><strong>St. George's School</strong>Vancouver, BC</span></li>
@@ -2037,8 +2036,9 @@
         style:'mapbox://styles/mapbox/dark-v11',
         center:[-101.8,46.2],
         zoom:2.25,
-        pitch:18,
-        bearing:-8,
+        projection:'mercator',
+        pitch:0,
+        bearing:0,
         attributionControl:true
       });
       map.addControl(new mapboxgl.NavigationControl({showCompass:false}),'top-right');
