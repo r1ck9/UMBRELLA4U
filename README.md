@@ -1,4 +1,4 @@
-# Umbrella — web app (starter) normanupdate63-11 mobilefix7 optimize10-4 fontupdate/theme10 bugfix3-5
+# Umbrella — web app (starter) normanupdate63-11 mobilefix8 optimize10-4 fontupdate/theme10 bugfix3-5
 
 A real [Next.js](https://nextjs.org) + [Supabase](https://supabase.com) starter for Umbrella.
 It **runs right away with sample data**, then goes live once you connect Supabase.
