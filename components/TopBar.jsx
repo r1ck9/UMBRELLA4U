@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import MobileMenu from '@/components/MobileMenu'
 import { accentStyle } from '@/lib/palette'
+import LanguageSelect from '@/components/LanguageSelect'
 
 export default function TopBar() {
   const router = useRouter()
@@ -70,6 +71,7 @@ export default function TopBar() {
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
       </form>
       <div className="tb-right">
+        <LanguageSelect />
         <a href="/team" className="tb-team" title="Meet the Umbrella4U team">Our Team</a>
         <Link href="/welcome" className="tb-help" title="How to use Haven">?</Link>
         {email ? (
