@@ -36,7 +36,7 @@ export default function LanguageSelect() {
   }
 
   return (
-    <div className="language-wrap">
+    <div className="language-wrap notranslate">
       <select
         className="language-select"
         data-language-select

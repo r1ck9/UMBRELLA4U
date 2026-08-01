@@ -112,6 +112,9 @@ a{color:inherit}
   box-shadow:0 8px 20px -18px color-mix(in srgb,var(--ui-plum) 45%,transparent)}
 .language-wrap::after{content:"▾";position:absolute;right:10px;top:50%;transform:translateY(-52%);font-size:10px;color:var(--ink-3);pointer-events:none}
 .language-select:hover,.language-select:focus-visible{border-color:var(--shelter);box-shadow:var(--interactive-glow);outline:none}
+#google_translate_element{position:fixed!important;left:-9999px!important;top:-9999px!important;width:1px!important;height:1px!important;overflow:hidden!important}
+body > .skiptranslate,iframe.skiptranslate,iframe.goog-te-banner-frame,.goog-te-banner-frame,#goog-gt-tt,.goog-tooltip{display:none!important;visibility:hidden!important;width:0!important;height:0!important;opacity:0!important;pointer-events:none!important}
+body{top:0!important}
 .chip{font-size:13px; color:var(--ink-2); text-decoration:none; border:1px solid var(--rain-2);
   padding:6px 12px; border-radius:999px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
 .tb-avatar{width:38px; height:38px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center;

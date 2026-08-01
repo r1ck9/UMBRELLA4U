@@ -66,7 +66,7 @@ export default function TopBar() {
   return (
     <header className="topbar">
       <MobileMenu />
-      <Link href="/" className="brand" title="Umbrella4U home">☂ Umbrella4U</Link>
+      <Link href="/" className="brand notranslate" title="Umbrella4U home">☂ Umbrella4U</Link>
       <form className="tb-search" onSubmit={(e) => { e.preventDefault(); if (q.trim()) router.push(`/search?q=${encodeURIComponent(q.trim())}`) }}>
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search stories & people" aria-label="Search" />
       </form>
