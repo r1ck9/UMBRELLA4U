@@ -7,11 +7,16 @@ import StatsPanel from '@/components/StatsPanel'
 import ActivityChart from '@/components/ActivityChart'
 import PostTypeReport from '@/components/PostTypeReport'
 import FunnelChart from '@/components/FunnelChart'
+import MediaReviewQueue from '@/components/MediaReviewQueue'
 
 export default function ModerationDashboard() {
   return (
     <>
       <h2 className="feedhead">Moderation</h2>
+      <p className="sub" style={{ color: 'var(--ink-3)', margin: '8px 0 4px' }}>
+        Photos and GIFs waiting for human approval. Nothing here is public yet.
+      </p>
+      <MediaReviewQueue />
       <StatsPanel />
       <ActivityChart />
       <FunnelChart />

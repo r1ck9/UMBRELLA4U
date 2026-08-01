@@ -10,7 +10,7 @@ export default function Privacy() {
       <main className="container legal">
         <p className="legal-eyebrow">Umbrella</p>
         <h1>Privacy Policy</h1>
-        <p className="legal-date">Last updated: July 31, 2026</p>
+        <p className="legal-date">Last updated: August 1, 2026</p>
 
         <div className="legal-tldr">
           <strong>The short version:</strong> You're anonymous here. We only ask for an email so you can log in, it's never shown to anyone. We don't sell your data or run ads. You can edit or delete what you share. Umbrella is peer support, not a crisis service, if you're in danger, contact the lines in our <Link href="/resources">Resource Hub</Link>.
@@ -26,6 +26,7 @@ export default function Privacy() {
           <li><strong>Profile details you choose to add</strong>, username, display name, pronouns, status, bio, interest tags, and a chosen emoji avatar. Share as little or as much as you want.</li>
           <li><strong>What you post</strong>, your stories, the umbrellas you open, and any short notes you send.</li>
           <li><strong>GIF choices</strong>, if you attach a GIPHY GIF, we store its GIPHY identifier with your story.</li>
+          <li><strong>Photos you choose to upload</strong>, stored privately while they wait for human review. We resize and re-encode photos on your device before upload, which removes embedded metadata such as GPS location.</li>
           <li><strong>Basic technical data</strong>, standard information (like general device/browser info) that our hosting provider records to keep the service running and secure.</li>
         </ul>
 
@@ -35,7 +36,7 @@ export default function Privacy() {
         <h2>How we use your information</h2>
         <ul>
           <li>To run Umbrella, show your stories, count umbrellas, and let you customize your profile.</li>
-          <li>To keep the community safe, screen content, review reports, and act on anything harmful.</li>
+          <li>To keep the community safe, screen content, review reports and every photo or GIF submission, and act on anything harmful.</li>
           <li>To let you know when someone opens an umbrella on your story.</li>
         </ul>
 
@@ -44,9 +45,9 @@ export default function Privacy() {
 
         <h2>Who can see what</h2>
         <ul>
-          <li><strong>Stories</strong> are visible to everyone (including logged-out visitors), shown under your username, or as "Anonymous" if you posted anonymously.</li>
+          <li><strong>Stories</strong> are visible to everyone (including logged-out visitors), shown under your username, or as "Anonymous" if you posted anonymously. A story with a photo or GIF stays private until a moderator approves it.</li>
           <li><strong>Your profile</strong> is public, unless you turn off "Show me in search" in Settings.</li>
-          <li><strong>Moderators</strong> can review reported content to keep everyone safe.</li>
+          <li><strong>Moderators</strong> can review reported content and pending photos or GIFs to keep everyone safe.</li>
         </ul>
 
         <h2>Sharing with others</h2>

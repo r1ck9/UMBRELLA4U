@@ -10,6 +10,7 @@ import { DAILY_STORY_LIMIT } from '@/lib/config'
 import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import GiphyPicker from '@/components/GiphyPicker'
+import PhotoPicker from '@/components/PhotoPicker'
 
 // Post weather the author picks: heavier weather takes more umbrellas to clear.
 const WEATHERS = [
@@ -56,6 +57,14 @@ export default function Composer() {
   const [channels, setChannels] = useState([])       // the current user's channels
   const [channelId, setChannelId] = useState('')     // chosen channel (non-anonymous only)
   const [giphyId, setGiphyId] = useState(null)
+  const [photo, setPhoto] = useState(null)
+
+  const hasMedia = Boolean(giphyId || photo)
+
+  function clearPhoto() {
+    if (photo?.previewUrl) URL.revokeObjectURL(photo.previewUrl)
+    setPhoto(null)
+  }
 
   // The "Answer this" button in the Rail opens the composer with the prompt pinned.
   useEffect(() => {
@@ -125,13 +134,14 @@ export default function Composer() {
       if (mod && mod.allowed === false) { setBusy(false); setConfirming(false); setRejected(mod.reason === 'doxxing' ? DOX_MSG : REJECT_MSG); return }
     } catch { /* network hiccup, fall through; the DB keyword trigger still guards */ }
 
+    const photoPath = photo ? `uploads/${crypto.randomUUID()}.${photo.ext}` : null
     const insertController = new AbortController()
     const insertTimeout = setTimeout(() => insertController.abort(), 15000)
     let created, error
     try {
       ({ data: created, error } = await withTimeout(
         supabase.from('stories')
-          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, giphy_id: giphyId }, (!anon && channelId) ? { channel_id: channelId } : {}))
+          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, giphy_id: giphyId, photo_path: photoPath }, (!anon && channelId) ? { channel_id: channelId } : {}))
           .select('id').single().abortSignal(insertController.signal),
         15000,
         'Story posting timed out. Please run the database fallback SQL and try again.'
@@ -151,6 +161,33 @@ export default function Composer() {
       return
     }
 
+    // The private Storage policy accepts a photo only after this authenticated
+    // member owns a matching pending story. If upload fails, remove that shell
+    // so moderators never get a broken submission.
+    if (photo && photoPath) {
+      let uploadError
+      try {
+        const result = await withTimeout(
+          supabase.storage.from('story-media').upload(photoPath, photo.blob, {
+            contentType: photo.contentType,
+            cacheControl: '3600',
+            upsert: false,
+          }),
+          20000,
+          'Photo upload timed out. Please try again.'
+        )
+        uploadError = result.error
+      } catch (e) {
+        uploadError = e
+      }
+      if (uploadError) {
+        await supabase.from('stories').delete().eq('id', created.id)
+        setBusy(false); setConfirming(false)
+        alert(uploadError.message || 'The photo could not be uploaded. Please try again.')
+        return
+      }
+    }
+
     // Attach the poll, if there is one. The DB screens every option with the
     // same word/PII filters as the story; if any is rejected we undo the story
     // so we never leave a story with a half-built poll.
@@ -160,6 +197,7 @@ export default function Composer() {
       const { error: pe } = await supabase.from('poll_options').insert(rows)
       if (pe) {
         await supabase.from('stories').delete().eq('id', created.id)
+        if (photoPath) await supabase.storage.from('story-media').remove([photoPath])
         setBusy(false); setConfirming(false)
         setRejected(/personal_info/i.test(pe.message) ? PII_MSG
           : /blocked_content|empty_option/i.test(pe.message) ? REJECT_MSG : pe.message)
@@ -168,11 +206,16 @@ export default function Composer() {
     }
     setBusy(false)
     setConfirming(false)
-    track('posted')
+    track(hasMedia ? 'media_submitted' : 'posted')
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
-      detail: { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
+      detail: hasMedia
+        ? { variant: 'post', message: "Submitted for review. A moderator will check your photo or GIF before it appears." }
+        : { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); setGiphyId(null); router.refresh() }, 3100)
+    setTimeout(() => {
+      setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', ''])
+      setPrompt(null); setIntentTouched(false); setHeavy(false); setGiphyId(null); clearPhoto(); router.refresh()
+    }, 3100)
   }
 
   return (
@@ -202,7 +245,21 @@ export default function Composer() {
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) track('compose_start'); if (rejected) setRejected('') }}
             placeholder="You don't have to share your worst moment, just whatever you're carrying right now." />
           <p className="compose-privacy">🔒 Keep it anonymous, please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
-          <GiphyPicker value={giphyId} onChange={setGiphyId} />
+          <div className="media-attachers">
+            <GiphyPicker value={giphyId} onChange={(id) => {
+              if (id) clearPhoto()
+              setGiphyId(id)
+            }} />
+            <PhotoPicker value={photo} onChange={(next) => {
+              if (next) setGiphyId(null)
+              setPhoto(next)
+            }} />
+          </div>
+          {hasMedia && (
+            <p className="media-review-note">
+              🛡️ Photos and GIFs are checked by a human moderator before they appear. If yours isn&apos;t approved, we&apos;ll notify you. Don&apos;t upload anyone without their permission.
+            </p>
+          )}
           <div className="row">
             <label>Respond with
               <select value={intent} onChange={(e) => { setIntent(e.target.value); setIntentTouched(true) }}>
@@ -290,7 +347,7 @@ export default function Composer() {
           </div>
 
           <div className="row end">
-            <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']) }}>Cancel</button>
+            <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']); setGiphyId(null); clearPhoto() }}>Cancel</button>
             <button className="btn prim sm" onClick={startShare}>☂ Share</button>
           </div>
         </div>
@@ -301,6 +358,7 @@ export default function Composer() {
           <div className="modal-box" role="dialog" aria-label="Agree to community guidelines">
             <h2>Before you share</h2>
             <p className="care-line">We know struggling is hard. Please keep your words safe and kind, to yourself, and to everyone else here. 🫂</p>
+            {hasMedia && <p className="media-modal-note">Your photo or GIF will stay private until a human moderator approves it. It will not appear in Haven right away.</p>}
             <p className="ms-sub">A quick reminder, this keeps Haven safe for everyone.</p>
             <ul className="rulelist">
               {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
@@ -311,7 +369,7 @@ export default function Composer() {
             </label>
             <div className="row end" style={{ marginTop: 14 }}>
               <button className="btn ghost sm" onClick={() => setConfirming(false)}>Cancel</button>
-              <button className="btn prim sm" onClick={doPost} disabled={!agreed || busy}>{busy ? 'Posting…' : 'Post my story ☂'}</button>
+              <button className="btn prim sm" onClick={doPost} disabled={!agreed || busy}>{busy ? 'Submitting…' : (hasMedia ? 'Submit for review ☂' : 'Post my story ☂')}</button>
             </div>
           </div>
         </div>

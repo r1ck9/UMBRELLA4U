@@ -9,6 +9,7 @@ import { earnedBadges } from '@/lib/badges'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import { accentStyle } from '@/lib/palette'
 import { giphyImageUrl } from '@/lib/giphy'
+import StoryPhoto from '@/components/StoryPhoto'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -354,6 +355,12 @@ export default function StoryCard({ story }) {
         <figure className="story-giphy">
           <img src={giphyImageUrl(story.giphy_id)} alt="GIF attached to this story" loading="lazy" decoding="async" />
           <figcaption>Powered by GIPHY</figcaption>
+        </figure>
+      )}
+
+      {revealed && story.photo_path && (
+        <figure className="story-photo">
+          <StoryPhoto path={story.photo_path} alt="Photo attached to this story" />
         </figure>
       )}
 

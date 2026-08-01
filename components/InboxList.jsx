@@ -52,6 +52,12 @@ export default function InboxList() {
         .select('id,message,created_at,from_user').eq('to_user', user.id)
         .order('created_at', { ascending: false })
 
+      // Human media-review decisions. Approvals simply publish; rejections
+      // create an explicit private inbox notice for the submitting member.
+      const { data: mediaNotices } = await supabase.from('media_review_notifications')
+        .select('id,message,story_excerpt,created_at')
+        .order('created_at', { ascending: false })
+
       // thank-yous I've already sent, so those replies show a "Sent" state
       const { data: mine } = await supabase.from('thanks')
         .select('umbrella_id,message').eq('from_user', user.id)
@@ -68,7 +74,12 @@ export default function InboxList() {
         kind: 'thanks', id: 't' + t.id, message: t.message,
         created_at: t.created_at, isNew: t.created_at > seen,
       }))
-      const items = [...umbItems, ...thankItems].sort((a, b) => b.created_at.localeCompare(a.created_at))
+      const mediaItems = (mediaNotices || []).map((notice) => ({
+        kind: 'media-review', id: 'm' + notice.id, message: notice.message,
+        story_excerpt: notice.story_excerpt, created_at: notice.created_at,
+        isNew: notice.created_at > seen,
+      }))
+      const items = [...umbItems, ...thankItems, ...mediaItems].sort((a, b) => b.created_at.localeCompare(a.created_at))
       setState({ loading: false, user, items })
       localStorage.setItem('umbrella_inbox_seen', new Date().toISOString()) // mark read on view
     })()
@@ -95,6 +106,18 @@ export default function InboxList() {
       {newCount > 0 && <p className="notif-new">{newCount} new</p>}
       <div className="notif-list">
         {state.items.map((n) => {
+          if (n.kind === 'media-review') {
+            return (
+              <div className={'notif' + (n.isNew ? ' new' : '')} key={n.id}>
+                <span className="ic">🛡️</span>
+                <div className="nbody">
+                  <div className="ntext">{n.message}</div>
+                  {n.story_excerpt && <div className="nctx">On &ldquo;{excerpt(n.story_excerpt)}&rdquo;</div>}
+                </div>
+                <span className="ntm">{ago(n.created_at)}</span>
+              </div>
+            )
+          }
           if (n.kind === 'thanks') {
             return (
               <div className={'notif' + (n.isNew ? ' new' : '')} key={n.id}>
