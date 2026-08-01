@@ -16,6 +16,11 @@ const LANGUAGES = [
   ['tl', 'Filipino'],
 ]
 
+const MOBILE_LABELS = {
+  en: 'EN', fr: 'FR', 'zh-CN': '中文', es: 'ES', ar: 'AR', hi: 'HI',
+  pa: 'PA', ko: 'KO', ja: 'JA', fa: 'FA', tl: 'TL',
+}
+
 function currentLanguage() {
   if (typeof window === 'undefined') return 'en'
   return localStorage.getItem('umbrella_language') || 'en'
@@ -37,6 +42,7 @@ export default function LanguageSelect() {
 
   return (
     <div className="language-wrap notranslate">
+      <span className="language-mobile-label" aria-hidden="true">{MOBILE_LABELS[lang] || 'EN'}</span>
       <select
         className="language-select"
         data-language-select
