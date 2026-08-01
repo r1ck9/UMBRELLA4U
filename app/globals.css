@@ -1003,8 +1003,17 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .pulse-ic{font-size:16px}
 .pulse-n{font-family:var(--serif); font-size:19px; font-weight:800; color:var(--ink-1); font-variant-numeric:tabular-nums}
 .pulse-l{font-size:13px; color:var(--ink-2)}
+.pulse-l-short{display:none}
 .pulse-today{margin-left:auto; font-size:12.5px; font-weight:700; color:var(--shelter-deep)}
-@media (max-width:560px){ .pulse{gap:8px 16px; padding:12px 14px} .pulse-today{margin-left:0; flex-basis:100%} }
+@media (max-width:560px){
+  .pulse{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:8px 5px;overflow:hidden}
+  .pulse-item{min-width:0;justify-content:center;gap:3px;white-space:nowrap;overflow:hidden}
+  .pulse-ic{font-size:11px;flex:0 0 auto}
+  .pulse-n{font-size:clamp(11px,3.3vw,14px);flex:0 0 auto}
+  .pulse-l{font-size:clamp(8px,2.35vw,10px);overflow:hidden;text-overflow:clip}
+  .pulse-l-full{display:none}.pulse-l-short{display:inline}
+  .pulse-today{display:none}
+}
 
 /* ---- "you were seen" return banner ---- */
 .seen-banner{display:flex; align-items:center; gap:13px; background:var(--shelter-wash);

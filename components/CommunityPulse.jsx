@@ -24,9 +24,9 @@ export default function CommunityPulse() {
 
   if (!s) return null
   const items = [
-    { ic: '☂', n: Number(s.umbrellas), l: 'umbrellas opened' },
-    { ic: '💬', n: Number(s.stories), l: 'stories shared' },
-    { ic: '🫂', n: Number(s.members), l: 'sheltering together' }
+    { ic: '☂', n: Number(s.umbrellas), l: 'umbrellas opened', short: 'opened' },
+    { ic: '💬', n: Number(s.stories), l: 'stories shared', short: 'stories' },
+    { ic: '🫂', n: Number(s.members), l: 'sheltering together', short: 'together' }
   ]
   const today = Number(s.umbrellas_today)
 
@@ -36,7 +36,8 @@ export default function CommunityPulse() {
         <div className="pulse-item" key={it.l}>
           <span className="pulse-ic" aria-hidden="true">{it.ic}</span>
           <b className="pulse-n">{it.n.toLocaleString()}</b>
-          <span className="pulse-l">{it.l}</span>
+          <span className="pulse-l pulse-l-full">{it.l}</span>
+          <span className="pulse-l pulse-l-short">{it.short}</span>
         </div>
       ))}
       {today > 0 && <span className="pulse-today">🌧 {today.toLocaleString()} opened today</span>}
