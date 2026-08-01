@@ -10,6 +10,7 @@ import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import { accentStyle } from '@/lib/palette'
 import { giphyImageUrl } from '@/lib/giphy'
 import StoryPhoto from '@/components/StoryPhoto'
+import GiphyAttribution from '@/components/GiphyAttribution'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -354,7 +355,7 @@ export default function StoryCard({ story }) {
       {revealed && giphyImageUrl(story.giphy_id) && (
         <figure className="story-giphy">
           <img src={giphyImageUrl(story.giphy_id)} alt="GIF attached to this story" loading="lazy" decoding="async" />
-          <figcaption>Powered by GIPHY</figcaption>
+          <figcaption><GiphyAttribution className="giphy-attribution-card" /></figcaption>
         </figure>
       )}
 

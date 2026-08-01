@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { giphyImageUrl } from '@/lib/giphy'
 import StoryPhoto from '@/components/StoryPhoto'
+import GiphyAttribution from '@/components/GiphyAttribution'
 
 function ago(iso) {
   const seconds = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -75,7 +76,7 @@ export default function MediaReviewQueue() {
           ) : (
             <figure className="media-review-giphy">
               <img src={giphyImageUrl(story.giphy_id)} alt="GIF awaiting moderator review" />
-              <figcaption>Powered by GIPHY</figcaption>
+              <figcaption><GiphyAttribution className="giphy-attribution-card" /></figcaption>
             </figure>
           )}
           <div className="media-review-actions">

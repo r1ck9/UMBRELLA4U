@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { giphyImageUrl, GIPHY_ID_PATTERN } from '@/lib/giphy'
+import GiphyAttribution from '@/components/GiphyAttribution'
 
 const API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY
 const RESULT_LIMIT = 18
@@ -87,7 +88,7 @@ export default function GiphyPicker({ value, onChange }) {
       <div className="giphy-selected">
         <img src={giphyImageUrl(value)} alt="Selected GIPHY GIF" />
         <div className="giphy-selected-actions">
-          <span>GIF attached · Powered by GIPHY</span>
+          <GiphyAttribution className="giphy-attribution-selected" />
           <button type="button" onClick={showPicker}>Change</button>
           <button type="button" onClick={() => { onChange(null); setOpen(false) }}>Remove</button>
         </div>
@@ -117,7 +118,7 @@ export default function GiphyPicker({ value, onChange }) {
             </button>
           ))}
         </div>
-        <a className="giphy-credit" href="https://giphy.com" target="_blank" rel="noopener noreferrer">Powered by GIPHY</a>
+        <GiphyAttribution className="giphy-attribution-picker" />
       </div>
     )
   }

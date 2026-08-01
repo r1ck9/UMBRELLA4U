@@ -202,15 +202,20 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .giphy-grid button{position:relative;display:block;width:100%;height:100%;min-width:0;min-height:0;border:2px solid transparent;border-radius:9px;padding:0;overflow:hidden;background:var(--rain-1);cursor:pointer;isolation:isolate}
 .giphy-grid button:hover,.giphy-grid button:focus-visible{border-color:var(--shelter);box-shadow:var(--interactive-glow)}
 .giphy-grid img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover}
-.giphy-credit{display:inline-block;margin-top:9px;color:var(--ink-2);font-size:11px;font-weight:900;letter-spacing:.03em;text-decoration:none}
+.giphy-attribution{display:inline-flex;align-items:center;background:#000;border-radius:3px;overflow:hidden;text-decoration:none;line-height:0}
+.giphy-attribution img{display:block;width:100%;height:auto;border:0;background:#000}
+.giphy-attribution-picker{width:150px;margin-top:9px}
+.giphy-attribution-selected{width:128px;margin-right:auto}
+.giphy-attribution-card{width:118px}
+.giphy-attribution-mod{width:105px}
 .giphy-selected>img{display:block;width:100%;max-height:300px;object-fit:contain;background:var(--rain-0);border:1px solid var(--rain-2);border-radius:12px}
 .giphy-selected-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:7px;font-size:11.5px;color:var(--ink-3)}
-.giphy-selected-actions span{margin-right:auto;font-weight:700}
 .giphy-selected-actions button{border:0;background:transparent;color:var(--shelter-deep);font:inherit;font-weight:800;cursor:pointer;padding:3px 4px}
 .story-giphy{margin:12px 0 0}
 .story-giphy img{display:block;width:100%;max-height:480px;object-fit:contain;background:var(--rain-0);border-radius:12px;border:1px solid var(--rain-2)}
-.story-giphy figcaption{text-align:right;margin-top:4px;color:var(--ink-3);font-size:10.5px;font-weight:800;letter-spacing:.02em}
+.story-giphy figcaption{display:flex;justify-content:flex-end;margin-top:5px}
 .mod-giphy{display:block;max-width:220px;max-height:160px;object-fit:contain;margin-top:9px;border-radius:9px;border:1px solid var(--rain-2)}
+.mod-giphy-wrap{width:max-content;max-width:100%;margin:0}.mod-giphy-wrap figcaption{display:flex;justify-content:flex-end;margin-top:4px}
 .photo-add,.photo-selected{margin:0 0 12px}
 .photo-file-input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 .photo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -238,7 +243,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .media-review-card>p{margin:8px 0 12px;color:var(--ink-1);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
 .media-review-meta{color:var(--ink-3);font-size:12px;font-weight:800}
 .media-review-image,.media-review-giphy img{display:block;width:100%;max-height:430px;object-fit:contain;background:var(--rain-0);border-radius:12px;border:1px solid var(--rain-2)}
-.media-review-giphy{margin:0}.media-review-giphy figcaption{text-align:right;margin-top:4px;color:var(--ink-3);font-size:10px;font-weight:800}
+.media-review-giphy{margin:0}.media-review-giphy figcaption{display:flex;justify-content:flex-end;margin-top:5px}
 .media-review-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:13px;flex-wrap:wrap}
 @media(max-width:560px){
   .giphy-panel{width:100%;min-width:0;padding:10px}

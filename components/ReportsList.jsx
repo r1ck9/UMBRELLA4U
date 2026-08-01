@@ -5,6 +5,7 @@ import { getMe } from '@/lib/me'
 import { OFF_TOPIC_THRESHOLD } from '@/lib/config'
 import { giphyImageUrl } from '@/lib/giphy'
 import StoryPhoto from '@/components/StoryPhoto'
+import GiphyAttribution from '@/components/GiphyAttribution'
 
 export default function ReportsList() {
   const [state, setState] = useState({ loading: true, isMod: false, items: [], flagged: [] })
@@ -71,7 +72,12 @@ export default function ReportsList() {
           <div className="ibx-orig">
             <div className="l">🛑 {it.count} report{it.count !== 1 ? 's' : ''} · {it.story.category}{it.story.anonymous ? ' · anonymous' : ''}</div>
             <p>&ldquo;{it.story.text}&rdquo;</p>
-            {giphyImageUrl(it.story.giphy_id) && <img className="mod-giphy" src={giphyImageUrl(it.story.giphy_id)} alt="Reported story GIF" />}
+            {giphyImageUrl(it.story.giphy_id) && (
+              <figure className="mod-giphy-wrap">
+                <img className="mod-giphy" src={giphyImageUrl(it.story.giphy_id)} alt="Reported story GIF" />
+                <figcaption><GiphyAttribution className="giphy-attribution-mod" /></figcaption>
+              </figure>
+            )}
             {it.story.photo_path && <StoryPhoto path={it.story.photo_path} className="mod-giphy" alt="Reported story photo" />}
           </div>
           <div className="row end" style={{ gap: 10 }}>
@@ -91,7 +97,12 @@ export default function ReportsList() {
           <div className="ibx-orig">
             <div className="l">👥 {s.off_topic_count} members marked off-topic · {s.category}{s.anonymous ? ' · anonymous' : ''}</div>
             <p>&ldquo;{s.text}&rdquo;</p>
-            {giphyImageUrl(s.giphy_id) && <img className="mod-giphy" src={giphyImageUrl(s.giphy_id)} alt="Flagged story GIF" />}
+            {giphyImageUrl(s.giphy_id) && (
+              <figure className="mod-giphy-wrap">
+                <img className="mod-giphy" src={giphyImageUrl(s.giphy_id)} alt="Flagged story GIF" />
+                <figcaption><GiphyAttribution className="giphy-attribution-mod" /></figcaption>
+              </figure>
+            )}
             {s.photo_path && <StoryPhoto path={s.photo_path} className="mod-giphy" alt="Flagged story photo" />}
           </div>
           <div className="row end" style={{ gap: 10 }}>
