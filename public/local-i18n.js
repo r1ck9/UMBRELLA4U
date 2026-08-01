@@ -124,6 +124,7 @@
     document.documentElement.dir=(lang==='ar'||lang==='fa')?'rtl':'ltr';
     document.documentElement.classList.toggle('umbrella-translated',lang!=='en');
     document.querySelectorAll('[data-language-select]').forEach(function(sel){sel.value=lang;});
+    window.dispatchEvent(new CustomEvent('umbrella:languagechange',{detail:{language:lang}}));
     protectNames();
     setCookie(lang);
     hideGoogleChrome();
@@ -142,6 +143,7 @@
     document.documentElement.lang=lang;
     document.documentElement.dir=(lang==='ar'||lang==='fa')?'rtl':'ltr';
     document.documentElement.classList.toggle('umbrella-translated',lang!=='en');
+    window.dispatchEvent(new CustomEvent('umbrella:languagechange',{detail:{language:lang}}));
     document.querySelectorAll('[data-language-select]').forEach(function(sel){
       sel.value=lang;
       if(!sel.dataset.i18nBound){
