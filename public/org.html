@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&amp;family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.css" rel="stylesheet">
 <script defer src="https://api.mapbox.com/mapbox-gl-js/v3.27.0/mapbox-gl.js"></script>
+<script defer src="/local-i18n.js"></script>
 <style>
   :root{
     --paper:#faf7ff; --surface:#ffffff; --surface-2:#f0e8f8;
@@ -103,9 +104,6 @@
   .lang-wrap::after{content:"▾";position:absolute;right:10px;top:50%;transform:translateY(-52%);font-size:10px;color:currentColor;pointer-events:none}
   .nav.scrolled .lang-select{background:var(--surface);color:var(--ink);border-color:var(--line)}
   .lang-select:hover,.lang-select:focus-visible{box-shadow:var(--interactive-glow);outline:none}
-  #google_translate_element,.goog-te-banner-frame,.goog-te-balloon-frame,.goog-logo-link,.goog-te-gadget span{display:none!important}
-  .goog-te-gadget{font-size:0!important}
-  body{top:0!important}
   .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:650;
     position:relative;isolation:isolate;overflow:hidden;font-size:.95rem;padding:11px 20px;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:transform .16s,box-shadow .16s,background .16s}
   .chip,.goal,.role-card{position:relative;overflow:hidden}
@@ -501,7 +499,7 @@
       <a href="#chapters">Chapters</a>
       <a href="/handbook">Handbook</a>
       <span class="lang-wrap">
-        <select class="lang-select" id="site-language" aria-label="Choose language">
+        <select class="lang-select" id="site-language" data-language-select aria-label="Choose language">
           <option value="en">English</option>
           <option value="fr">Français</option>
           <option value="zh-CN">中文</option>
@@ -514,53 +512,12 @@
           <option value="fa">فارسی</option>
           <option value="tl">Filipino</option>
         </select>
-        <span id="google_translate_element" aria-hidden="true"></span>
       </span>
       <a class="cta-link" href="/feed">Enter Haven ☂</a>
       <a class="btn primary cta-link" href="https://docs.google.com/forms/d/e/1FAIpQLScOq_Ia0X5UksN8V68HedMTrIpm3i2HyXCFA9hFeja7pk2tiw/viewform?usp=header" target="_blank" rel="noopener">Lead a Chapter</a>
     </nav>
   </div>
 </header>
-<script>
-(function(){
-  var languages=['en','fr','zh-CN','es','ar','hi','pa','ko','ja','fa','tl'];
-  function readLang(){
-    var m=document.cookie.match(/(?:^|;\s*)googtrans=\/en\/([^;]+)/);
-    return (m&&m[1])||localStorage.getItem('umbrella_language')||'en';
-  }
-  function setCookie(lang){
-    var host=location.hostname,base=lang==='en'?'':'/en/'+lang,maxAge=lang==='en'?'Max-Age=0':'Max-Age=31536000';
-    document.cookie='googtrans='+base+'; Path=/; '+maxAge+'; SameSite=Lax';
-    if(host.indexOf('.')>-1)document.cookie='googtrans='+base+'; Path=/; Domain=.'+host+'; '+maxAge+'; SameSite=Lax';
-  }
-  window.googleTranslateElementInit=function(){
-    if(!window.google||!google.translate||!google.translate.TranslateElement)return;
-    new google.translate.TranslateElement({pageLanguage:'en',includedLanguages:languages.join(','),autoDisplay:false},'google_translate_element');
-  };
-  var select=document.getElementById('site-language');
-  if(select){
-    select.value=readLang();
-    select.addEventListener('change',function(){
-      localStorage.setItem('umbrella_language',select.value);
-      setCookie(select.value);
-      var combo=document.querySelector('.goog-te-combo');
-      if(combo&&select.value!=='en'){
-        combo.value=select.value;
-        combo.dispatchEvent(new Event('change'));
-      }else{
-        location.reload();
-      }
-    });
-  }
-  if(!document.querySelector('script[data-umbrella-translate]')){
-    var script=document.createElement('script');
-    script.src='https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-    script.async=true;
-    script.dataset.umbrellaTranslate='true';
-    document.body.appendChild(script);
-  }
-})();
-</script>
 <script>
 (function(){
   var n=document.querySelector('header.nav');if(!n)return;

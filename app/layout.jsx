@@ -39,6 +39,7 @@ export default function RootLayout({ children }) {
         <meta name="theme-color" content="#76509a" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t==='dusk')document.documentElement.setAttribute('data-ui-theme',t);else if(t)localStorage.removeItem('umbrella_theme')}catch(e){}" }} />
+        <script src="/local-i18n.js" defer />
       </head>
       <body><Rain /><ViewCounter /><FunnelTracker /><PushRegistrar /><PageTransition>{children}</PageTransition><GuidelinesModal /><UmbrellaBurst /><Analytics /></body>
     </html>
