@@ -1,13 +1,7 @@
 import TopBar from '@/components/TopBar'
 import Nav from '@/components/Nav'
 import Rail from '@/components/Rail'
-import ReportsList from '@/components/ReportsList'
-import ReplyQueue from '@/components/ReplyQueue'
-import BotReport from '@/components/BotReport'
-import StatsPanel from '@/components/StatsPanel'
-import ActivityChart from '@/components/ActivityChart'
-import PostTypeReport from '@/components/PostTypeReport'
-import FunnelChart from '@/components/FunnelChart'
+import ModerationGate from '@/components/ModerationGate'
 
 export default function Moderation() {
   return (
@@ -16,23 +10,7 @@ export default function Moderation() {
       <div className="shell">
         <Nav active="moderation" />
         <main className="feed">
-          <h2 className="feedhead">Moderation</h2>
-          <StatsPanel />
-          <ActivityChart />
-          <FunnelChart />
-          <PostTypeReport />
-          <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
-            Bot activity, how the seeded accounts are boosting real posts toward ~50 umbrellas over 24h.
-          </p>
-          <BotReport />
-          <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
-            New posts waiting for a reply. Type a note, it&apos;s posted as a member and lands in their inbox.
-          </p>
-          <ReplyQueue />
-          <p className="sub" style={{ color: 'var(--ink-3)', margin: '18px 0 4px' }}>
-            Posts people flagged for review. Take them down or dismiss.
-          </p>
-          <ReportsList />
+          <ModerationGate />
         </main>
         <Rail />
       </div>
