@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 import { OFF_TOPIC_THRESHOLD } from '@/lib/config'
+import { giphyImageUrl } from '@/lib/giphy'
 
 export default function ReportsList() {
   const [state, setState] = useState({ loading: true, isMod: false, items: [], flagged: [] })
@@ -21,7 +22,7 @@ export default function ReportsList() {
     const ids = [...new Set((reports || []).map((r) => r.target_id))]
     const byId = {}
     if (ids.length) {
-      const { data: stories } = await supabase.from('stories').select('id,text,category,anonymous').in('id', ids)
+      const { data: stories } = await supabase.from('stories').select('id,text,category,anonymous,giphy_id').in('id', ids)
       ;(stories || []).forEach((s) => { byId[s.id] = s })
     }
     const grouped = {}
@@ -32,7 +33,7 @@ export default function ReportsList() {
 
     // Community-flagged (enough members marked "not relevant here")
     const { data: flagged } = await supabase.from('stories')
-      .select('id,text,category,anonymous,off_topic_count')
+      .select('id,text,category,anonymous,off_topic_count,giphy_id')
       .eq('state', 'live').gte('off_topic_count', OFF_TOPIC_THRESHOLD)
       .order('off_topic_count', { ascending: false })
 
@@ -69,6 +70,7 @@ export default function ReportsList() {
           <div className="ibx-orig">
             <div className="l">🛑 {it.count} report{it.count !== 1 ? 's' : ''} · {it.story.category}{it.story.anonymous ? ' · anonymous' : ''}</div>
             <p>&ldquo;{it.story.text}&rdquo;</p>
+            {giphyImageUrl(it.story.giphy_id) && <img className="mod-giphy" src={giphyImageUrl(it.story.giphy_id)} alt="Reported story GIF" />}
           </div>
           <div className="row end" style={{ gap: 10 }}>
             <button className="btn ghost sm" onClick={() => dismissReport(it.story)}>Dismiss</button>
@@ -87,6 +89,7 @@ export default function ReportsList() {
           <div className="ibx-orig">
             <div className="l">👥 {s.off_topic_count} members marked off-topic · {s.category}{s.anonymous ? ' · anonymous' : ''}</div>
             <p>&ldquo;{s.text}&rdquo;</p>
+            {giphyImageUrl(s.giphy_id) && <img className="mod-giphy" src={giphyImageUrl(s.giphy_id)} alt="Flagged story GIF" />}
           </div>
           <div className="row end" style={{ gap: 10 }}>
             <button className="btn ghost sm" onClick={() => keepFlagged(s)}>Keep it</button>

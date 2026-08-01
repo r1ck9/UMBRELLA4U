@@ -25,7 +25,7 @@ revoke all on table push_config from anon, authenticated;
 
 -- B) stories: only these columns are user-settable on insert.
 revoke insert on table stories from anon, authenticated;
-grant insert (text, intent, category, anonymous, weather, prompt_id, channel_id, content_warning)
+grant insert (text, intent, category, anonymous, weather, prompt_id, channel_id, content_warning, giphy_id)
   on table stories to authenticated;
 -- author_id / author_name are set by the trigger; umbrella_count, boost_count,
 -- hug_count, view_count, off_topic_count, state, seed, seed_batch keep their

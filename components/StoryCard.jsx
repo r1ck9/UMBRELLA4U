@@ -8,6 +8,7 @@ import { getMe, getMyStoryIds } from '@/lib/me'
 import { earnedBadges } from '@/lib/badges'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import { accentStyle } from '@/lib/palette'
+import { giphyImageUrl } from '@/lib/giphy'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -348,6 +349,13 @@ export default function StoryCard({ story }) {
       {revealed
         ? <p className="text">{story.text}</p>
         : <button className="cw" onClick={() => setRevealed(true)}>🌧 Sensitive · tap to read</button>}
+
+      {revealed && giphyImageUrl(story.giphy_id) && (
+        <figure className="story-giphy">
+          <img src={giphyImageUrl(story.giphy_id)} alt="GIF attached to this story" loading="lazy" decoding="async" />
+          <figcaption>Powered by GIPHY</figcaption>
+        </figure>
+      )}
 
       {poll && revealed && (() => {
         const showResults = !!poll.myOption || isOwn

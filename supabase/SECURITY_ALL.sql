@@ -90,7 +90,7 @@ begin
     into cols from information_schema.columns
    where table_schema='public' and table_name='stories'
      and column_name in ('text','intent','category','anonymous','weather',
-       'prompt_id','channel_id','content_warning');
+       'prompt_id','channel_id','content_warning','giphy_id');
   execute format('grant insert (%s) on table stories to authenticated', cols);
 end $$;
 

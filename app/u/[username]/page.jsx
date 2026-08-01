@@ -43,7 +43,7 @@ export default function PublicProfile({ params }) {
         supabase.rpc('umbrellas_opened_by', { uid: prof.id }),
         supabase.rpc('follow_counts', { target: prof.id }),
         supabase.from('channels').select('id,name').eq('owner_id', prof.id).order('created_at', { ascending: true }),
-        supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather').eq('author_id', prof.id).eq('anonymous', false).eq('state', 'live').order('created_at', { ascending: false })
+        supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather,giphy_id').eq('author_id', prof.id).eq('anonymous', false).eq('state', 'live').order('created_at', { ascending: false })
       ])
       const s = mine || []
       setStats({ stories: s.length, received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0), opened: Number(opened) || 0 })

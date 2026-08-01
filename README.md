@@ -33,6 +33,8 @@ Open **http://localhost:3000**. You'll see the landing page; **/feed** shows sam
    NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
    ```
+   To enable the safe GIF picker, also add `NEXT_PUBLIC_GIPHY_API_KEY` from the
+   GIPHY developer dashboard and set that key's maximum content rating to **G**.
 5. (For easy testing) **Authentication → Providers → Email** → turn **"Confirm email" OFF**, so new accounts work instantly without clicking an email link.
 6. Stop the server (Ctrl+C) and run `npm run dev` again.
 

@@ -27,6 +27,7 @@ create table if not exists stories (
     check (intent in ('listen','advice','similar','resources')),
   category text not null,
   content_warning boolean default false,
+  giphy_id text check (giphy_id is null or giphy_id ~ '^[A-Za-z0-9_-]{1,80}$'),
   umbrella_count int default 0,
   state text default 'live' check (state in ('live','hidden','removed')),
   created_at timestamptz default now()

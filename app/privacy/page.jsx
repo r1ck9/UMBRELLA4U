@@ -10,7 +10,7 @@ export default function Privacy() {
       <main className="container legal">
         <p className="legal-eyebrow">Umbrella</p>
         <h1>Privacy Policy</h1>
-        <p className="legal-date">Last updated: July 7, 2026</p>
+        <p className="legal-date">Last updated: July 31, 2026</p>
 
         <div className="legal-tldr">
           <strong>The short version:</strong> You're anonymous here. We only ask for an email so you can log in, it's never shown to anyone. We don't sell your data or run ads. You can edit or delete what you share. Umbrella is peer support, not a crisis service, if you're in danger, contact the lines in our <Link href="/resources">Resource Hub</Link>.
@@ -25,6 +25,7 @@ export default function Privacy() {
           <li><strong>Your password</strong>, stored encrypted/hashed by our authentication provider; we never see it in plain text.</li>
           <li><strong>Profile details you choose to add</strong>, username, display name, pronouns, status, bio, interest tags, and a chosen emoji avatar. Share as little or as much as you want.</li>
           <li><strong>What you post</strong>, your stories, the umbrellas you open, and any short notes you send.</li>
+          <li><strong>GIF choices</strong>, if you attach a GIPHY GIF, we store its GIPHY identifier with your story.</li>
           <li><strong>Basic technical data</strong>, standard information (like general device/browser info) that our hosting provider records to keep the service running and secure.</li>
         </ul>
 
@@ -49,7 +50,7 @@ export default function Privacy() {
         </ul>
 
         <h2>Sharing with others</h2>
-        <p>We do <strong>not</strong> sell your data. We use trusted providers to run the service (secure hosting and email delivery), and they only process data on our behalf. We may disclose information if the law requires it, or if we genuinely believe it's needed to prevent serious harm to someone.</p>
+        <p>We do <strong>not</strong> sell your data. We use trusted providers to run the service (secure hosting and email delivery), and they only process data on our behalf. If you search for, view, or attach a GIF, GIPHY delivers that content and may receive standard technical information such as your IP address, browser details, and the GIF or search you requested. We may disclose information if the law requires it, or if we genuinely believe it's needed to prevent serious harm to someone.</p>
 
         <h2>Safety &amp; crisis</h2>
         <p>If content suggests someone may be in danger, we may show crisis resources and take protective action. Umbrella is peer support, <strong>not a substitute for professional counseling or emergency services</strong>. In an emergency, contact local emergency services or a crisis line (Canada: <strong>988</strong>; Kids Help Phone: <strong>text CONNECT to 686868</strong>).</p>

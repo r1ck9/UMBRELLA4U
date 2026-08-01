@@ -9,6 +9,7 @@ import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { DAILY_STORY_LIMIT } from '@/lib/config'
 import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
+import GiphyPicker from '@/components/GiphyPicker'
 
 // Post weather the author picks: heavier weather takes more umbrellas to clear.
 const WEATHERS = [
@@ -54,6 +55,7 @@ export default function Composer() {
   const [prompt, setPrompt] = useState(null)
   const [channels, setChannels] = useState([])       // the current user's channels
   const [channelId, setChannelId] = useState('')     // chosen channel (non-anonymous only)
+  const [giphyId, setGiphyId] = useState(null)
 
   // The "Answer this" button in the Rail opens the composer with the prompt pinned.
   useEffect(() => {
@@ -129,7 +131,7 @@ export default function Composer() {
     try {
       ({ data: created, error } = await withTimeout(
         supabase.from('stories')
-          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null }, (!anon && channelId) ? { channel_id: channelId } : {}))
+          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, giphy_id: giphyId }, (!anon && channelId) ? { channel_id: channelId } : {}))
           .select('id').single().abortSignal(insertController.signal),
         15000,
         'Story posting timed out. Please run the database fallback SQL and try again.'
@@ -170,7 +172,7 @@ export default function Composer() {
     window.dispatchEvent(new CustomEvent('umbrella:burst', {
       detail: { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
     }))
-    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); router.refresh() }, 3100)
+    setTimeout(() => { setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', '']); setPrompt(null); setIntentTouched(false); setHeavy(false); setGiphyId(null); router.refresh() }, 3100)
   }
 
   return (
@@ -200,6 +202,7 @@ export default function Composer() {
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) track('compose_start'); if (rejected) setRejected('') }}
             placeholder="You don't have to share your worst moment, just whatever you're carrying right now." />
           <p className="compose-privacy">🔒 Keep it anonymous, please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
+          <GiphyPicker value={giphyId} onChange={setGiphyId} />
           <div className="row">
             <label>Respond with
               <select value={intent} onChange={(e) => { setIntent(e.target.value); setIntentTouched(true) }}>
