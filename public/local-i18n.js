@@ -5,6 +5,23 @@
   var loading=false;
   var pending=null;
 
+  // Google Translate wraps/replaces text nodes. React can later try to remove
+  // one of the original nodes and throw a client-side exception. Make those DOM
+  // operations tolerant so translated pages keep running.
+  if(!window.__umbrellaTranslateReactGuard){
+    window.__umbrellaTranslateReactGuard=true;
+    var removeChild=Node.prototype.removeChild;
+    var insertBefore=Node.prototype.insertBefore;
+    Node.prototype.removeChild=function(child){
+      if(child&&child.parentNode!==this)return child;
+      return removeChild.call(this,child);
+    };
+    Node.prototype.insertBefore=function(newNode,referenceNode){
+      if(referenceNode&&referenceNode.parentNode!==this)return this.appendChild(newNode);
+      return insertBefore.call(this,newNode,referenceNode);
+    };
+  }
+
   function valid(lang){return LANGS.indexOf(lang)>=0?lang:'en';}
 
   function setCookie(lang){
@@ -104,6 +121,7 @@
     localStorage.setItem(KEY,lang);
     document.documentElement.lang=lang;
     document.documentElement.dir=(lang==='ar'||lang==='fa')?'rtl':'ltr';
+    document.documentElement.classList.toggle('umbrella-translated',lang!=='en');
     document.querySelectorAll('[data-language-select]').forEach(function(sel){sel.value=lang;});
     protectNames();
     setCookie(lang);
@@ -122,6 +140,7 @@
     var lang=valid(localStorage.getItem(KEY)||'en');
     document.documentElement.lang=lang;
     document.documentElement.dir=(lang==='ar'||lang==='fa')?'rtl':'ltr';
+    document.documentElement.classList.toggle('umbrella-translated',lang!=='en');
     document.querySelectorAll('[data-language-select]').forEach(function(sel){
       sel.value=lang;
       if(!sel.dataset.i18nBound){
