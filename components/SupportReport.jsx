@@ -1,10 +1,11 @@
 'use client'
+
 import { useEffect, useState, Fragment } from 'react'
 import { supabase } from '@/lib/supabase'
-import { getMe } from '@/lib/me'
 
-function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '…' : t }
+function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '...' : t }
 const statusColor = { complete: 'var(--ink-1)', 'on track': 'var(--shelter)', behind: 'var(--ink-2)' }
+
 function nextLabel(secs) {
   if (secs == null) return 'done'
   const n = Number(secs)
@@ -38,25 +39,29 @@ function Sparkline({ data, range }) {
   )
 }
 
-const EMPTY = { isMod: false, summary: [], posts: [], hourly: [] }
+const EMPTY = { allowed: false, summary: [], posts: [], hourly: [] }
 
-async function fetchData(range) {
-  const me = await getMe()
-  if (!me.isModerator) return EMPTY
-  const [{ data: summary }, { data: posts }, { data: hourly }] = await Promise.all([
-    supabase.rpc('bot_status'),
-    supabase.rpc('bot_report_posts', { n: 30 }),
-    supabase.rpc('bot_likes_series', { mode: range }),
-  ])
-  return { isMod: true, summary: summary || [], posts: posts || [], hourly: hourly || [] }
+async function authHeaders() {
+  if (!supabase) return null
+  const { data } = await supabase.auth.getSession()
+  const token = data?.session?.access_token
+  return token ? { Authorization: `Bearer ${token}` } : null
 }
 
-export default function BotReport() {
+async function fetchData(range) {
+  const headers = await authHeaders()
+  if (!headers) return EMPTY
+  const res = await fetch(`/api/moderation/support?range=${encodeURIComponent(range)}`, { headers })
+  if (!res.ok) return EMPTY
+  const data = await res.json()
+  return { allowed: true, summary: data.summary || [], posts: data.posts || [], hourly: data.hourly || [] }
+}
+
+export default function SupportReport() {
   const [s, setS] = useState({ loading: true, ...EMPTY })
   const [range, setRange] = useState('day')
   const [refreshing, setRefreshing] = useState(false)
 
-  // load on mount + range change, and auto-refresh every 45s while the tab is visible
   useEffect(() => {
     if (!supabase) { setS({ loading: false, ...EMPTY }); return }
     let alive = true
@@ -75,8 +80,8 @@ export default function BotReport() {
     setRefreshing(false)
   }
 
-  if (s.loading) return <p className="empty">Loading…</p>
-  if (!s.isMod) return null
+  if (s.loading) return <p className="empty">Loading...</p>
+  if (!s.allowed) return null
 
   const tab = (val, label) => (
     <button onClick={() => setRange(val)} style={{
@@ -90,7 +95,7 @@ export default function BotReport() {
     <div style={{ border: '1px solid var(--line)', borderRadius: 14, padding: '16px 18px', background: 'var(--card)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, gap: 10, flexWrap: 'wrap' }}>
         <div style={{ fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--ink-3)' }}>
-          Bot umbrellas
+          Assisted umbrellas
         </div>
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           {tab('day', '24h')}
@@ -99,7 +104,7 @@ export default function BotReport() {
             style={{ font: 'inherit', fontSize: '.8rem', fontWeight: 600, cursor: 'pointer',
               border: '1px solid var(--line)', background: 'transparent', color: 'var(--ink)',
               borderRadius: 999, padding: '4px 12px', opacity: refreshing ? 0.6 : 1 }}>
-            {refreshing ? '…' : '↻'}
+            {refreshing ? '...' : 'refresh'}
           </button>
         </div>
       </div>
@@ -128,38 +133,38 @@ export default function BotReport() {
           <thead>
             <tr style={{ textAlign: 'left', color: 'var(--ink-3)', fontSize: '.72rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>
               <th style={{ padding: '6px 8px' }}>Post</th>
-              <th style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>Bot likes</th>
+              <th style={{ padding: '6px 8px', whiteSpace: 'nowrap' }}>Assisted</th>
               <th style={{ padding: '6px 8px', width: 120 }}>Fill</th>
               <th style={{ padding: '6px 8px' }}>Real</th>
               <th style={{ padding: '6px 8px' }}>Status</th>
-              <th style={{ padding: '6px 8px' }}>Next like</th>
+              <th style={{ padding: '6px 8px' }}>Next</th>
             </tr>
           </thead>
           <tbody>
             {s.posts.map((p, i) => (
               <tr key={i} style={{ borderTop: '1px solid var(--line-2)' }}>
                 <td style={{ padding: '8px' }}>
-                  {excerpt(p.post_excerpt)}
-                  <span style={{ color: 'var(--ink-3)' }}> · {p.cat}{p.is_anon ? ' · anon' : ''}</span>
+                  {excerpt(p.excerpt)}
+                  <span style={{ color: 'var(--ink-3)' }}> · {p.category}{p.anonymous ? ' · anon' : ''}</span>
                 </td>
                 <td style={{ padding: '8px', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-                  {p.bot_likes} / {p.target_n}
+                  {p.assisted} / {p.target}
                 </td>
                 <td style={{ padding: '8px' }}>
                   <div style={{ background: 'var(--line-2)', borderRadius: 999, height: 7, overflow: 'hidden' }}>
-                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.drip_status] || 'var(--shelter)' }} />
+                    <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.status] || 'var(--shelter)' }} />
                   </div>
                 </td>
-                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3)' }}>{p.real_likes}</td>
+                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3)' }}>{p.real}</td>
                 <td style={{ padding: '8px' }}>
-                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.drip_status] || 'var(--shelter)' }}>{p.drip_status}</span>
+                  <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.status] || 'var(--shelter)' }}>{p.status}</span>
                 </td>
-                <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.next_secs)}</td>
+                <td style={{ padding: '8px', whiteSpace: 'nowrap', color: 'var(--ink-3)', fontVariantNumeric: 'tabular-nums' }}>{nextLabel(p.nextSecs)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        {s.posts.length === 0 && <p className="empty">No real posts are being boosted yet.</p>}
+        {s.posts.length === 0 && <p className="empty">No posts are being supported yet.</p>}
       </div>
     </div>
   )
