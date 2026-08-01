@@ -2166,14 +2166,25 @@
           data:{type:'FeatureCollection',features:features}
         });
         map.addLayer({
+          id:'chapter-pin-pulse',
+          type:'circle',
+          source:'chapter-locations',
+          paint:{
+            'circle-radius':10,
+            'circle-color':'#d8b6f4',
+            'circle-opacity':0,
+            'circle-blur':0.28
+          }
+        });
+        map.addLayer({
           id:'chapter-pin-glow',
           type:'circle',
           source:'chapter-locations',
           paint:{
-            'circle-radius':18,
+            'circle-radius':21,
             'circle-color':'#c49aea',
-            'circle-opacity':0.18,
-            'circle-blur':0.45
+            'circle-opacity':0.28,
+            'circle-blur':0.72
           }
         });
         map.addLayer({
@@ -2187,6 +2198,41 @@
             'circle-stroke-color':'#ffffff'
           }
         });
+        var pulseFrame=0,pulseVisible=false,lastPulsePaint=0;
+        var reducePulse=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function paintPulse(now){
+          pulseFrame=0;
+          if(!pulseVisible||document.hidden||reducePulse)return;
+          if(now-lastPulsePaint>=32){
+            var phase=(now%1000)/1000;
+            var fade=Math.pow(1-phase,1.85);
+            map.setPaintProperty('chapter-pin-pulse','circle-radius',10+phase*25);
+            map.setPaintProperty('chapter-pin-pulse','circle-opacity',0.56*fade);
+            map.setPaintProperty('chapter-pin-pulse','circle-blur',0.2+phase*0.55);
+            map.setPaintProperty('chapter-pin-core','circle-radius',8+fade*1.35);
+            lastPulsePaint=now;
+          }
+          pulseFrame=requestAnimationFrame(paintPulse);
+        }
+        function syncPulse(){
+          if(pulseVisible&&!document.hidden&&!reducePulse){
+            if(!pulseFrame)pulseFrame=requestAnimationFrame(paintPulse);
+          }else{
+            if(pulseFrame)cancelAnimationFrame(pulseFrame);
+            pulseFrame=0;
+            map.setPaintProperty('chapter-pin-pulse','circle-opacity',0);
+            map.setPaintProperty('chapter-pin-core','circle-radius',8);
+          }
+        }
+        if('IntersectionObserver'in window){
+          var pulseObserver=new IntersectionObserver(function(entries){
+            pulseVisible=!!(entries[0]&&entries[0].isIntersecting);
+            syncPulse();
+          },{rootMargin:'80px'});
+          pulseObserver.observe(board);
+        }else{pulseVisible=true;syncPulse();}
+        document.addEventListener('visibilitychange',syncPulse);
+        window.addEventListener('pagehide',function(){pulseVisible=false;syncPulse();},{once:true});
         map.on('mouseenter','chapter-pin-core',function(){map.getCanvas().style.cursor='pointer';});
         map.on('mouseleave','chapter-pin-core',function(){map.getCanvas().style.cursor='';});
         map.on('click','chapter-pin-core',function(e){
