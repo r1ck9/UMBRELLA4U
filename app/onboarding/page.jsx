@@ -8,7 +8,7 @@ import { BANNERS, bannerStyle } from '@/lib/banners'
 import { GUIDELINES } from '@/lib/guidelines'
 import EmojiPicker from '@/components/EmojiPicker'
 import { track } from '@/lib/analytics'
-import { PALETTE, PROFILE_ACCENTS, accentStyle, normalizeAccent } from '@/lib/palette'
+import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent } from '@/lib/palette'
 
 const USERNAME_IDEAS = ['rainy_owl', 'quiet_fern', 'soft_static', 'paper_boats', 'moonlit_kid', 'still_water', 'little_lighthouse', 'warm_socks', 'cloud_nine', 'half_asleep', 'tiny_thunder', 'sunday_dust']
 const SUGGESTED_TAGS = ['art', 'music', 'gaming', 'anime', 'books', 'poetry', 'film', 'photography', 'coding', 'sports', 'volleyball', 'skating', 'dance', 'coffee', 'plants', 'baking', 'anxiety', 'mental health', 'lgbtq+', 'newcomer', 'faith', 'languages', 'studying', 'night owl', 'introvert', 'overthinker', 'trying my best']
@@ -140,7 +140,7 @@ export default function Onboarding() {
             </label>
             <label>Accent
               <div className="swatches">
-                {PROFILE_ACCENTS.map((c) => <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} />)}
+                {PROFILE_ACCENTS.map((c) => <button key={c} type="button" title={accentName(c)} aria-label={accentName(c)} className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} />)}
               </div>
             </label>
             <label>Banner

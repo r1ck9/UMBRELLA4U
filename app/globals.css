@@ -453,7 +453,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .pform input,.pform textarea{border:1.5px solid var(--rain-2); background:var(--panel); color:var(--ink-1); border-radius:11px; padding:11px 13px; font:inherit; font-size:15px; font-weight:400; text-transform:none; letter-spacing:0}
 .pform textarea{resize:none; min-height:80px}
 .pform input:focus,.pform textarea:focus{outline:none; border-color:var(--shelter); box-shadow:0 0 0 3px var(--shelter-wash)}
-.swatches{display:flex; gap:8px}
+.swatches{display:flex; flex-wrap:wrap; gap:8px}
 .sw{width:34px; height:34px; border-radius:10px; border:2px solid var(--swatch-outline); cursor:pointer}
 .sw.on{outline:3px solid var(--ink-1); outline-offset:2px}
 .sw.av{display:grid; place-items:center; font-size:18px; line-height:1}

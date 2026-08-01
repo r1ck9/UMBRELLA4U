@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
 import { earnedBadges } from '@/lib/badges'
-import { PALETTE, PROFILE_ACCENTS, accentStyle, normalizeAccent } from '@/lib/palette'
+import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent } from '@/lib/palette'
 
 // Rotating example bios, a fresh one is picked each time the page opens.
 const BIO_EXAMPLES = [
@@ -161,7 +161,7 @@ export default function Profile() {
               <label>Accent color
                 <div className="swatches">
                   {PROFILE_ACCENTS.map((c) => (
-                    <button key={c} type="button" className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} aria-label={c} />
+                    <button key={c} type="button" title={accentName(c)} className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} aria-label={accentName(c)} />
                   ))}
                 </div>
               </label>
