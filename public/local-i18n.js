@@ -66,6 +66,7 @@
     var selectors=[
       '.brand','.namelink','.pf-name','.pf-user','.pf-avatar','.tb-avatar',
       '.person-chip','.people-row a','.team-card h3','.member-name',
+      '.lead-card .name',
       '[data-no-translate]','[data-username]'
     ];
     document.querySelectorAll(selectors.join(',')).forEach(function(el){
