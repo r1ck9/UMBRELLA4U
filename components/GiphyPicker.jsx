@@ -6,6 +6,15 @@ import { giphyImageUrl, GIPHY_ID_PATTERN } from '@/lib/giphy'
 const API_KEY = process.env.NEXT_PUBLIC_GIPHY_API_KEY
 const RESULT_LIMIT = 18
 
+function shuffle(items) {
+  const copy = [...items]
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy
+}
+
 function safeResult(item) {
   const id = String(item?.id || '')
   const preview = item?.images?.fixed_width_small?.webp
@@ -45,12 +54,13 @@ export default function GiphyPicker({ value, onChange }) {
         remove_low_contrast: 'true',
       })
       if (search) params.set('q', search.slice(0, 50))
+      else params.set('offset', String(Math.floor(Math.random() * 120)))
       const pageLanguage = document.documentElement.lang?.split('-')[0]
       if (search && pageLanguage) params.set('lang', pageLanguage)
       const response = await fetch(`https://api.giphy.com/v1/gifs/${endpoint}?${params}`, { signal: controller.signal })
       if (!response.ok) throw new Error('GIPHY search is unavailable right now.')
       const payload = await response.json()
-      const safe = (payload?.data || []).map(safeResult).filter(Boolean)
+      const safe = shuffle((payload?.data || []).map(safeResult).filter(Boolean))
       setItems(safe)
       if (!safe.length) setError(search ? 'No safe GIFs found. Try another search.' : 'No safe GIFs are available right now.')
     } catch (err) {
