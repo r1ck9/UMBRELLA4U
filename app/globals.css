@@ -502,6 +502,11 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .pf-stats > div{font-size:13px;color:var(--ink-3);padding:9px 11px;border:1px solid color-mix(in srgb,var(--profile-accent) 24%,var(--rain-2));
   border-radius:11px;background:color-mix(in srgb,var(--profile-accent) 8%,var(--panel))}
 .pf-stats b{display:block;font-size:19px;color:var(--profile-accent-ink);font-variant-numeric:tabular-nums}
+@media(min-width:561px){
+  .pf-stats{gap:8px;padding:12px 22px 0;flex-wrap:wrap}
+  .pf-stats>div{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:999px;font-size:11.5px;line-height:1.2}
+  .pf-stats b{display:inline;font-size:14px;line-height:1}
+}
 .pf-badges{display:flex; flex-wrap:wrap; gap:8px; padding:14px 22px 0}
 .pf-badge{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--profile-accent-ink);
   background:color-mix(in srgb,var(--profile-accent) 12%,var(--panel));border:1px solid color-mix(in srgb,var(--profile-accent) 28%,var(--rain-2));
