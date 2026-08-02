@@ -66,47 +66,77 @@ export default function Rail() {
   useEffect(() => {
     const rail = railRef.current
     if (!rail) return
+
+    const TOP_STOP = 82
+    const BOTTOM_STOP = 18
     let baseTop = 0
     let railHeight = 0
-    let frame = 0
-    function applyRailPosition() {
-      if (window.matchMedia('(max-width: 1040px)').matches) {
-        rail.style.transform = ''
-        return
-      }
+    let visualTop = null
+    let lastScrollY = window.scrollY
+    let active = false
+
+    function limits() {
       const viewport = window.innerHeight || document.documentElement.clientHeight || 0
-      const minTop = viewport - railHeight - 18
-      const maxTop = 82
+      return {
+        minTop: Math.min(TOP_STOP, viewport - railHeight - BOTTOM_STOP),
+        maxTop: TOP_STOP
+      }
+    }
+
+    function clamp(top) {
+      const { minTop, maxTop } = limits()
+      return Math.min(maxTop, Math.max(minTop, top))
+    }
+
+    function applyRailPosition() {
       const normalTop = baseTop - window.scrollY
-      const clampedTop = Math.min(maxTop, Math.max(minTop, normalTop))
-      const offset = clampedTop - normalTop
+      const offset = visualTop - normalTop
       rail.style.transform = offset ? `translate3d(0,${Math.round(offset)}px,0)` : ''
     }
+
     function measureRail() {
+      const desktop = !window.matchMedia('(max-width: 1040px)').matches
+      if (!desktop) {
+        active = false
+        visualTop = null
+        rail.style.transform = ''
+        lastScrollY = window.scrollY
+        return
+      }
+
+      const previousTop = active ? rail.getBoundingClientRect().top : null
       rail.style.transform = ''
       baseTop = rail.getBoundingClientRect().top + window.scrollY
       railHeight = rail.offsetHeight || 0
+      visualTop = clamp(previousTop ?? (baseTop - window.scrollY))
+      lastScrollY = window.scrollY
+      active = true
       applyRailPosition()
     }
-    function schedulePosition() {
-      if (frame) return
-      frame = requestAnimationFrame(() => {
-        frame = 0
-        applyRailPosition()
-      })
+
+    function moveRail() {
+      if (!active) return
+      const nextScrollY = window.scrollY
+      const delta = nextScrollY - lastScrollY
+      lastScrollY = nextScrollY
+
+      // Move with the page in either direction, then stop sharply once the
+      // rail itself reaches the top or bottom edge of the viewport.
+      visualTop = clamp(visualTop - delta)
+      applyRailPosition()
     }
+
     measureRail()
     const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measureRail) : null
     observer?.observe(rail)
     window.addEventListener('resize', measureRail)
-    window.addEventListener('scroll', schedulePosition, { passive: true })
+    window.addEventListener('scroll', moveRail, { passive: true })
     return () => {
       observer?.disconnect()
       window.removeEventListener('resize', measureRail)
-      window.removeEventListener('scroll', schedulePosition)
-      if (frame) cancelAnimationFrame(frame)
+      window.removeEventListener('scroll', moveRail)
     }
-  }, [stats, left, postsLeft, streak])
+  }, [])
 
   return (
     <aside className="rail" ref={railRef}>
