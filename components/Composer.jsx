@@ -60,6 +60,7 @@ export default function Composer() {
   const [photo, setPhoto] = useState(null)
 
   const hasMedia = Boolean(giphyId || photo)
+  const selectedWeather = WEATHERS[weather]
 
   function clearPhoto() {
     if (photo?.previewUrl) URL.revokeObjectURL(photo.previewUrl)
@@ -289,14 +290,20 @@ export default function Composer() {
           </div>
           <div className="wx-pick">
             <span className="wx-lbl">How&apos;s your weather today? Umbrellas from others help clear it to sunny.</span>
-            <div className="wx-opts">
-              {WEATHERS.map((w) => (
-                <button type="button" key={w.v}
-                  className={'wx-opt' + (weather === w.v ? ' on' : '')}
-                  onClick={() => setWeather(w.v)} aria-pressed={weather === w.v}>
-                  <span className="we">{w.e}</span>{w.l}
-                </button>
-              ))}
+            <div className="wx-slider-current" aria-live="polite">
+              <span aria-hidden="true">{selectedWeather.e}</span>
+              <b>{selectedWeather.l}</b>
+            </div>
+            <div className="wx-slider-wrap">
+              <input id="composer-weather" className="wx-slider" type="range"
+                min="0" max="4" step="1" value={weather}
+                onChange={(e) => setWeather(Number(e.target.value))}
+                aria-label="How is your weather today?" aria-valuetext={selectedWeather.l} />
+              <div className="wx-slider-stops" aria-hidden="true">
+                {WEATHERS.map((w) => (
+                  <span key={w.v} className={weather === w.v ? 'on' : ''}>{w.e}</span>
+                ))}
+              </div>
             </div>
           </div>
           <label className="anon">
