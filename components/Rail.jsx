@@ -7,37 +7,66 @@ import { startOfDayISO } from '@/lib/day'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { STREAK_MILESTONES } from '@/lib/badges'
 import CountUpNumber from '@/components/CountUpNumber'
+import { getRailUiCache, updateRailUiCache } from '@/lib/havenUiCache'
 
 export default function Rail() {
   const railRef = useRef(null)
   const railSlotRef = useRef(null)
-  const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
-  const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
-  const [postsLeft, setPostsLeft] = useState(null) // stories left today
-  const [streak, setStreak] = useState(null) // days-in-a-row; null = guest
+  const initialCache = useState(() => getRailUiCache())[0]
+  const [stats, setStats] = useState(initialCache.stats)
+  const [left, setLeft] = useState(initialCache.umbrellasLeft) // null = guest / unknown
+  const [postsLeft, setPostsLeft] = useState(initialCache.postsLeft)
+  const [streak, setStreak] = useState(initialCache.streak) // days-in-a-row; null = guest
 
   useEffect(() => {
     if (!supabase) return
+    let active = true
     ;(async () => {
-      const s = await supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live')
-      const u = await supabase.rpc('community_umbrellas')   // aggregate count (umbrella rows are private)
-      const sun = await supabase.rpc('sunny_count')
-      setStats({ stories: s.count ?? 0, umbrellas: Number(u.data) || 0, sunny: Number(sun.data) || 0 })
+      const [s, u, sun, auth] = await Promise.all([
+        supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live'),
+        supabase.rpc('community_umbrellas'), // aggregate count (umbrella rows are private)
+        supabase.rpc('sunny_count'),
+        supabase.auth.getUser(),
+      ])
+      if (!active) return
 
-      const { data } = await supabase.auth.getUser()
-      if (data.user) {
+      const nextStats = {
+        stories: s.count ?? 0,
+        umbrellas: Number(u.data) || 0,
+        sunny: Number(sun.data) || 0,
+      }
+      setStats(nextStats)
+      updateRailUiCache({ statsReady: true, stats: nextStats })
+
+      const user = auth.data.user
+      if (user) {
+        if (initialCache.userId && initialCache.userId !== user.id) {
+          setLeft(null)
+          setPostsLeft(null)
+          setStreak(null)
+        }
         const start = startOfDayISO()   // start of "today" in the app timezone (matches the DB)
-        const t = await supabase.from('umbrellas')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', data.user.id).gte('created_at', start)
-        setLeft(Math.max(0, DAILY_UMBRELLA_LIMIT - (t.count ?? 0)))
-        const ps = await supabase.from('stories')
-          .select('*', { count: 'exact', head: true })
-          .eq('author_id', data.user.id).gte('created_at', start)
-        setPostsLeft(Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0)))
-        // gentle daily streak, counts "showing up," idempotent per day
-        const { data: sc } = await supabase.rpc('touch_streak')
-        setStreak(typeof sc === 'number' ? sc : 0)
+        const [t, ps, streakResult] = await Promise.all([
+          supabase.from('umbrellas').select('*', { count: 'exact', head: true })
+            .eq('user_id', user.id).gte('created_at', start),
+          supabase.from('stories').select('*', { count: 'exact', head: true })
+            .eq('author_id', user.id).gte('created_at', start),
+          supabase.rpc('touch_streak'), // idempotent daily streak touch
+        ])
+        if (!active) return
+        const nextLeft = Math.max(0, DAILY_UMBRELLA_LIMIT - (t.count ?? 0))
+        const nextPostsLeft = Math.max(0, DAILY_STORY_LIMIT - (ps.count ?? 0))
+        const sc = typeof streakResult.data === 'number' ? streakResult.data : 0
+        setLeft(nextLeft)
+        setPostsLeft(nextPostsLeft)
+        setStreak(sc)
+        updateRailUiCache({
+          userReady: true,
+          userId: user.id,
+          umbrellasLeft: nextLeft,
+          postsLeft: nextPostsLeft,
+          streak: sc,
+        })
         // celebrate a milestone once, the day it's reached
         if (STREAK_MILESTONES.includes(sc)) {
           try {
@@ -49,16 +78,30 @@ export default function Rail() {
             }
           } catch {}
         }
+      } else {
+        setLeft(null)
+        setPostsLeft(null)
+        setStreak(null)
+        updateRailUiCache({ userReady: true, userId: null, umbrellasLeft: null, postsLeft: null, streak: null })
       }
     })()
+    return () => { active = false }
   }, [])
 
   // When the visitor opens an umbrella anywhere on the page, update the live
   // counts here immediately instead of waiting for a manual refresh.
   useEffect(() => {
     function onOpened() {
-      setLeft((n) => (typeof n === 'number' ? Math.max(0, n - 1) : n))
-      setStats((s) => ({ ...s, umbrellas: (s.umbrellas ?? 0) + 1 }))
+      setLeft((n) => {
+        const next = typeof n === 'number' ? Math.max(0, n - 1) : n
+        updateRailUiCache({ umbrellasLeft: next })
+        return next
+      })
+      setStats((s) => {
+        const next = { ...s, umbrellas: (s.umbrellas ?? 0) + 1 }
+        updateRailUiCache({ statsReady: true, stats: next })
+        return next
+      })
     }
     window.addEventListener('umbrella:opened', onOpened)
     return () => window.removeEventListener('umbrella:opened', onOpened)
@@ -196,7 +239,7 @@ export default function Rail() {
       {streak !== null && streak > 0 && (
         <div className="panel streak">
           <h3>Your streak</h3>
-          <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> <CountUpNumber value={streak} /> day{streak === 1 ? '' : 's'}</div>
+          <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> <CountUpNumber value={streak} initialValue={initialCache.userReady ? streak : undefined} /> day{streak === 1 ? '' : 's'}</div>
           <p className="streak-msg">
             {streak === 1
               ? 'You showed up today. That’s the whole thing, come back tomorrow to keep it going. 🫂'
@@ -207,19 +250,19 @@ export default function Rail() {
       <div className="panel">
         <h3>The community</h3>
         <div className="bigcount">
-          <div className="n"><CountUpNumber value={stats.umbrellas ?? 0} /></div>
+          <div className="n"><CountUpNumber value={stats.umbrellas ?? 0} initialValue={initialCache.statsReady ? stats.umbrellas : undefined} /></div>
           <div className="l">☂ umbrellas opened</div>
         </div>
-        <div className="ministat"><b><CountUpNumber value={stats.stories ?? 0} /></b> stories shared</div>
-        <div className="ministat">☀️ <b><CountUpNumber value={stats.sunny ?? 0} /></b> skies cleared to sunny</div>
+        <div className="ministat"><b><CountUpNumber value={stats.stories ?? 0} initialValue={initialCache.statsReady ? stats.stories : undefined} /></b> stories shared</div>
+        <div className="ministat">☀️ <b><CountUpNumber value={stats.sunny ?? 0} initialValue={initialCache.statsReady ? stats.sunny : undefined} /></b> skies cleared to sunny</div>
       </div>
 
       <div className="panel quota">
         <h3>Your umbrellas today</h3>
         {left === null
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
-          : <p className="qbig"><b><CountUpNumber value={left} /></b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
-        {postsLeft !== null && <p className="qbig"><b><CountUpNumber value={postsLeft} /></b> of {DAILY_STORY_LIMIT} posts left</p>}
+          : <p className="qbig"><b><CountUpNumber value={left} initialValue={initialCache.userReady ? left : undefined} /></b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
+        {postsLeft !== null && <p className="qbig"><b><CountUpNumber value={postsLeft} initialValue={initialCache.userReady ? postsLeft : undefined} /></b> of {DAILY_STORY_LIMIT} posts left</p>}
         <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day, so each one really counts.</p>
         <p className="qcare">🫂 One umbrella can mean the world to someone. Spend yours kindly, and help make this a place worth standing in.</p>
       </div>

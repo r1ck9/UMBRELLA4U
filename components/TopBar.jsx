@@ -8,12 +8,14 @@ import { accentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
 import LanguageSelect from '@/components/LanguageSelect'
 import CountUpNumber from '@/components/CountUpNumber'
+import { clearHavenUserUiCache, getTopBarUiCache, updateTopBarUiCache } from '@/lib/havenUiCache'
 
 export default function TopBar() {
   const router = useRouter()
-  const [email, setEmail] = useState(null)
-  const [av, setAv] = useState(null)
-  const [unread, setUnread] = useState(0)
+  const initialCache = useState(() => getTopBarUiCache())[0]
+  const [email, setEmail] = useState(initialCache.email)
+  const [av, setAv] = useState(initialCache.avatar)
+  const [unread, setUnread] = useState(initialCache.unread)
   const [q, setQ] = useState('')
 
   useEffect(() => {
@@ -24,11 +26,21 @@ export default function TopBar() {
       const { data } = await supabase.auth.getUser()
       const user = data.user
       if (!active) return
+      const previousUserId = getTopBarUiCache().userId
+      if (previousUserId && user?.id !== previousUserId) {
+        clearHavenUserUiCache()
+        setAv(null)
+        setUnread(0)
+      }
       setEmail(user?.email ?? null)
+      updateTopBarUiCache({ userId: user?.id ?? null, email: user?.email ?? null })
       if (user) {
         const { data: prof } = await supabase.from('profiles')
           .select('avatar_url,accent_color,username').eq('id', user.id).single()
-        if (active && prof) setAv(prof)
+        if (active && prof) {
+          setAv(prof)
+          updateTopBarUiCache({ avatar: prof })
+        }
         const { data: mine } = await supabase.from('story_authors').select('story_id')
         const ids = (mine || []).map((s) => s.story_id)
         if (ids.length) {
@@ -36,7 +48,10 @@ export default function TopBar() {
           const { count } = await supabase.from('umbrellas')
             .select('*', { count: 'exact', head: true })
             .in('story_id', ids).gt('created_at', seen).neq('user_id', user.id)
-          if (active) setUnread(count || 0)
+          if (active) {
+            setUnread(count || 0)
+            updateTopBarUiCache({ ready: true, unread: count || 0 })
+          }
           // Live: bump the bell the moment someone opens an umbrella on my story
           // (no-op if realtime replication isn't enabled on the umbrellas table).
           const mySet = new Set(ids)
@@ -44,15 +59,32 @@ export default function TopBar() {
             .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'umbrellas' }, (payload) => {
               const row = payload.new
               if (active && row && mySet.has(row.story_id) && row.user_id !== user.id) {
-                setUnread((u) => u + 1)
+                setUnread((u) => {
+                  const next = u + 1
+                  updateTopBarUiCache({ ready: true, unread: next })
+                  return next
+                })
               }
             })
             .subscribe()
         }
+        else if (active) updateTopBarUiCache({ ready: true, unread: 0 })
+      } else {
+        updateTopBarUiCache({ ready: true, avatar: null, unread: 0 })
       }
     }
     load()
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setEmail(s?.user?.email ?? null))
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      const user = s?.user
+      setEmail(user?.email ?? null)
+      if (!user) {
+        setAv(null)
+        setUnread(0)
+        clearHavenUserUiCache()
+      } else {
+        updateTopBarUiCache({ userId: user.id, email: user.email ?? null })
+      }
+    })
     return () => { active = false; sub.subscription.unsubscribe(); if (channel) supabase.removeChannel(channel) }
   }, [])
 
@@ -79,7 +111,7 @@ export default function TopBar() {
         <Link href="/welcome" className="tb-help" title="How to use Haven">?</Link>
         {email ? (
           <>
-            <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn"><CountUpNumber value={unread} /></span>}</Link>
+            <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn"><CountUpNumber value={unread} initialValue={initialCache.ready ? unread : undefined} /></span>}</Link>
             <Link href={av?.username ? `/u/${encodeURIComponent(av.username)}` : '/profile'} className="tb-avatar" style={avStyle} title={`Your profile${email ? ' · ' + email : ''}`}>
               {isEmoji ? url.slice(6) : (isImg ? '' : initial)}
             </Link>

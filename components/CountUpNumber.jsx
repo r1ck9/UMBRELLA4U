@@ -16,15 +16,17 @@ export default function CountUpNumber({
   className,
   minimumFractionDigits = 0,
   maximumFractionDigits,
+  initialValue,
 }) {
   const target = Number.isFinite(Number(value)) ? Number(value) : 0
+  const initial = Number.isFinite(Number(initialValue)) ? Number(initialValue) : 0
   const digits = fractionDigits(target, maximumFractionDigits)
   const formatter = useMemo(() => new Intl.NumberFormat(undefined, {
     minimumFractionDigits: Math.min(minimumFractionDigits, digits),
     maximumFractionDigits: digits,
   }), [digits, minimumFractionDigits])
   const elementRef = useRef(null)
-  const displayedRef = useRef(0)
+  const displayedRef = useRef(initial)
 
   useEffect(() => {
     const element = elementRef.current
