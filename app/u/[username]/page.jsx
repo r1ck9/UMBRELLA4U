@@ -11,6 +11,7 @@ import { getMe } from '@/lib/me'
 import { bannerStyle } from '@/lib/banners'
 import { earnedBadges } from '@/lib/badges'
 import { accentStyle } from '@/lib/palette'
+import { avatarImageUrl } from '@/lib/avatar'
 
 function since(ts) {
   if (!ts) return ' '
@@ -74,9 +75,10 @@ export default function PublicProfile({ params }) {
   const { loading, prof } = state
   const av = prof?.avatar_url || ''
   const isEmoji = av.startsWith('emoji:')
-  const isImg = /^https?:/.test(av)
+  const imageUrl = avatarImageUrl(av)
+  const isImg = Boolean(imageUrl)
   const initial = (prof?.display_name || prof?.username || '☂').trim().charAt(0).toUpperCase()
-  const avStyle = isImg ? { backgroundImage: `url(${av})` } : accentStyle(prof?.accent_color)
+  const avStyle = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(prof?.accent_color)
   const shown = posts.filter((p) => sel === 'all' || p.channel_id === sel)
 
   return (

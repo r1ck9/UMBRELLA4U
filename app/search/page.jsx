@@ -8,6 +8,7 @@ import Rail from '@/components/Rail'
 import StoryCard from '@/components/StoryCard'
 import { supabase } from '@/lib/supabase'
 import { accentStyle } from '@/lib/palette'
+import { avatarImageUrl } from '@/lib/avatar'
 
 function Results() {
   const q = (useSearchParams().get('q') || '').trim()
@@ -49,9 +50,10 @@ function Results() {
             {state.people.map((pr) => {
               const av = pr.avatar_url || ''
               const isEmoji = av.startsWith('emoji:')
-              const isImg = /^https?:/.test(av)
+              const imageUrl = avatarImageUrl(av)
+              const isImg = Boolean(imageUrl)
               const initial = (pr.display_name || pr.username || '☂').trim().charAt(0).toUpperCase()
-              const st = isImg ? { backgroundImage: `url(${av})` } : accentStyle(pr.accent_color)
+              const st = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(pr.accent_color)
               return (
                 <Link key={pr.username} href={`/u/${encodeURIComponent(pr.username)}`} className="person-chip">
                   <span className="pc-av" style={st}>{isEmoji ? av.slice(6) : (isImg ? '' : initial)}</span>

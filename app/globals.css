@@ -487,6 +487,23 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .up-btn:hover{border-color:var(--shelter); color:var(--shelter-deep)}
 .up-btn:disabled{opacity:.6; cursor:default}
 .up-note{font-size:11.5px; color:var(--care); margin:10px 0 0; line-height:1.5}
+.avatar-photo-picker,.avatar-photo-pending{border:1px solid var(--rain-2);background:var(--rain-0);border-radius:14px;padding:14px}
+.avatar-photo-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.avatar-photo-selected,.avatar-photo-pending{display:grid;grid-template-columns:92px minmax(0,1fr);gap:13px;align-items:center}
+.avatar-photo-selected img,.avatar-photo-pending img,.avatar-photo-placeholder{width:92px;height:92px;border-radius:22px;object-fit:cover;border:2px solid var(--panel);box-shadow:var(--shadow)}
+.avatar-photo-placeholder{display:grid;place-items:center;text-align:center;padding:8px;background:var(--rain-1);color:var(--ink-3);font-size:11px;font-weight:700}
+.avatar-photo-selected strong,.avatar-photo-pending strong{display:block;color:var(--ink-1);font-size:14px;margin-bottom:3px}
+.avatar-photo-selected p,.avatar-photo-pending p,.avatar-photo-status{margin:0 0 9px;color:var(--ink-3);font-size:11.5px;line-height:1.45}
+.avatar-photo-status{margin:10px 1px 0}
+.avatar-photo-pending>.photo-error{grid-column:1/-1;margin:0}
+.avatar-review-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+.avatar-review-image{aspect-ratio:1;object-fit:cover;max-height:360px}
+@media(max-width:560px){
+  .avatar-photo-selected,.avatar-photo-pending{grid-template-columns:72px minmax(0,1fr);align-items:start}
+  .avatar-photo-selected img,.avatar-photo-pending img,.avatar-photo-placeholder{width:72px;height:72px;border-radius:18px}
+  .avatar-photo-actions .up-btn,.avatar-photo-actions .btn{flex:1 1 125px;text-align:center;justify-content:center}
+  .avatar-review-list{grid-template-columns:1fr}
+}
 
 /* modals (guidelines popup + pre-post checkpoint) */
 .modal-scrim{position:fixed; inset:0; z-index:80; background:color-mix(in srgb,var(--ui-plum) 55%,transparent); backdrop-filter:blur(3px);

@@ -7,8 +7,10 @@ import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
 import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
+import ProfilePhotoPicker from '@/components/ProfilePhotoPicker'
 import { earnedBadges } from '@/lib/badges'
 import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent } from '@/lib/palette'
+import { avatarImageUrl } from '@/lib/avatar'
 
 // Rotating example bios, a fresh one is picked each time the page opens.
 const BIO_EXAMPLES = [
@@ -102,10 +104,11 @@ export default function Profile() {
   if (!user) return (<><TopBar /><main className="container"><h1>Your profile</h1><p className="sub" style={{ color: 'var(--ink-2)' }}>Log in to set up your profile.</p></main></>)
 
   const initial = (p.display_name || p.username || '☂').trim().charAt(0).toUpperCase()
-  // avatar_url holds either "emoji:X" (preset) or a real URL (legacy uploads)
+  // avatar_url holds an emoji preset or a moderator-approved custom photo path.
   const isEmoji = p.avatar_url.startsWith('emoji:')
-  const isImg = /^https?:/.test(p.avatar_url)
-  const avStyle = isImg ? { backgroundImage: `url(${p.avatar_url})` } : accentStyle(p.accent_color)
+  const imageUrl = avatarImageUrl(p.avatar_url)
+  const isImg = Boolean(imageUrl)
+  const avStyle = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(p.accent_color)
   const avInner = isEmoji ? p.avatar_url.slice(6) : (isImg ? '' : initial)
   const badges = earnedBadges({ streak, posts: stats.stories, umbrellasSent: stats.sent })
 
@@ -151,7 +154,8 @@ export default function Profile() {
               <label>Avatar
                 <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
               </label>
-              <p className="up-note">Choose any emoji as your picture, on Apple devices you’ll see the Apple emoji set. Custom photo uploads are coming once we add image moderation to keep everyone safe. 🔒</p>
+              <p className="up-note">Choose an emoji, or upload a real profile photo below. Emoji changes are applied when you save your profile.</p>
+              <ProfilePhotoPicker userId={user.id} />
 
               <label>Display name<input value={p.display_name} maxLength={30} onChange={(e) => set('display_name', e.target.value)} placeholder={p.username} /></label>
               <label>Pronouns<input value={p.pronouns} maxLength={30} onChange={(e) => set('pronouns', e.target.value)} placeholder="they/them (optional)" /></label>

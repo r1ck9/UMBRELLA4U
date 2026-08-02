@@ -11,6 +11,7 @@ import { accentStyle } from '@/lib/palette'
 import { giphyImageUrl } from '@/lib/giphy'
 import StoryPhoto from '@/components/StoryPhoto'
 import GiphyAttribution from '@/components/GiphyAttribution'
+import { avatarImageUrl } from '@/lib/avatar'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -65,9 +66,10 @@ const SHOW_HUG_FACES = false
 function HugAvatar({ h }) {
   const url = h.avatar_url || ''
   const isEmoji = url.startsWith('emoji:')
-  const isImg = /^https?:/.test(url)
+  const imageUrl = avatarImageUrl(url)
+  const isImg = Boolean(imageUrl)
   const initial = (h.username || '☂').trim().charAt(0).toUpperCase()
-  const style = isImg ? { backgroundImage: `url(${url})` } : accentStyle(h.accent_color)
+  const style = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(h.accent_color)
   return <span className="hug-av" style={style} title={'@' + h.username}>{isEmoji ? url.slice(6) : (isImg ? '' : initial)}</span>
 }
 const NOTE_PROMPT = {

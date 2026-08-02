@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import MobileMenu from '@/components/MobileMenu'
 import { accentStyle } from '@/lib/palette'
+import { avatarImageUrl } from '@/lib/avatar'
 import LanguageSelect from '@/components/LanguageSelect'
 
 export default function TopBar() {
@@ -59,9 +60,10 @@ export default function TopBar() {
   // Render the profile picture (preset emoji / uploaded image / colored initial).
   const url = av?.avatar_url || ''
   const isEmoji = url.startsWith('emoji:')
-  const isImg = /^https?:/.test(url)
+  const imageUrl = avatarImageUrl(url)
+  const isImg = Boolean(imageUrl)
   const initial = (av?.username || email || '☂').trim().charAt(0).toUpperCase()
-  const avStyle = isImg ? { backgroundImage: `url(${url})` } : accentStyle(av?.accent_color)
+  const avStyle = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(av?.accent_color)
 
   return (
     <header className="topbar">
