@@ -1200,7 +1200,6 @@
     var canvas = document.getElementById('umb3d'); if(!canvas) return;
     if(window.innerWidth<=760) return;
     var ctx = canvas.getContext('2d',{alpha:true,desynchronized:true});
-    var hitCtx=document.createElement('canvas').getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     var W, H, DPR, raf=0, visible=true;
     function resize(){
@@ -1281,7 +1280,7 @@
     var meadowLayerDPR=1,meadowLayerAcc=1,meadowLayersReady=false;
     var meadowStaticReady=false,meadowIdleHandle=0,meadowPending=null,meadowLayerGeneration=0;
     var meadowBackRect={x:0,y:0,w:1,h:1},meadowFrontRect={x:0,y:0,w:1,h:1};
-    var meadowFrameStep=1/30;
+    var meadowFrameStep=1/30,grassPhaseBins=5,grassSpriteCache=null;
     var shadowSprite=document.createElement('canvas'),shadowSpriteCtx=shadowSprite.getContext('2d',{alpha:true}),shadowSpriteScale=0;
     var pointer={x:0,y:0,active:false,lastMove:0}, aim={x:0,y:0,ready:false};
     function resizeMeadowLayers(){
@@ -1310,7 +1309,7 @@
         staticContexts[i].setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-rects[i].x*meadowLayerDPR,-rects[i].y*meadowLayerDPR);
       }
       meadowLayerAcc=1;meadowLayersReady=false;meadowStaticReady=false;
-      meadowLayerGeneration++;meadowPending=null;
+      grassSpriteCache=null;meadowLayerGeneration++;meadowPending=null;
     }
     function scene(){
       var narrow = W < 760;
@@ -1340,7 +1339,7 @@
       var pr=function(P){ var f=fov/(camZ-P.z); return {x:sc.cx+P.x*f*sc.scale, y:sc.cy-P.y*f*sc.scale, z:P.z}; };
       var transformed=new Array(canopyVertices.length),projected=new Array(canopyVertices.length);
       for(var vi=0;vi<canopyVertices.length;vi++){transformed[vi]=tf(canopyVertices[vi]);projected[vi]=pr(transformed[vi]);}
-      var hitSurfaces=[],hitPath=typeof Path2D==='function'?new Path2D():null,minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+      var hitSurfaces=[],minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
       for(var pi=0;pi<panelIndexes.length;pi++){
         var indexes=panelIndexes[pi],pts=new Array(indexes.length),zc=0,surfaceMinX=Infinity,surfaceMaxX=-Infinity,surfaceMinY=Infinity,surfaceMaxY=-Infinity;
         for(var vi=0;vi<indexes.length;vi++){var point=projected[indexes[vi]];pts[vi]=point;zc+=transformed[indexes[vi]].z;}
@@ -1352,11 +1351,20 @@
         var n=norm(cross(sub(t1,t0),sub(t2,t0))),under=n.z<0;
         if(under)n={x:-n.x,y:-n.y,z:-n.z};
         minX=Math.min(minX,surfaceMinX);maxX=Math.max(maxX,surfaceMaxX);minY=Math.min(minY,surfaceMinY);maxY=Math.max(maxY,surfaceMaxY);
-        if(hitPath){hitPath.moveTo(pts[0].x,pts[0].y);for(var hi=1;hi<pts.length;hi++)hitPath.lineTo(pts[hi].x,pts[hi].y);hitPath.closePath();}
         hitSurfaces.push({z:zc/indexes.length,pts:pts,color:shade(n,under),minX:surfaceMinX,maxX:surfaceMaxX,minY:surfaceMinY,maxY:surfaceMaxY});
       }
       hitSurfaces.sort(function(a,b){return b.z-a.z;});
-      return {tf:tf,pr:pr,transformed:transformed,projected:projected,hitPath:hitPath,hitSurfaces:hitSurfaces,hitBounds:{minX:minX,maxX:maxX,minY:minY,maxY:maxY},handlePts:handle.map(tf).map(pr)};
+      // Preserve the original per-panel hit shape, but index those panels into
+      // small screen cells so a drop checks only the nearby surfaces.
+      var hitCell=32,hitCols=Math.max(1,Math.ceil(W/hitCell)),hitGrid=Object.create(null);
+      for(var si=0;si<hitSurfaces.length;si++){
+        var surface=hitSurfaces[si],gx0=Math.max(0,Math.floor(surface.minX/hitCell)),gx1=Math.min(hitCols-1,Math.floor(surface.maxX/hitCell));
+        var gy0=Math.max(0,Math.floor(surface.minY/hitCell)),gy1=Math.max(gy0,Math.floor(surface.maxY/hitCell));
+        for(var gy=gy0;gy<=gy1;gy++)for(var gx=gx0;gx<=gx1;gx++){
+          var key=gy*hitCols+gx;(hitGrid[key]||(hitGrid[key]=[])).push(surface);
+        }
+      }
+      return {tf:tf,pr:pr,transformed:transformed,projected:projected,hitCell:hitCell,hitCols:hitCols,hitGrid:hitGrid,hitSurfaces:hitSurfaces,hitBounds:{minX:minX,maxX:maxX,minY:minY,maxY:maxY},handlePts:handle.map(tf).map(pr)};
     }
     function pointInPoly(x,y,pts){
       var inside=false;
@@ -1369,10 +1377,10 @@
     function hitUmbrella(frame,x,y){
       var bounds=frame.hitBounds;
       if(x<bounds.minX||x>bounds.maxX||y<bounds.minY||y>bounds.maxY)return false;
-      // Let the browser's native path engine test the complete canopy at once.
-      if(frame.hitPath)return hitCtx.isPointInPath(frame.hitPath,x,y);
-      for(var i=0;i<frame.hitSurfaces.length;i++){
-        var surface=frame.hitSurfaces[i];
+      var key=Math.floor(y/frame.hitCell)*frame.hitCols+Math.floor(x/frame.hitCell),candidates=frame.hitGrid[key];
+      if(!candidates)return false;
+      for(var i=0;i<candidates.length;i++){
+        var surface=candidates[i];
         if(x>=surface.minX&&x<=surface.maxX&&y>=surface.minY&&y<=surface.maxY&&pointInPoly(x,y,surface.pts))return true;
       }
       return false;
@@ -1380,7 +1388,7 @@
     function rainHit(frame,x0,y0,x1,y1){
       var bounds=frame.hitBounds;
       if(Math.max(x0,x1)<bounds.minX||Math.min(x0,x1)>bounds.maxX||Math.max(y0,y1)<bounds.minY||Math.min(y0,y1)>bounds.maxY)return null;
-      var distance=Math.hypot(x1-x0,y1-y0),steps=Math.max(2,Math.min(4,Math.ceil(distance/6)));
+      var steps=8;
       for(var i=1;i<=steps;i++){
         var t=i/steps, x=x0+(x1-x0)*t, y=y0+(y1-y0)*t;
         if(hitUmbrella(frame,x,y))return {x:x,y:y,nx:(x-W*0.5)/Math.max(W*0.5,1)};
@@ -1526,10 +1534,13 @@
       // Fixed at the bottom-right hero boundary; it never follows umbrella movement.
       return {x:Math.min(W-sc.scale*1.30,sc.cx-sc.scale*.08),y:H*1.012};
     }
-    function bladePath(x,y,h,sway,w){
+    function bladePathOn(target,x,y,h,sway,w){
       var tx=x+sway,top=w*.08,cx=x+sway*.3,cy=y-h*.52;
-      ctx.moveTo(x-w*.5,y);ctx.quadraticCurveTo(cx-w*.18,cy,tx-top,y-h);
-      ctx.lineTo(tx+top,y-h);ctx.quadraticCurveTo(cx+w*.18,cy,x+w*.5,y);ctx.closePath();
+      target.moveTo(x-w*.5,y);target.quadraticCurveTo(cx-w*.18,cy,tx-top,y-h);
+      target.lineTo(tx+top,y-h);target.quadraticCurveTo(cx+w*.18,cy,x+w*.5,y);target.closePath();
+    }
+    function bladePath(x,y,h,sway,w){
+      bladePathOn(ctx,x,y,h,sway,w);
     }
     function meadowTaper(x){
       var edge=Math.abs(x),fringe=Math.max(0,Math.min(1,(edge-.38)/.62));
@@ -1544,7 +1555,7 @@
       var key=W+'|'+H+'|'+scale.toFixed(3)+'|'+mx.toFixed(2)+'|'+my.toFixed(2);
       if(key===meadowLayoutKey)return meadowLayout;
       meadowLayoutKey=key;meadowLayout={scale:scale,mx:mx,my:my,rx:rx};
-      meadowStaticReady=false;
+      meadowStaticReady=false;grassSpriteCache=null;
       for(var band=0;band<backGrass.length;band++){
         var group=backGrass[band];
         for(var i=0;i<group.length;i++){
@@ -1603,6 +1614,94 @@
         bush.bh=scale*(.045+.022*bush.s)*(.38+.62*Math.pow(edge,.62));
       }
       return meadowLayout;
+    }
+    function grassPhaseIndex(phase){
+      phase=(phase%6.283+6.283)%6.283;
+      return Math.min(grassPhaseBins-1,Math.floor(phase/6.283*grassPhaseBins));
+    }
+    function grassPhaseWind(blade,speed,amount){
+      var phase=((blade.phaseBin||0)+.5)/grassPhaseBins*6.283;
+      return Math.sin(tt*speed+phase)*amount;
+    }
+    function makeGrassSpriteSet(groups,colors,rect){
+      var sprites=new Array(grassPhaseBins);
+      for(var band=0;band<groups.length;band++){
+        var group=groups[band];
+        for(var gi=0;gi<group.length;gi++)if(group[gi].visible)group[gi].phaseBin=grassPhaseIndex(group[gi].windPhase);
+      }
+      for(var phase=0;phase<grassPhaseBins;phase++){
+        var sprite=document.createElement('canvas');
+        sprite.width=Math.round(rect.w*meadowLayerDPR);sprite.height=Math.round(rect.h*meadowLayerDPR);
+        var spriteCtx=sprite.getContext('2d',{alpha:true});
+        spriteCtx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-rect.x*meadowLayerDPR,-rect.y*meadowLayerDPR);
+        for(var band=0;band<groups.length;band++){
+          var group=groups[band];spriteCtx.beginPath();
+          for(var gi=0;gi<group.length;gi++){
+            var blade=group[gi];if(!blade.visible||blade.phaseBin!==phase)continue;
+            bladePathOn(spriteCtx,blade.gx,blade.gy,blade.gh,0,blade.bw);
+          }
+          spriteCtx.fillStyle=colors[band];spriteCtx.fill();
+        }
+        sprites[phase]=sprite;
+      }
+      return {sprites:sprites,rect:rect};
+    }
+    function buildGrassSpriteCache(sc){
+      if(grassSpriteCache)return grassSpriteCache;
+      var shortColors=[];for(var i=0;i<vividGreens.length;i++)shortColors.push(vividGreens[(i+4)%vividGreens.length]);
+      grassSpriteCache={
+        anchorY:meadowAnchor(sc).y,
+        back:makeGrassSpriteSet(backGrass,rearGreens,meadowBackRect),
+        main:makeGrassSpriteSet(grassBlades,vividGreens,meadowFrontRect),
+        short:makeGrassSpriteSet(shortGrass,shortColors,meadowFrontRect),
+        shortColors:shortColors
+      };
+      return grassSpriteCache;
+    }
+    function drawWindSpriteSet(set,speed,amount){
+      var rect=set.rect,anchorY=grassSpriteCache.anchorY;
+      for(var phase=0;phase<grassPhaseBins;phase++){
+        var wind=Math.sin(tt*speed+(phase+.5)/grassPhaseBins*6.283)*amount;
+        ctx.save();ctx.transform(1,0,-wind,1,wind*anchorY,0);
+        ctx.drawImage(set.sprites[phase],rect.x,rect.y,rect.w,rect.h);ctx.restore();
+      }
+    }
+    function drawReactiveGrass(groups,colors,set,speed,amount,field,cursorField,dt){
+      drawWindSpriteSet(set,speed,amount);
+      var activeByBand=new Array(groups.length),activeByPhase=new Array(grassPhaseBins);
+      for(var band=0;band<groups.length;band++)activeByBand[band]=[];
+      for(var phase=0;phase<grassPhaseBins;phase++)activeByPhase[phase]=[];
+      for(var band=0;band<groups.length;band++){
+        var group=groups[band];
+        for(var gi=0;gi<group.length;gi++){
+          var blade=group[gi];if(!blade.visible)continue;
+          var wind=grassPhaseWind(blade,speed,amount),baseSway=wind*blade.gh,sway=baseSway;
+          sway+=grassPush(blade.gx,blade.gy,blade.gh,blade,field,dt);
+          sway+=beeBladePush(blade.gx,blade.gy,blade.gh,sway,blade);
+          sway+=cursorBladePush(blade.gx,blade.gy,blade.gh,sway,blade,cursorField,dt);
+          var extra=sway-baseSway;
+          if(Math.abs(extra)<.015&&Math.abs(blade.bendV||0)<.08&&!blade.handleHit&&!(blade.beeMask||0))continue;
+          var item={blade:blade,wind:wind,sway:sway};activeByBand[band].push(item);activeByPhase[blade.phaseBin].push(item);
+        }
+      }
+      // Remove only the cached resting shapes that are currently bending,
+      // then paint those blades at their live interactive positions.
+      for(var phase=0;phase<grassPhaseBins;phase++){
+        var active=activeByPhase[phase];if(!active.length)continue;
+        var wind=Math.sin(tt*speed+(phase+.5)/grassPhaseBins*6.283)*amount;
+        ctx.save();ctx.transform(1,0,-wind,1,wind*grassSpriteCache.anchorY,0);ctx.globalCompositeOperation='destination-out';ctx.fillStyle='#000';ctx.beginPath();
+        for(var ai=0;ai<active.length;ai++){var blade=active[ai].blade;bladePath(blade.gx,blade.gy,blade.gh,0,blade.bw);}
+        ctx.fill();ctx.restore();
+      }
+      for(var band=0;band<activeByBand.length;band++){
+        var active=activeByBand[band];if(!active.length)continue;
+        ctx.fillStyle=colors[band];ctx.beginPath();
+        for(var ai=0;ai<active.length;ai++){
+          var item=active[ai],blade=item.blade,baseShift=item.wind*(grassSpriteCache.anchorY-blade.gy);
+          bladePath(blade.gx+baseShift,blade.gy,blade.gh,item.sway,blade.bw);
+        }
+        ctx.fill();
+      }
     }
     function makeGrassField(points,scale,dt){
       var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
@@ -1797,20 +1896,24 @@
           ctx.fillStyle=toweringGreens[tc];ctx.fill();
         }
       }
-      for(var band=0;band<rearGreens.length;band++){
-        ctx.beginPath();
-        var group=backGrass[band];
-        for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
-          var sway=Math.sin(tt*.78+g.windPhase)*g.gh*.12;
-          if(dynamicPass){
-            sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
-            sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
-            sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+      if(dynamicPass&&grassSpriteCache){
+        drawReactiveGrass(backGrass,rearGreens,grassSpriteCache.back,.78,.12,field,cursorField,dt);
+      }else{
+        for(var band=0;band<rearGreens.length;band++){
+          ctx.beginPath();
+          var group=backGrass[band];
+          for(var gi=0;gi<group.length;gi++){
+            var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
+            var sway=Math.sin(tt*.78+g.windPhase)*g.gh*.12;
+            if(dynamicPass){
+              sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
+              sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+              sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+            }
+            bladePath(g.gx,g.gy,g.gh,sway,g.bw);
           }
-          bladePath(g.gx,g.gy,g.gh,sway,g.bw);
+          ctx.fillStyle=rearGreens[band];ctx.fill();
         }
-        ctx.fillStyle=rearGreens[band];ctx.fill();
       }
     }
     function drawMeadowLife(sc,field,cursorField,dt,dynamicPass){
@@ -1830,20 +1933,24 @@
           ctx.fillStyle=toweringGreens[tc];ctx.fill();
         }
       }
-      for(var band=0;band<vividGreens.length;band++){
-        ctx.beginPath();
-        var group=grassBlades[band];
-        for(var gi=0;gi<group.length;gi++){
-          var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
-          var sway=Math.sin(tt*.92+g.windPhase)*g.gh*(g.t?.14:.09);
-          if(dynamicPass){
-            sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
-            sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
-            sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+      if(dynamicPass&&grassSpriteCache){
+        drawReactiveGrass(grassBlades,vividGreens,grassSpriteCache.main,.92,.115,field,cursorField,dt);
+      }else{
+        for(var band=0;band<vividGreens.length;band++){
+          ctx.beginPath();
+          var group=grassBlades[band];
+          for(var gi=0;gi<group.length;gi++){
+            var g=group[gi];if(!g.visible||g.d!==dynamicPass)continue;
+            var sway=Math.sin(tt*.92+g.windPhase)*g.gh*(g.t?.14:.09);
+            if(dynamicPass){
+              sway+=grassPush(g.gx,g.gy,g.gh,g,field,dt);
+              sway+=beeBladePush(g.gx,g.gy,g.gh,sway,g);
+              sway+=cursorBladePush(g.gx,g.gy,g.gh,sway,g,cursorField,dt);
+            }
+            bladePath(g.gx,g.gy,g.gh,sway,g.bw);
           }
-          bladePath(g.gx,g.gy,g.gh,sway,g.bw);
+          ctx.fillStyle=vividGreens[band];ctx.fill();
         }
-        ctx.fillStyle=vividGreens[band];ctx.fill();
       }
       if(dynamicPass){
         // Batch stems, petals and centres so the entire flower field takes a
@@ -1869,20 +1976,24 @@
       }
       // A separate foreground carpet of pure short grass, about one quarter of
       // the tall-grass height, to make the base feel fully grown-in.
-      for(var sb=0;sb<vividGreens.length;sb++){
-        ctx.beginPath();
-        var shortGroup=shortGrass[sb];
-        for(var sgi=0;sgi<shortGroup.length;sgi++){
-          var sg=shortGroup[sgi];if(!sg.visible||sg.d!==dynamicPass)continue;
-          var ss=Math.sin(tt*.86+sg.windPhase)*sg.gh*.08;
-          if(dynamicPass){
-            ss+=grassPush(sg.gx,sg.gy,sg.gh,sg,field,dt);
-            ss+=beeBladePush(sg.gx,sg.gy,sg.gh,ss,sg);
-            ss+=cursorBladePush(sg.gx,sg.gy,sg.gh,ss,sg,cursorField,dt);
+      if(dynamicPass&&grassSpriteCache){
+        drawReactiveGrass(shortGrass,grassSpriteCache.shortColors,grassSpriteCache.short,.86,.08,field,cursorField,dt);
+      }else{
+        for(var sb=0;sb<vividGreens.length;sb++){
+          ctx.beginPath();
+          var shortGroup=shortGrass[sb];
+          for(var sgi=0;sgi<shortGroup.length;sgi++){
+            var sg=shortGroup[sgi];if(!sg.visible||sg.d!==dynamicPass)continue;
+            var ss=Math.sin(tt*.86+sg.windPhase)*sg.gh*.08;
+            if(dynamicPass){
+              ss+=grassPush(sg.gx,sg.gy,sg.gh,sg,field,dt);
+              ss+=beeBladePush(sg.gx,sg.gy,sg.gh,ss,sg);
+              ss+=cursorBladePush(sg.gx,sg.gy,sg.gh,ss,sg,cursorField,dt);
+            }
+            bladePath(sg.gx,sg.gy,sg.gh,ss,sg.bw);
           }
-          bladePath(sg.gx,sg.gy,sg.gh,ss,sg.bw);
+          ctx.fillStyle=vividGreens[(sb+4)%vividGreens.length];ctx.fill();
         }
-        ctx.fillStyle=vividGreens[(sb+4)%vividGreens.length];ctx.fill();
       }
       if(dynamicPass){
         for(var bi=0;bi<meadowBees.length;bi++){
@@ -1962,6 +2073,7 @@
       var grassField=makeGrassField(frame.handlePts,sc.scale,layerDt);
       var cursorField=makeCursorGrassField(sc,layerDt),mainCtx=ctx;
       renderStaticMeadow(sc);
+      buildGrassSpriteCache(sc);
       ctx=meadowBackCtx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,meadowBackLayer.width,meadowBackLayer.height);
       ctx.drawImage(meadowStaticBack,0,0);
       ctx.setTransform(meadowLayerDPR,0,0,meadowLayerDPR,-meadowBackRect.x*meadowLayerDPR,-meadowBackRect.y*meadowLayerDPR);
