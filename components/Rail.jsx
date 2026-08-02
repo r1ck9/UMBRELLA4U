@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
@@ -9,6 +9,7 @@ import { STREAK_MILESTONES } from '@/lib/badges'
 import CountUpNumber from '@/components/CountUpNumber'
 
 export default function Rail() {
+  const railRef = useRef(null)
   const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
   const [postsLeft, setPostsLeft] = useState(null) // stories left today
@@ -62,8 +63,23 @@ export default function Rail() {
     return () => window.removeEventListener('umbrella:opened', onOpened)
   }, [])
 
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail) return
+    function onWheel(event) {
+      if (window.matchMedia('(max-width: 780px)').matches) return
+      if (!event.deltaY) return
+      event.preventDefault()
+      const max = Math.max(0, rail.scrollHeight - rail.clientHeight)
+      if (max > 0) rail.scrollTop = Math.min(max, Math.max(0, rail.scrollTop + event.deltaY))
+      window.scrollBy({ top: event.deltaY, left: 0, behavior: 'auto' })
+    }
+    rail.addEventListener('wheel', onWheel, { passive: false })
+    return () => rail.removeEventListener('wheel', onWheel)
+  }, [])
+
   return (
-    <aside className="rail">
+    <aside className="rail" ref={railRef}>
       {streak !== null && streak > 0 && (
         <div className="panel streak">
           <h3>Your streak</h3>
