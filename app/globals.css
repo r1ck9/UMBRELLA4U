@@ -883,8 +883,9 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   .pf-about{padding:12px 14px 16px;font-size:13.5px;overflow-wrap:anywhere}
   .pf-tags{padding:0 14px 16px}.pf-viewlink{display:block;margin:0 14px 16px;font-size:12.5px;overflow-wrap:anywhere}
   .pf-actions{padding:0 14px 16px}
-  .pf-actions .profile-edit-btn{min-width:180px;min-height:52px;justify-content:center;padding:14px 22px;font-size:15px}
-  .pf-avatar-edit{opacity:1;transform:none}
+  .pf-actions .profile-edit-btn{min-width:90px;min-height:34px;justify-content:center;padding:7px 11px;font-size:12px}
+  .pf-avatar-button:hover .pf-avatar-edit,.pf-avatar-button:focus-visible .pf-avatar-edit{opacity:0;transform:translateY(4px)}
+  .pf-avatar-button:active .pf-avatar-edit{opacity:1;transform:none}
   .profile-photo-modal{padding:19px 15px}
   .pf-edit{padding:16px 14px}
   .profile-edit-bar{margin-top:11px;gap:8px;flex-wrap:wrap}.profile-edit-bar .btn{min-width:180px;min-height:52px;justify-content:center;padding:14px 22px;font-size:15px}
