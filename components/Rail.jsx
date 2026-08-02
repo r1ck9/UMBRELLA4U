@@ -10,6 +10,7 @@ import CountUpNumber from '@/components/CountUpNumber'
 
 export default function Rail() {
   const railRef = useRef(null)
+  const railSlotRef = useRef(null)
   const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
   const [postsLeft, setPostsLeft] = useState(null) // stories left today
@@ -65,17 +66,18 @@ export default function Rail() {
 
   useEffect(() => {
     const rail = railRef.current
-    if (!rail) return
+    const slot = railSlotRef.current
+    if (!rail || !slot) return
 
     const TOP_STOP = 82
     const BOTTOM_STOP = 18
-    let baseTop = 0
+    let slotTop = 0
     let railHeight = 0
-    let visualTop = null
     let lastScrollY = window.scrollY
+    let mode = 'page'
     let active = false
 
-    function limits() {
+    function getStops() {
       const viewport = window.innerHeight || document.documentElement.clientHeight || 0
       return {
         minTop: Math.min(TOP_STOP, viewport - railHeight - BOTTOM_STOP),
@@ -83,35 +85,60 @@ export default function Rail() {
       }
     }
 
-    function clamp(top) {
-      const { minTop, maxTop } = limits()
+    function clampTop(top) {
+      const { minTop, maxTop } = getStops()
       return Math.min(maxTop, Math.max(minTop, top))
     }
 
-    function applyRailPosition() {
-      const normalTop = baseTop - window.scrollY
-      const offset = visualTop - normalTop
-      rail.style.transform = offset ? `translate3d(0,${Math.round(offset)}px,0)` : ''
+    function placeWithPage(viewportTop) {
+      mode = 'page'
+      const localTop = viewportTop + window.scrollY - slotTop
+      rail.style.position = 'absolute'
+      rail.style.inset = `${Math.round(localTop)}px 0 auto`
+      rail.style.width = '100%'
+      rail.style.transform = 'none'
+    }
+
+    function lockAt(edge) {
+      const slotRect = slot.getBoundingClientRect()
+      const { minTop, maxTop } = getStops()
+      mode = edge
+      rail.style.position = 'fixed'
+      rail.style.inset = `${Math.round(edge === 'top' ? maxTop : minTop)}px auto auto ${Math.round(slotRect.left)}px`
+      rail.style.width = `${Math.round(slotRect.width)}px`
+      rail.style.transform = 'none'
+    }
+
+    function clearPosition() {
+      active = false
+      mode = 'page'
+      rail.style.position = ''
+      rail.style.inset = ''
+      rail.style.width = ''
+      rail.style.transform = ''
+      slot.style.height = ''
     }
 
     function measureRail() {
       const desktop = !window.matchMedia('(max-width: 1040px)').matches
       if (!desktop) {
-        active = false
-        visualTop = null
-        rail.style.transform = ''
+        clearPosition()
         lastScrollY = window.scrollY
         return
       }
 
       const previousTop = active ? rail.getBoundingClientRect().top : null
-      rail.style.transform = ''
-      baseTop = rail.getBoundingClientRect().top + window.scrollY
       railHeight = rail.offsetHeight || 0
-      visualTop = clamp(previousTop ?? (baseTop - window.scrollY))
+      slot.style.height = `${railHeight}px`
+      slotTop = slot.getBoundingClientRect().top + window.scrollY
+      const nextTop = clampTop(previousTop ?? (slotTop - window.scrollY))
       lastScrollY = window.scrollY
       active = true
-      applyRailPosition()
+
+      const { minTop, maxTop } = getStops()
+      if (nextTop <= minTop) lockAt('bottom')
+      else if (nextTop >= maxTop) lockAt('top')
+      else placeWithPage(nextTop)
     }
 
     function moveRail() {
@@ -119,11 +146,26 @@ export default function Rail() {
       const nextScrollY = window.scrollY
       const delta = nextScrollY - lastScrollY
       lastScrollY = nextScrollY
+      if (!delta) return
 
-      // Move with the page in either direction, then stop sharply once the
-      // rail itself reaches the top or bottom edge of the viewport.
-      visualTop = clamp(visualTop - delta)
-      applyRailPosition()
+      const { minTop, maxTop } = getStops()
+
+      // Leaving either stop pins the rail back to the document at that exact
+      // point. From there the browser scrolls it normally with the page, so
+      // there is no interpolated or spring-like movement.
+      if ((mode === 'bottom' && delta < 0) || (mode === 'top' && delta > 0)) {
+        const releasedTop = clampTop(rail.getBoundingClientRect().top - delta)
+        if (releasedTop <= minTop) lockAt('bottom')
+        else if (releasedTop >= maxTop) lockAt('top')
+        else placeWithPage(releasedTop)
+        return
+      }
+
+      if (mode !== 'page') return
+
+      const rect = rail.getBoundingClientRect()
+      if (delta > 0 && rect.bottom <= window.innerHeight - BOTTOM_STOP) lockAt('bottom')
+      else if (delta < 0 && rect.top >= TOP_STOP) lockAt('top')
     }
 
     measureRail()
@@ -135,11 +177,13 @@ export default function Rail() {
       observer?.disconnect()
       window.removeEventListener('resize', measureRail)
       window.removeEventListener('scroll', moveRail)
+      clearPosition()
     }
   }, [])
 
   return (
-    <aside className="rail" ref={railRef}>
+    <div className="rail-slot" ref={railSlotRef}>
+      <aside className="rail" ref={railRef}>
       {streak !== null && streak > 0 && (
         <div className="panel streak">
           <h3>Your streak</h3>
@@ -185,6 +229,7 @@ export default function Rail() {
         <Link className="crisis" href="/resources">Resource hub &amp; crisis lines →</Link>
         <p className="safe">Peer support, not a substitute for professional counselling or crisis services.</p>
       </div>
-    </aside>
+      </aside>
+    </div>
   )
 }

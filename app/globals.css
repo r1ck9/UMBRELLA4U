@@ -314,7 +314,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 }
 
 /* right rail: stays visible without becoming a separate scroll area */
-.rail{position:relative; display:flex; flex-direction:column; gap:16px; padding-right:4px; will-change:transform}
+.rail-slot{position:relative; min-width:0}
+.rail{display:flex; flex-direction:column; gap:16px; padding-right:4px; transition:none}
 .panel{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
 .panel h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 12px}
 .bigcount{text-align:center}
@@ -405,7 +406,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .auth .alt a{color:var(--shelter-deep); font-weight:700}
 
 /* responsive */
-@media (max-width:1040px){ .shell{grid-template-columns:180px minmax(0,1fr)} .rail{display:none} }
+@media (max-width:1040px){ .shell{grid-template-columns:180px minmax(0,1fr)} .rail-slot{display:none} }
 @media (max-width:780px){ .shell{grid-template-columns:1fr} .nav{display:none} }
 
 /* notification bell */
