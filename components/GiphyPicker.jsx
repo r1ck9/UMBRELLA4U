@@ -125,7 +125,8 @@ export default function GiphyPicker({ value, onChange }) {
 
   return (
     <div className="giphy-add">
-      <button type="button" className="giphy-toggle" onClick={open ? () => setOpen(false) : showPicker}>GIF · Add from GIPHY</button>
+      <button type="button" className="giphy-toggle" aria-label="Add a GIF from GIPHY"
+        onClick={open ? () => setOpen(false) : showPicker}>GIF</button>
       {open && renderPanel()}
     </div>
   )

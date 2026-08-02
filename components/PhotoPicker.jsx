@@ -50,10 +50,10 @@ export default function PhotoPicker({ value, onChange }) {
       <input ref={cameraRef} className="photo-file-input" type="file"
         accept="image/jpeg,image/png,image/webp" capture="environment" onChange={choose} />
       <div className="photo-actions">
-        <button type="button" className="photo-toggle" disabled={busy}
-          onClick={() => uploadRef.current?.click()}>{busy ? 'Preparing…' : 'Photo · Upload'}</button>
-        <button type="button" className="photo-toggle" disabled={busy}
-          onClick={() => cameraRef.current?.click()}>Camera · Take photo</button>
+        <button type="button" className="photo-toggle" aria-label="Upload a photo" disabled={busy}
+          onClick={() => uploadRef.current?.click()}>{busy ? '…' : 'Photo'}</button>
+        <button type="button" className="photo-toggle" aria-label="Take a photo with the camera" disabled={busy}
+          onClick={() => cameraRef.current?.click()}>Camera</button>
       </div>
       {error && <p className="photo-error">{error}</p>}
     </div>
