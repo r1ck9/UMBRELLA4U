@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
+import CountUpNumber from '@/components/CountUpNumber'
 
 // Moderator-only overview: totals, plus per-user averages and the activation gap.
 export default function StatsPanel() {
@@ -65,7 +66,7 @@ export default function StatsPanel() {
       <div className="stats-grid">
         {totals.map((c) => (
           <div className="stat-card" key={c.l}>
-            <div className="stat-n">{c.n.toLocaleString()}</div>
+            <div className="stat-n"><CountUpNumber value={c.n} /></div>
             <div className="stat-l">{c.l}</div>
           </div>
         ))}
@@ -76,7 +77,7 @@ export default function StatsPanel() {
           <div className="stats-grid">
             {engCards.map((c) => (
               <div className="stat-card" key={c.l}>
-                <div className="stat-n">{c.n.toLocaleString()}</div>
+                <div className="stat-n"><CountUpNumber value={c.n} /></div>
                 <div className="stat-l">{c.l}</div>
               </div>
             ))}
@@ -89,7 +90,7 @@ export default function StatsPanel() {
           <div className="stats-grid">
             {retCards.map((c) => (
               <div className="stat-card" key={c.l}>
-                <div className="stat-n">{c.n.toLocaleString()}</div>
+                <div className="stat-n"><CountUpNumber value={c.n} /></div>
                 <div className="stat-l">{c.l}</div>
               </div>
             ))}

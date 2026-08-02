@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
+import CountUpNumber from '@/components/CountUpNumber'
 
 // The "you were seen" moment: when a returning member has new umbrellas on
 // their stories since they last checked their inbox, greet them with it right
@@ -37,7 +38,7 @@ export default function SeenBanner() {
     <div className="seen-banner">
       <span className="sb-ic" aria-hidden="true">☂</span>
       <div className="sb-body">
-        <b>{n === 1 ? 'Someone stood with you.' : `${n} people stood with you.`}</b>
+        <b>{n === 1 ? 'Someone stood with you.' : <><CountUpNumber value={n} /> people stood with you.</>}</b>
         <span>{note ? `“${note}”` : 'While you were away, an umbrella opened for you. You’re not alone. 🫂'}</span>
       </div>
       <Link href="/inbox" className="btn prim sm sb-cta">See who ☂</Link>

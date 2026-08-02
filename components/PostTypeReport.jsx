@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
+import CountUpNumber from '@/components/CountUpNumber'
 
 // Fixed color per intent (categorical slots 1–4), color follows the entity,
 // never its rank, so sorting bars by count doesn't repaint them. Every bar also
@@ -45,7 +46,7 @@ export default function PostTypeReport() {
     <section className="ptr">
       <div className="ptr-head">
         <h3>Posts by type</h3>
-        {rows && <span className="ptr-cap">{grand.toLocaleString()} posts · {days} day{days === 1 ? '' : 's'} since first post</span>}
+        {rows && <span className="ptr-cap"><CountUpNumber value={grand} /> posts · <CountUpNumber value={days} /> day{days === 1 ? '' : 's'} since first post</span>}
       </div>
       {err && <p className="activity-note">Couldn’t load: {err}</p>}
       {!err && !rows && <p className="activity-note">Loading…</p>}
@@ -57,7 +58,7 @@ export default function PostTypeReport() {
               <div className="ptr-track">
                 <div className="ptr-fill" style={{ width: `${(r.total / max) * 100}%`, background: r.color }} />
               </div>
-              <div className="ptr-val">{r.total.toLocaleString()}<span className="ptr-avg"> · {r.avg}/day</span></div>
+              <div className="ptr-val"><CountUpNumber value={r.total} /><span className="ptr-avg"> · <CountUpNumber value={r.avg} />/day</span></div>
             </div>
           ))}
         </div>

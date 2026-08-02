@@ -9,6 +9,7 @@ import StoryCard from '@/components/StoryCard'
 import FollowButton from '@/components/FollowButton'
 import ProfileEditor from '@/components/ProfileEditor'
 import ProfilePhotoPicker from '@/components/ProfilePhotoPicker'
+import CountUpNumber from '@/components/CountUpNumber'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 import { bannerStyle } from '@/lib/banners'
@@ -156,10 +157,10 @@ export default function PublicProfile({ params }) {
                         onChange={(change) => setCounts((current) => ({ ...current, followers: Math.max(0, current.followers + change) }))} />
                     </div>
                     <div className="pf-stats">
-                      <div><b>{counts.followers}</b> followers</div>
-                      <div><b>{counts.following}</b> following</div>
-                      <div><b>{stats.stories}</b> stories</div>
-                      <div><b>{stats.received}</b> received</div>
+                      <div><b><CountUpNumber value={counts.followers} /></b> followers</div>
+                      <div><b><CountUpNumber value={counts.following} /></b> following</div>
+                      <div><b><CountUpNumber value={stats.stories} /></b> stories</div>
+                      <div><b><CountUpNumber value={stats.received} /></b> received</div>
                     </div>
                     {prof.about_me && <p className="pf-about">{prof.about_me}</p>}
                     {prof.tags.length > 0 && (

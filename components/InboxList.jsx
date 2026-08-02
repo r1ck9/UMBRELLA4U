@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import CountUpNumber from '@/components/CountUpNumber'
 
 function ago(iso) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -103,7 +104,7 @@ export default function InboxList() {
 
   return (
     <>
-      {newCount > 0 && <p className="notif-new">{newCount} new</p>}
+      {newCount > 0 && <p className="notif-new"><CountUpNumber value={newCount} /> new</p>}
       <div className="notif-list">
         {state.items.map((n) => {
           if (n.kind === 'media-review') {

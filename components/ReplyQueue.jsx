@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import CountUpNumber from '@/components/CountUpNumber'
 
 function ago(iso) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -86,7 +87,7 @@ export default function ReplyQueue() {
         <div className="ibx new" key={it.story_id}>
           <div className="ibx-orig">
             <div className="l">
-              {it.category}{it.anonymous ? ' · anonymous' : ''} · umbrellas {it.umbrella_count} · {ago(it.created_at)}
+              {it.category}{it.anonymous ? ' · anonymous' : ''} · umbrellas <CountUpNumber value={it.umbrella_count} /> · {ago(it.created_at)}
             </div>
             <div className="t" style={{ margin: '4px 0 8px' }}>{it.text}</div>
           </div>

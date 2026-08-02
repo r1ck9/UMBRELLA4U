@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
+import CountUpNumber from '@/components/CountUpNumber'
 
 // The signup → first-post funnel. Shows where people drop off.
 const STEPS = [
@@ -58,13 +59,13 @@ export default function FunnelChart() {
               <div className={'funnel-row' + (i === worst && worstDrop > 0 ? ' worst' : '')} key={r.key}>
                 <div className="fn-label">{r.label}</div>
                 <div className="fn-track"><div className="fn-fill" style={{ width: `${pctTop}%` }} /></div>
-                <div className="fn-val">{r.n.toLocaleString()}
-                  {i > 0 && <span className="fn-conv">{conv}%{i === worst && worstDrop > 0 ? ' · biggest drop' : ''}</span>}
+                <div className="fn-val"><CountUpNumber value={r.n} />
+                  {i > 0 && <span className="fn-conv"><CountUpNumber value={conv} />%{i === worst && worstDrop > 0 ? ' · biggest drop' : ''}</span>}
                 </div>
               </div>
             )
           })}
-          <p className="funnel-note">Started typing but never posted: <b>{abandoned.toLocaleString()}</b></p>
+          <p className="funnel-note">Started typing but never posted: <b><CountUpNumber value={abandoned} /></b></p>
         </div>
       )}
     </section>

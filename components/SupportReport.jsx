@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Fragment } from 'react'
 import { supabase } from '@/lib/supabase'
+import CountUpNumber from '@/components/CountUpNumber'
 
 function excerpt(t = '') { return t.length > 88 ? t.slice(0, 88) + '...' : t }
 const statusColor = { complete: 'var(--ink-1)', 'on track': 'var(--shelter)', behind: 'var(--ink-2)' }
@@ -32,7 +33,7 @@ function Sparkline({ data, range }) {
       </div>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '.7rem', color: 'var(--ink-3)' }}>
         <span>{range === 'week' ? '7d ago' : '24h ago'}</span>
-        <span>{total} total</span>
+        <span><CountUpNumber value={total} /> total</span>
         <span>now</span>
       </div>
     </div>
@@ -122,7 +123,9 @@ export default function SupportReport() {
           ) : (
             <Fragment key={i}>
               <div style={{ color: 'var(--ink-2)' }}>{r.metric}</div>
-              <div style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, textAlign: 'right' }}>{r.value}</div>
+              <div style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600, textAlign: 'right' }}>
+                {Number.isFinite(Number(r.value)) ? <CountUpNumber value={Number(r.value)} /> : r.value}
+              </div>
             </Fragment>
           )
         })}
@@ -148,14 +151,14 @@ export default function SupportReport() {
                   <span style={{ color: 'var(--ink-3)' }}> · {p.category}{p.anonymous ? ' · anon' : ''}</span>
                 </td>
                 <td style={{ padding: '8px', whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums' }}>
-                  {p.assisted} / {p.target}
+                  <CountUpNumber value={p.assisted} /> / <CountUpNumber value={p.target} />
                 </td>
                 <td style={{ padding: '8px' }}>
                   <div style={{ background: 'var(--line-2)', borderRadius: 999, height: 7, overflow: 'hidden' }}>
                     <div style={{ width: Math.min(100, p.pct) + '%', height: '100%', background: statusColor[p.status] || 'var(--shelter)' }} />
                   </div>
                 </td>
-                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3)' }}>{p.real}</td>
+                <td style={{ padding: '8px', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-3)' }}><CountUpNumber value={p.real} /></td>
                 <td style={{ padding: '8px' }}>
                   <span style={{ fontSize: '.72rem', fontWeight: 700, color: statusColor[p.status] || 'var(--shelter)' }}>{p.status}</span>
                 </td>

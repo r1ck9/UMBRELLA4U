@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import CountUpNumber from '@/components/CountUpNumber'
 
 // A live banner that makes the community feel alive. Uses cumulative totals
 // (which only grow, never an awkward zero) and ticks up in real time as
@@ -35,12 +36,12 @@ export default function CommunityPulse() {
       {items.map((it) => (
         <div className="pulse-item" key={it.l}>
           <span className="pulse-ic" aria-hidden="true">{it.ic}</span>
-          <b className="pulse-n">{it.n.toLocaleString()}</b>
+          <b className="pulse-n"><CountUpNumber value={it.n} /></b>
           <span className="pulse-l pulse-l-full">{it.l}</span>
           <span className="pulse-l pulse-l-short">{it.short}</span>
         </div>
       ))}
-      {today > 0 && <span className="pulse-today">🌧 {today.toLocaleString()} opened today</span>}
+      {today > 0 && <span className="pulse-today">🌧 <CountUpNumber value={today} /> opened today</span>}
     </div>
   )
 }

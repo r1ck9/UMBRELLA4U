@@ -6,6 +6,7 @@ import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
 import { startOfDayISO } from '@/lib/day'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { STREAK_MILESTONES } from '@/lib/badges'
+import CountUpNumber from '@/components/CountUpNumber'
 
 export default function Rail() {
   const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
@@ -66,7 +67,7 @@ export default function Rail() {
       {streak !== null && streak > 0 && (
         <div className="panel streak">
           <h3>Your streak</h3>
-          <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> {streak} day{streak === 1 ? '' : 's'}</div>
+          <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> <CountUpNumber value={streak} /> day{streak === 1 ? '' : 's'}</div>
           <p className="streak-msg">
             {streak === 1
               ? 'You showed up today. That’s the whole thing, come back tomorrow to keep it going. 🫂'
@@ -77,19 +78,19 @@ export default function Rail() {
       <div className="panel">
         <h3>The community</h3>
         <div className="bigcount">
-          <div className="n">{stats.umbrellas ?? ', '}</div>
+          <div className="n"><CountUpNumber value={stats.umbrellas ?? 0} /></div>
           <div className="l">☂ umbrellas opened</div>
         </div>
-        <div className="ministat"><b>{stats.stories ?? ', '}</b> stories shared</div>
-        <div className="ministat">☀️ <b>{stats.sunny ?? ', '}</b> skies cleared to sunny</div>
+        <div className="ministat"><b><CountUpNumber value={stats.stories ?? 0} /></b> stories shared</div>
+        <div className="ministat">☀️ <b><CountUpNumber value={stats.sunny ?? 0} /></b> skies cleared to sunny</div>
       </div>
 
       <div className="panel quota">
         <h3>Your umbrellas today</h3>
         {left === null
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
-          : <p className="qbig"><b>{left}</b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
-        {postsLeft !== null && <p className="qbig"><b>{postsLeft}</b> of {DAILY_STORY_LIMIT} posts left</p>}
+          : <p className="qbig"><b><CountUpNumber value={left} /></b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
+        {postsLeft !== null && <p className="qbig"><b><CountUpNumber value={postsLeft} /></b> of {DAILY_STORY_LIMIT} posts left</p>}
         <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day, so each one really counts.</p>
         <p className="qcare">🫂 One umbrella can mean the world to someone. Spend yours kindly, and help make this a place worth standing in.</p>
       </div>

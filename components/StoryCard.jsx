@@ -13,6 +13,7 @@ import StoryPhoto from '@/components/StoryPhoto'
 import GiphyAttribution from '@/components/GiphyAttribution'
 import { avatarImageUrl } from '@/lib/avatar'
 import { POST_WEATHERS, WEATHER_MAX, weatherTarget } from '@/lib/weather'
+import CountUpNumber from '@/components/CountUpNumber'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -37,7 +38,7 @@ function WeatherMeter({ weather, count }) {
     return (
       <div className="wx-meter wx-sunny">
         <span className="wx-sun" aria-hidden="true">☀️</span>
-        <span className="wx-sun-txt">Sunny{count ? `, cleared by ${count} umbrella${count === 1 ? '' : 's'}` : ''}</span>
+        <span className="wx-sun-txt">Sunny{count ? <>, cleared by <CountUpNumber value={count} /> umbrella{count === 1 ? '' : 's'}</> : ''}</span>
       </div>
     )
   }
@@ -46,7 +47,7 @@ function WeatherMeter({ weather, count }) {
       <div className="wx-head">
         <span className="wx-e">{w.e}</span>
         <span className="wx-l">{w.l}</span>
-        <span className="wx-need">{`${more} umbrella${more === 1 ? '' : 's'} to sunny`}</span>
+        <span className="wx-need"><CountUpNumber value={more} /> umbrella{more === 1 ? '' : 's'} to sunny</span>
       </div>
       <div className="wx-bar"><div className="wx-fill" style={{ width: (prog * 100) + '%' }} /></div>
     </div>
@@ -388,7 +389,7 @@ export default function StoryCard({ story }) {
           <div className="poll">
             <div className="poll-head">
               <span className="poll-ico">📊</span>
-              <span className="poll-total">{poll.total} {poll.total === 1 ? 'vote' : 'votes'}</span>
+              <span className="poll-total"><CountUpNumber value={poll.total} /> {poll.total === 1 ? 'vote' : 'votes'}</span>
               {!showResults && <span className="poll-cta">· tap to vote</span>}
             </div>
             {poll.options.map((o) => {
@@ -405,7 +406,7 @@ export default function StoryCard({ story }) {
                 <div key={o.id} className={'poll-result' + (mine ? ' mine' : '')}>
                   <div className="poll-bar" style={{ width: pct + '%' }} aria-hidden="true" />
                   <span className="poll-label">{mine && <span className="poll-check">✓</span>}{o.label}</span>
-                  <span className="poll-pct">{pct}%</span>
+                  <span className="poll-pct"><CountUpNumber value={pct} />%</span>
                 </div>
               )
             })}
@@ -417,15 +418,15 @@ export default function StoryCard({ story }) {
 
       <div className="cfoot">
         {isOwn
-          ? <span className="umb own" title="Umbrellas others opened for you"><span className="umb-ico">☂</span> <span>{count}</span></span>
+          ? <span className="umb own" title="Umbrellas others opened for you"><span className="umb-ico">☂</span> <CountUpNumber value={count} /></span>
           : <button className={'umb' + (opened ? ' on' : '')} onClick={() => openUmbrella(null)}
               title={opened ? 'Umbrella opened' : 'Open an umbrella'}>
-              <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <span>{count}</span>
+              <span className="umb-ico">{opened ? '☂' : '🌂'}</span> <CountUpNumber value={count} />
             </button>}
         {!isOwn && (
           <button className={'hug' + (hugged ? ' on' : '')} onClick={toggleHug}
             title={hugged ? 'You’re here with them' : 'Send a hug, I’m here with you'}>
-            🫂 <span>{hugCount}</span>
+            🫂 <CountUpNumber value={hugCount} />
           </button>
         )}
         <span className="hint">
@@ -445,7 +446,7 @@ export default function StoryCard({ story }) {
           {me.isModerator &&
             <button className={'boost' + (boosted ? ' on' : '')} onClick={toggleBoost}
               title="Promote this story, a boost gives it 25 umbrellas' worth of reach in the feed. Moderators only.">
-              ▲ {boosted ? 'Promoted' : 'Promote'}{boostCount > 0 ? ` · ${boostCount}` : ''}
+              ▲ {boosted ? 'Promoted' : 'Promote'}{boostCount > 0 ? <> · <CountUpNumber value={boostCount} /></> : ''}
             </button>}
           {canRemove &&
             <button className="takedown" onClick={handleRemove}>{isOwn ? 'Delete' : '🛑 Take down'}</button>}
@@ -458,7 +459,7 @@ export default function StoryCard({ story }) {
             {huggers.map((h) => <HugAvatar key={h.user_id} h={h} />)}
           </div>
           <button className="hug-more" onClick={() => { const ex = !hugExpanded; setHugExpanded(ex); refreshHuggers(ex ? 500 : 20) }}>
-            {hugCount.toLocaleString()} {hugCount === 1 ? 'person is' : 'people are'} here
+            <CountUpNumber value={hugCount} /> {hugCount === 1 ? 'person is' : 'people are'} here
             {!hugExpanded && hugCount > huggers.length ? ' · see all' : hugExpanded ? ' · show less' : ''}
           </button>
         </div>
