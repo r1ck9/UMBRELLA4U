@@ -66,32 +66,14 @@ export default function Rail() {
   useEffect(() => {
     const rail = railRef.current
     if (!rail) return
-    let targetY = window.scrollY
-    let raf = 0
-    const maxScroll = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
-    const animate = () => {
-      const currentY = window.scrollY
-      const nextY = currentY + (targetY - currentY) * 0.28
-      if (Math.abs(targetY - currentY) < 0.5) {
-        window.scrollTo(0, targetY)
-        raf = 0
-        return
-      }
-      window.scrollTo(0, nextY)
-      raf = requestAnimationFrame(animate)
-    }
     function onWheel(event) {
       if (window.matchMedia('(max-width: 780px)').matches) return
       if (!event.deltaY) return
       event.preventDefault()
-      targetY = Math.min(maxScroll(), Math.max(0, targetY + event.deltaY))
-      if (!raf) raf = requestAnimationFrame(animate)
+      window.scrollBy({ top: event.deltaY, left: 0, behavior: 'auto' })
     }
     rail.addEventListener('wheel', onWheel, { passive: false })
-    return () => {
-      rail.removeEventListener('wheel', onWheel)
-      if (raf) cancelAnimationFrame(raf)
-    }
+    return () => rail.removeEventListener('wheel', onWheel)
   }, [])
 
   return (
