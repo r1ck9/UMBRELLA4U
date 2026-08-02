@@ -11,15 +11,10 @@ import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import GiphyPicker from '@/components/GiphyPicker'
 import PhotoPicker from '@/components/PhotoPicker'
+import { DEFAULT_WEATHER, POST_WEATHERS, WEATHER_MAX } from '@/lib/weather'
 
 // Post weather the author picks: heavier weather takes more umbrellas to clear.
-const WEATHERS = [
-  { v: 0, e: '⛈️', l: 'Heavy rain' },
-  { v: 1, e: '🌧️', l: 'Rain' },
-  { v: 2, e: '☁️', l: 'Cloudy' },
-  { v: 3, e: '🌤️', l: 'Partly sunny' },
-  { v: 4, e: '☀️', l: 'Sunny' },
-]
+const WEATHERS = POST_WEATHERS
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
 // We normalize first, de-leet + strip non-letters, so "f u c k", "sh1t", "xxfaggotxx" are all caught.
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
@@ -46,7 +41,7 @@ export default function Composer() {
   const [heavy, setHeavy] = useState(false)                  // heavy/crisis language detected → suggest "just listen"
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
-  const [weather, setWeather] = useState(2)          // continuous 0–4 slider; rounded only for display/storage
+  const [weather, setWeather] = useState(DEFAULT_WEATHER) // continuous slider; rounded only for display/storage
   const [pollOn, setPollOn] = useState(false)
   const [pollOpts, setPollOpts] = useState(['', ''])   // 2–4 options
   const [confirming, setConfirming] = useState(false)
@@ -214,7 +209,7 @@ export default function Composer() {
         : { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
     }))
     setTimeout(() => {
-      setText(''); setOpen(false); setAnon(false); setWeather(2); setPollOn(false); setPollOpts(['', ''])
+      setText(''); setOpen(false); setAnon(false); setWeather(DEFAULT_WEATHER); setPollOn(false); setPollOpts(['', ''])
       setPrompt(null); setIntentTouched(false); setHeavy(false); setGiphyId(null); clearPhoto(); router.refresh()
     }, 3100)
   }
@@ -296,13 +291,13 @@ export default function Composer() {
             </div>
             <div className="wx-slider-wrap">
               <input id="composer-weather" className="wx-slider" type="range"
-                min="0" max="4" step="0.01" value={weather}
+                min="0" max={WEATHER_MAX} step="0.01" value={weather}
                 onChange={(e) => setWeather(Number(e.target.value))}
                 aria-label="How is your weather today?" aria-valuetext={selectedWeather.l} />
               <div className="wx-slider-stops" aria-hidden="true">
                 {WEATHERS.map((w) => (
                   <span key={w.v} className={selectedWeather.v === w.v ? 'on' : ''}
-                    style={{ left: `${w.v * 25}%` }}>{w.e}</span>
+                    style={{ left: `${(w.v / WEATHER_MAX) * 100}%` }}>{w.e}</span>
                 ))}
               </div>
             </div>

@@ -12,6 +12,7 @@ import { giphyImageUrl } from '@/lib/giphy'
 import StoryPhoto from '@/components/StoryPhoto'
 import GiphyAttribution from '@/components/GiphyAttribution'
 import { avatarImageUrl } from '@/lib/avatar'
+import { POST_WEATHERS, WEATHER_MAX, weatherTarget } from '@/lib/weather'
 
 const INTENT = {
   listen: '🫂 Just listen', advice: '☂ Give advice',
@@ -20,23 +21,17 @@ const INTENT = {
 
 // Post weather: the author picks it; umbrellas clear it toward sunny. Heavier
 // weather needs more. WX[i].need = umbrellas to reach sunny from stage i.
-const WX = [
-  { e: '⛈️', l: 'Heavy rain', need: 50 },
-  { e: '🌧️', l: 'Rain', need: 35 },
-  { e: '☁️', l: 'Cloudy', need: 22 },
-  { e: '🌤️', l: 'Partly sunny', need: 12 },
-  { e: '☀️', l: 'Sunny', need: 8 },
-]
+const WX = POST_WEATHERS
 function WeatherMeter({ weather, count }) {
-  const has = weather != null && weather >= 0 && weather <= 4
+  const has = Number.isInteger(weather) && weather >= 0 && weather <= WEATHER_MAX
   // legacy posts (no chosen weather): derive a stage from the count vs 50
-  const base = has ? weather : (count >= 50 ? 4 : count >= 40 ? 3 : count >= 25 ? 2 : count >= 10 ? 1 : 0)
-  const need = has ? WX[base].need : 50
+  const base = has ? weather : (count >= 50 ? 8 : count >= 40 ? 6 : count >= 25 ? 4 : count >= 10 ? 2 : 0)
+  const need = has ? weatherTarget(base) : 50
   const prog = need > 0 ? Math.min(count / need, 1) : 1
-  const idx = need > 0 ? Math.min(4, base + Math.round(prog * (4 - base))) : 4
+  const idx = need > 0 ? Math.min(WEATHER_MAX, base + Math.round(prog * (WEATHER_MAX - base))) : WEATHER_MAX
   const w = WX[idx]
   const more = Math.max(0, need - count)
-  const sunny = idx >= 4
+  const sunny = idx >= WEATHER_MAX
   // Once it's sunny, drop the bar and show a big sun instead, it's cleared.
   if (sunny) {
     return (

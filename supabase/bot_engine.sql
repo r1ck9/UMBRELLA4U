@@ -41,8 +41,8 @@ exception when others then null; end $$;
 --     Fires only for real (non-bot) authors. During seed_bots.sql the triggers
 --     on stories are disabled, so seeded bot posts never get a target/queue row.
 -- ============================================================
-create or replace function on_new_story() returns trigger
-language plpgsql security definer set search_path = public as $$
+create or replace function public.on_new_story() returns trigger
+language plpgsql security definer set search_path = '' as $$
 declare bot_author boolean;
 begin
   -- Skip seeded/bot posts. Real posts proceed — INCLUDING anonymous ones, which
@@ -50,33 +50,35 @@ begin
   -- author: those are real user posts and deserve umbrellas too.
   if coalesce(new.seed, false) then return null; end if;
   if new.author_id is not null then
-    select coalesce(is_bot, false) into bot_author from profiles where id = new.author_id;
+    select coalesce(is_bot, false) into bot_author from public.profiles where id = new.author_id;
     if bot_author then return null; end if;
   end if;
 
   -- umbrellas needed to reach sunny, by the poster's chosen weather
-  -- (0 heavy rain · 1 rain · 2 cloudy · 3 partly sunny · 4 sunny; null → rain)
-  update stories set umbrella_target =
-    case coalesce(new.weather, 1)
-      when 0 then 50 when 1 then 35 when 2 then 22 when 3 then 12 when 4 then 8 else 35 end
+  -- (0 heavy rain → 8 sunny on the nine-point scale; null → rain)
+  update public.stories set umbrella_target =
+    case coalesce(new.weather, 2)
+      when 0 then 50 when 1 then 43 when 2 then 35 when 3 then 29 when 4 then 22
+      when 5 then 17 when 6 then 12 when 7 then 10 when 8 then 8 else 35 end
    where id = new.id and umbrella_target is null;
 
   -- HEAD START: drop a few umbrellas on right away so a brand-new post never
   -- sits at zero. The drip then ramps it toward ~50 over the next 24h.
-  insert into umbrellas (story_id, user_id, created_at)
+  insert into public.umbrellas (story_id, user_id, created_at)
   select new.id, p.id, now() - (random() * interval '2 minutes')
-  from profiles p
+  from public.profiles p
   where p.is_bot and (new.author_id is null or p.id <> new.author_id)
   order by random()
   limit (3 + floor(random() * 4)::int)          -- 3–6 immediately
   on conflict (story_id, user_id) do nothing;
 
-  insert into owner_reply_queue (story_id) values (new.id) on conflict do nothing;
+  insert into public.owner_reply_queue (story_id) values (new.id) on conflict do nothing;
   return null;
 end $$;
-drop trigger if exists trg_on_new_story on stories;
-create trigger trg_on_new_story after insert on stories
-  for each row execute function on_new_story();
+revoke all on function public.on_new_story() from public, anon, authenticated;
+drop trigger if exists trg_on_new_story on public.stories;
+create trigger trg_on_new_story after insert on public.stories
+  for each row execute function public.on_new_story();
 
 -- ============================================================
 --  2) The drip, paced over a 24-HOUR schedule. For each post: due = target ×

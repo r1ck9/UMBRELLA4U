@@ -30,6 +30,7 @@ language sql security definer set search_path = public stable as $$
   select count(*)::bigint from stories
   where state = 'live' and umbrella_count >=
     case coalesce(weather, -1)
-      when 0 then 50 when 1 then 35 when 2 then 22 when 3 then 12 when 4 then 8 else 50 end
+      when 0 then 50 when 1 then 43 when 2 then 35 when 3 then 29 when 4 then 22
+      when 5 then 17 when 6 then 12 when 7 then 10 when 8 then 8 else 50 end
 $$;
 grant execute on function sunny_count() to anon, authenticated;
