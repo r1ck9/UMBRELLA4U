@@ -8,6 +8,7 @@ import FeedTour from '@/components/FeedTour'
 import SafetyNote from '@/components/SafetyNote'
 import SeenBanner from '@/components/SeenBanner'
 import CommunityPulse from '@/components/CommunityPulse'
+import CareBanner from '@/components/CareBanner'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,7 +34,7 @@ export default async function Feed({ searchParams }) {
           <SeenBanner />
           <CommunityPulse />
           <SafetyNote />
-          <p className="care-banner">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here, just be kind to yourself, and to everyone else.</p>
+          <CareBanner />
           <Composer />
           {stories.length === 0
             ? <p className="empty">No stories here yet. Be the first to share this weather. ☂</p>
