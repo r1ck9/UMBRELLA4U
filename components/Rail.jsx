@@ -70,8 +70,6 @@ export default function Rail() {
       if (window.matchMedia('(max-width: 780px)').matches) return
       if (!event.deltaY) return
       event.preventDefault()
-      const max = Math.max(0, rail.scrollHeight - rail.clientHeight)
-      if (max > 0) rail.scrollTop = Math.min(max, Math.max(0, rail.scrollTop + event.deltaY))
       window.scrollBy({ top: event.deltaY, left: 0, behavior: 'auto' })
     }
     rail.addEventListener('wheel', onWheel, { passive: false })
