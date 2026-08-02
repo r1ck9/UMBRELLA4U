@@ -26,12 +26,14 @@ function savedLanguage() {
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [isMod, setIsMod] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [language, setLanguage] = useState('en')
   const [dragX, setDragX] = useState(0)
   const gesture = useRef(null)
   const suppressClick = useRef(false)
+  const closeTimer = useRef(null)
   const pathname = usePathname()
   const router = useRouter()
 
@@ -47,17 +49,39 @@ export default function MobileMenu() {
     }
   }, [])
   useEffect(() => { getMe().then((m) => setIsMod(m.isModerator)) }, [])
-  useEffect(() => { setOpen(false) }, [pathname])
+  useEffect(() => {
+    return () => clearTimeout(closeTimer.current)
+  }, [])
+  useEffect(() => { if (open) closeMenu() }, [pathname])
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [open])
   useEffect(() => {
     if (!open) return
-    const closeOnEscape = (event) => { if (event.key === 'Escape') setOpen(false) }
+    const closeOnEscape = (event) => { if (event.key === 'Escape') closeMenu() }
     window.addEventListener('keydown', closeOnEscape)
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [open])
+
+  function showMenu() {
+    clearTimeout(closeTimer.current)
+    setLanguage(savedLanguage())
+    setClosing(false)
+    setOpen(true)
+  }
+
+  function closeMenu() {
+    if (!open) return
+    clearTimeout(closeTimer.current)
+    setDragX(0)
+    setClosing(true)
+    const delay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220
+    closeTimer.current = setTimeout(() => {
+      setOpen(false)
+      setClosing(false)
+    }, delay)
+  }
 
   function startSwipe(event) {
     if (!event.isPrimary) return
@@ -92,7 +116,7 @@ export default function MobileMenu() {
     gesture.current = null
     setDragX(0)
     if (dx < -Math.min(64, window.innerWidth * 0.14) && Math.abs(dx) > Math.abs(dy)) {
-      setOpen(false)
+      closeMenu()
     }
   }
 
@@ -104,7 +128,7 @@ export default function MobileMenu() {
   }
 
   function tour() {
-    setOpen(false)
+    closeMenu()
     if (pathname === '/feed') window.dispatchEvent(new CustomEvent('umbrella:start-tour'))
     else router.push('/feed?tour=1')
   }
@@ -113,15 +137,15 @@ export default function MobileMenu() {
 
   return (
     <>
-      <button className="hamburger notranslate" translate="no" aria-label={copy.openMenu} aria-expanded={open}
-        onClick={() => { setLanguage(savedLanguage()); setOpen(true) }}>
+      <button className="hamburger notranslate" translate="no" aria-label={copy.openMenu} aria-expanded={open && !closing}
+        onClick={showMenu}>
         <span /><span /><span />
       </button>
 
       {open && mounted && createPortal(
-        <div className="mm-layer notranslate" translate="no">
+        <div className={'mm-layer notranslate' + (closing ? ' closing' : '')} translate="no">
           <button type="button" className="mm-backdrop" aria-label={copy.closeMenu}
-            onClick={() => setOpen(false)} />
+            onClick={closeMenu} />
           <div className={'mm-panel' + (dragX ? ' dragging' : '')}
             role="dialog" aria-modal="true" aria-label={copy.menu}
             style={dragX ? { transform: `translate3d(${dragX}px,0,0)` } : undefined}
@@ -130,12 +154,12 @@ export default function MobileMenu() {
             onClickCapture={blockSwipeClick}>
             <div className="mm-head">
               <span className="mm-title">☂ {copy.menu}</span>
-              <button className="mm-close" aria-label={copy.closeMenu} onClick={() => setOpen(false)}>✕</button>
+              <button className="mm-close" aria-label={copy.closeMenu} onClick={closeMenu}>✕</button>
             </div>
 
             <div className="mm-grid">
               {LINKS.map((l) => (
-                <Link key={l.href} href={l.href} className="mm-item" onClick={() => setOpen(false)}>
+                <Link key={l.href} href={l.href} className="mm-item" onClick={closeMenu}>
                   <span className="mi-ic" aria-hidden="true">{l.icon}</span><span className="mi-label">{copy[l.key]}</span>
                 </Link>
               ))}
@@ -146,7 +170,7 @@ export default function MobileMenu() {
                 <span className="mi-ic" aria-hidden="true">🧭</span><span className="mi-label">{copy.tour}</span>
               </button>
               {isMod && (
-                <Link href="/moderation" className="mm-item" onClick={() => setOpen(false)}>
+                <Link href="/moderation" className="mm-item" onClick={closeMenu}>
                   <span className="mi-ic" aria-hidden="true">🛑</span><span className="mi-label">{copy.reports}</span>
                 </Link>
               )}
@@ -155,7 +179,7 @@ export default function MobileMenu() {
             <div className="mm-section">{copy.browse}</div>
             <div className="mm-cats">
               {CATEGORIES.map((c) => (
-                <Link key={c.key} href={`/feed?cat=${c.key}`} className="mm-cat" onClick={() => setOpen(false)}>
+                <Link key={c.key} href={`/feed?cat=${c.key}`} className="mm-cat" onClick={closeMenu}>
                   <span className="dot" style={{ background: c.color }} /><span className="mm-cat-label">{copy.categories[c.key] || c.name}</span>
                 </Link>
               ))}
