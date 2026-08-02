@@ -322,6 +322,20 @@ export default function StoryCard({ story }) {
   }
 
   const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
+  const authorAvatar = story.author_avatar_url || ''
+  const authorAvatarIsEmoji = authorAvatar.startsWith('emoji:')
+  const authorAvatarImage = avatarImageUrl(authorAvatar)
+  const authorAvatarStyle = story.anonymous ? undefined : {
+    ...accentStyle(story.author_accent_color),
+    ...(authorAvatarImage ? { backgroundImage: `url(${authorAvatarImage})` } : {}),
+  }
+  const authorAvatarContent = story.anonymous
+    ? '🕶️'
+    : authorAvatarIsEmoji
+      ? authorAvatar.slice(6)
+      : authorAvatarImage
+        ? ''
+        : (story.author_name || '☂').trim().charAt(0).toUpperCase()
   const badges = story.anonymous ? [] : earnedBadges({
     streak: story.author_streak || 0,
     posts: story.author_posts || 0,
@@ -335,7 +349,8 @@ export default function StoryCard({ story }) {
   return (
     <article className="card">
       <div className="chead">
-        <span className={'avatar' + (story.anonymous ? ' anon' : '')} aria-hidden="true">{story.anonymous ? '🕶️' : ''}</span>
+        <span className={'avatar' + (story.anonymous ? ' anon' : '')}
+          style={authorAvatarStyle} aria-hidden="true">{authorAvatarContent}</span>
         <div>
           <div className="name">
             {story.anonymous || !story.author_name

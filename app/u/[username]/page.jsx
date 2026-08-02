@@ -11,6 +11,7 @@ import { getMe } from '@/lib/me'
 import { bannerStyle } from '@/lib/banners'
 import { accentStyle, profileAccentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
+import { withStoryAuthor } from '@/lib/storyAuthors'
 
 function since(ts) {
   if (!ts) return ' '
@@ -50,7 +51,7 @@ export default function PublicProfile({ params }) {
       const row = Array.isArray(fc) ? fc[0] : fc
       setCounts({ followers: Number(row?.followers) || 0, following: Number(row?.following) || 0 })
       setChannels(chs || [])
-      setPosts(ps || [])
+      setPosts((ps || []).map((story) => withStoryAuthor(story, prof)))
       setState({ loading: false, prof })
     })()
   }, [uname])

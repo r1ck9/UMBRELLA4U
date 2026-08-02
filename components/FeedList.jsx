@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
+import { attachStoryAuthors } from '@/lib/storyAuthors'
 import StoryCard from '@/components/StoryCard'
 
 const GUEST_LIMIT = 3 // how many stories a logged-out visitor can read before the wall
@@ -21,7 +22,7 @@ export default function FeedList({ stories, category = null }) {
         let q = supabase.from('stories').select('id,author_id,author_name,anonymous,text,intent,category,content_warning,umbrella_count,state,created_at,boost_count,hug_count,off_topic_count,prompt_id,view_count,weather,giphy_id,photo_path').eq('state', 'live')
           .order('created_at', { ascending: false }).limit(100)
         if (category) q = q.eq('category', category)
-        q.then(({ data }) => { if (data) setModRows(data) })
+        q.then(async ({ data }) => { if (data) setModRows(await attachStoryAuthors(supabase, data)) })
       }
     })
   }, [category])

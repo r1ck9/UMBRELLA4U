@@ -273,7 +273,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 /* story card */
 .card{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:18px 20px; box-shadow:var(--shadow)}
 .chead{display:flex; align-items:center; gap:11px; margin-bottom:12px}
-.avatar{width:34px; height:34px; border-radius:50%; background:var(--sky-glow); flex:0 0 auto; display:grid; place-items:center; font-size:15px}
+.avatar{width:34px; height:34px; border-radius:50%; background:var(--sky-glow); flex:0 0 auto; display:grid; place-items:center; font-size:17px; font-weight:800; background-size:cover; background-position:center}
 .avatar.anon{background:linear-gradient(135deg,var(--ui-violet),var(--ui-plum))}
 .name{font-weight:700; font-size:14px}
 .name .lock{color:var(--ink-3); font-weight:600}

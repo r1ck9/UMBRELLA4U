@@ -9,6 +9,7 @@ import StoryCard from '@/components/StoryCard'
 import { supabase } from '@/lib/supabase'
 import { accentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
+import { attachStoryAuthors } from '@/lib/storyAuthors'
 
 function Results() {
   const q = (useSearchParams().get('q') || '').trim()
@@ -32,7 +33,8 @@ function Results() {
       ;[...(byName || []), ...(byTag || [])].forEach((pr) => {
         if (!seen.has(pr.username)) { seen.add(pr.username); people.push(pr) }
       })
-      setState({ loading: false, stories: stories || [], people })
+      const storiesWithAuthors = await attachStoryAuthors(supabase, stories || [])
+      setState({ loading: false, stories: storiesWithAuthors, people })
     })()
   }, [q])
 
