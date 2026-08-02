@@ -486,6 +486,12 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .pf-avatar{width:90px; height:90px; border-radius:24px; border:4px solid var(--panel); background-size:cover; background-position:center;
   display:grid; place-items:center; font-family:var(--serif); font-weight:800; font-size:36px; color:var(--ui-cloud); flex:0 0 auto;
   box-shadow:0 0 0 2px var(--profile-accent),0 5px 16px color-mix(in srgb,var(--profile-accent) 25%,transparent)}
+.pf-avatar-button{position:relative;padding:0;cursor:pointer;overflow:hidden;appearance:none}
+.pf-avatar-button:focus-visible{outline:3px solid var(--profile-accent);outline-offset:4px}
+.pf-avatar-edit{position:absolute;inset:auto 0 0;padding:5px 3px;background:color-mix(in srgb,var(--ui-plum) 78%,transparent);
+  color:var(--ui-cloud);font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  opacity:0;transform:translateY(4px);transition:opacity .18s ease,transform .18s ease}
+.pf-avatar-button:hover .pf-avatar-edit,.pf-avatar-button:focus-visible .pf-avatar-edit{opacity:1;transform:none}
 .pf-id{padding-bottom:6px; min-width:0; margin-top:52px}
 .pf-name{font-family:var(--serif); font-size:23px; font-weight:800; line-height:1.1; color:var(--profile-accent-ink)}
 .pf-handle{font-size:13px;color:color-mix(in srgb,var(--profile-accent-ink) 62%,var(--ink-2));margin-top:3px}
@@ -612,7 +618,15 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   background:var(--shelter-wash); padding:4px 11px; border-radius:999px}
 .pf-viewlink{display:inline-block; margin:0 22px 20px; font-size:13.5px; color:var(--shelter); text-decoration:none; font-weight:600}
 .pf-viewlink:hover{text-decoration:underline}
-.pf-actions{padding:0 22px 20px}
+.pf-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:0 22px 20px}
+.pf-actions .report{padding:7px 0}
+.profile-photo-modal{max-width:520px}
+.profile-photo-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+.profile-photo-modal-head h2{margin:0 0 5px}
+.profile-photo-modal-head p{margin:0;color:var(--ink-3);font-size:13px;line-height:1.4}
+.modal-x{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border:1px solid var(--rain-2);border-radius:11px;
+  background:var(--rain-0);color:var(--ink-2);font-size:22px;line-height:1;cursor:pointer}
+.modal-x:hover{border-color:var(--shelter);color:var(--shelter-deep)}
 .profile-card .pf-tags .tag{color:var(--profile-accent-ink);background:color-mix(in srgb,var(--profile-accent) 13%,var(--panel));
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--profile-accent) 24%,transparent)}
 .profile-card .pf-viewlink{color:var(--profile-accent-ink)}
@@ -620,7 +634,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   background:color-mix(in srgb,var(--profile-accent) 8%,var(--panel))}
 .profile-card .followbtn:hover,.profile-card .followbtn.on{color:var(--profile-on-accent);border-color:var(--profile-accent);background:var(--profile-accent)}
 .tag-edit{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px}
-.tag.rm{cursor:pointer}
+.tag.rm{cursor:pointer;border:0;font:inherit}
 .tag.rm:hover{background:var(--care); color:var(--on-accent)}
 .tag-input{flex:1; min-width:150px; border:1.5px solid var(--rain-2); border-radius:999px; padding:6px 13px; font:inherit; font-size:13px; background:var(--panel); color:var(--ink-1)}
 .sw.bn{width:44px; height:30px}
@@ -869,6 +883,9 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   .pf-about{padding:12px 14px 16px;font-size:13.5px;overflow-wrap:anywhere}
   .pf-tags{padding:0 14px 16px}.pf-viewlink{display:block;margin:0 14px 16px;font-size:12.5px;overflow-wrap:anywhere}
   .pf-actions{padding:0 14px 16px}
+  .pf-actions .profile-edit-btn{min-width:180px;min-height:52px;justify-content:center;padding:14px 22px;font-size:15px}
+  .pf-avatar-edit{opacity:1;transform:none}
+  .profile-photo-modal{padding:19px 15px}
   .pf-edit{padding:16px 14px}
   .profile-edit-bar{margin-top:11px;gap:8px;flex-wrap:wrap}.profile-edit-bar .btn{min-width:180px;min-height:52px;justify-content:center;padding:14px 22px;font-size:15px}
   .profile-autosave{min-width:0;font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

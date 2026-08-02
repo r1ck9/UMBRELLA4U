@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase'
 export default function Settings() {
   const router = useRouter()
   const [user, setUser] = useState(null)
+  const [username, setUsername] = useState('')
   const [loading, setLoading] = useState(true)
   const [prefs, setPrefs] = useState({ discoverable: true, notify_email: true })
 
@@ -20,8 +21,11 @@ export default function Settings() {
       const { data } = await supabase.auth.getUser()
       if (!data.user) { setLoading(false); return }
       setUser(data.user)
-      const { data: prof } = await supabase.from('profiles').select('discoverable,notify_email').eq('id', data.user.id).single()
-      if (prof) setPrefs({ discoverable: prof.discoverable ?? true, notify_email: prof.notify_email ?? false })
+      const { data: prof } = await supabase.from('profiles').select('username,discoverable,notify_email').eq('id', data.user.id).single()
+      if (prof) {
+        setUsername(prof.username || '')
+        setPrefs({ discoverable: prof.discoverable ?? true, notify_email: prof.notify_email ?? false })
+      }
       setLoading(false)
     })()
   }, [])
@@ -72,7 +76,7 @@ export default function Settings() {
 
           <div className="set-group">
             <h3>Account</h3>
-            <p className="set-line"><Link href="/profile">Edit your profile →</Link></p>
+            <p className="set-line"><Link href={username ? `/u/${encodeURIComponent(username)}` : '/profile'}>Edit your profile →</Link></p>
             <p className="set-line"><Link href="/welcome">How Haven works &amp; why you’re safe →</Link></p>
             <button className="btn ghost sm" onClick={logoutEverywhere}>Log out of all devices</button>
           </div>

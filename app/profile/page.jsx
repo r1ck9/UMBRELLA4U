@@ -1,244 +1,35 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import Link from 'next/link'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import TopBar from '@/components/TopBar'
-import Nav from '@/components/Nav'
-import Rail from '@/components/Rail'
 import { supabase } from '@/lib/supabase'
-import { BANNERS, bannerStyle } from '@/lib/banners'
-import EmojiPicker from '@/components/EmojiPicker'
-import ProfilePhotoPicker from '@/components/ProfilePhotoPicker'
-import { earnedBadges } from '@/lib/badges'
-import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent, profileAccentStyle } from '@/lib/palette'
-import { avatarImageUrl } from '@/lib/avatar'
 
-// Rotating example bios, a fresh one is picked each time the page opens.
-const BIO_EXAMPLES = [
-  'Volleyball, playlists on repeat, and still figuring it out. 🌱',
-  'Art kid. Overthinker. Trying to be kinder to myself.',
-  'Loves rainy days, bad puns, and my dog. Here to listen.',
-  'Just a teen navigating school, friends, and everything in between.',
-  'Books over parties. Anxiety is loud, but so is my hope.',
-  'Learning guitar (badly). Big feelings, small steps.',
-  'Third-culture kid finding where I belong. 🌍',
-  'Some days heavy, some days light, either way, I’m here.',
-  'Coffee, coding, and cats. Say hi. ☕',
-  'Trying my best, one deep breath at a time.',
-  'Music makes it bearable. Ask me for song recs. 🎧',
-  'New school, new city, still me. Figuring it out.',
-  'Soft-spoken, but I’ve always got your back.',
-  'Plant parent in training 🌿, here to hold umbrellas.',
-  'Gamer, dreamer, occasional crier. All are welcome here.'
-]
-const STATUS_EXAMPLES = [
-  '🌧 heavy but managing', '⛅ better than yesterday', '🌱 slowly growing',
-  '🌊 riding the waves', '☀️ actually okay today', '🌙 tired but hopeful',
-  '🌫 a little foggy', '⛈ rough week, still standing'
-]
-const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
-
-export default function Profile() {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [editOpen, setEditOpen] = useState(false)
-  const [saveState, setSaveState] = useState('idle')
-  const [saveError, setSaveError] = useState('')
-  const saveRevision = useRef(0)
-  const [stats, setStats] = useState({ stories: 0, received: 0, sent: 0 })
-  const [streak, setStreak] = useState(0)
-  const [tagInput, setTagInput] = useState('')
-  // Fresh example placeholders each time the page mounts.
-  const [ph] = useState(() => ({ bio: pick(BIO_EXAMPLES), status: pick(STATUS_EXAMPLES) }))
-  const [p, setP] = useState({
-    username: '', display_name: '', pronouns: '', status_weather: '', about_me: '',
-    accent_color: PALETTE.violet, avatar_url: '', banner_theme: 'rain', tags: []
-  })
+// Compatibility route for old bookmarks. Haven now has one profile page: /u/:username.
+export default function ProfileRedirect() {
+  const router = useRouter()
 
   useEffect(() => {
-    if (!supabase) { setLoading(false); return }
+    if (!supabase) { router.replace('/login'); return }
+    let active = true
     ;(async () => {
       const { data } = await supabase.auth.getUser()
-      if (!data.user) { setLoading(false); return }
-      setUser(data.user)
-      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,created_at').eq('id', data.user.id).single()
-      if (prof) setP({
-        username: prof.username || '', display_name: prof.display_name || '', pronouns: prof.pronouns || '',
-        status_weather: prof.status_weather || '', about_me: prof.about_me || '',
-        accent_color: normalizeAccent(prof.accent_color), avatar_url: prof.avatar_url || '',
-        banner_theme: prof.banner_theme || 'rain', tags: prof.tags || []
-      })
-      if (prof) setStreak(prof.streak_count || 0)
-      const { data: mine } = await supabase.from('stories').select('id,umbrella_count').eq('author_id', data.user.id)
-      const s = mine || []
-      setStats({
-        stories: s.length,
-        received: s.reduce((a, x) => a + (x.umbrella_count || 0), 0),
-        sent: prof?.umbrellas_sent || 0
-      })
-      setLoading(false)
+      if (!active) return
+      if (!data.user) { router.replace('/login'); return }
+
+      const { data: profile } = await supabase.from('profiles')
+        .select('username').eq('id', data.user.id).maybeSingle()
+      if (!active) return
+      if (profile?.username) router.replace(`/u/${encodeURIComponent(profile.username)}`)
+      else router.replace('/onboarding')
     })()
-  }, [])
-
-  function set(k, v) {
-    saveRevision.current += 1
-    setP((prev) => ({ ...prev, [k]: v }))
-    setSaveError('')
-    setSaveState('pending')
-  }
-
-  function addTag() {
-    const t = tagInput.trim().replace(/^#/, '').slice(0, 20)
-    if (t && !p.tags.includes(t) && p.tags.length < 8) set('tags', [...p.tags, t])
-    setTagInput('')
-  }
-  function removeTag(t) { set('tags', p.tags.filter((x) => x !== t)) }
-
-  useEffect(() => {
-    if (!supabase || !user || saveState !== 'pending') return
-    const revision = saveRevision.current
-    const profile = {
-      display_name: p.display_name,
-      pronouns: p.pronouns,
-      status_weather: p.status_weather,
-      about_me: p.about_me,
-      accent_color: normalizeAccent(p.accent_color),
-      avatar_url: p.avatar_url,
-      banner_theme: p.banner_theme,
-      tags: p.tags,
-    }
-    const timer = setTimeout(async () => {
-      setSaveState('saving')
-      const { data, error } = await supabase.from('profiles')
-        .update(profile).eq('id', user.id).select('id').maybeSingle()
-      if (revision !== saveRevision.current) return
-      if (error || !data) {
-        const message = error?.message || 'Your profile could not be saved. Please try again.'
-        setSaveError(/blocked_content/i.test(message)
-          ? "Some of your profile text isn’t allowed. Please remove any hurtful or unsafe words. 💛"
-          : message)
-        setSaveState('error')
-        return
-      }
-      setSaveError('')
-      setSaveState('saved')
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [p, saveState, user])
-
-  if (loading) return (<><TopBar /><main className="container"><p className="empty">Loading…</p></main></>)
-  if (!user) return (<><TopBar /><main className="container"><h1>Your profile</h1><p className="sub" style={{ color: 'var(--ink-2)' }}>Log in to set up your profile.</p></main></>)
-
-  const initial = (p.display_name || p.username || '☂').trim().charAt(0).toUpperCase()
-  // avatar_url holds an emoji preset or a moderator-approved custom photo path.
-  const isEmoji = p.avatar_url.startsWith('emoji:')
-  const imageUrl = avatarImageUrl(p.avatar_url)
-  const isImg = Boolean(imageUrl)
-  const avStyle = isImg ? { backgroundImage: `url(${imageUrl})` } : accentStyle(p.accent_color)
-  const avInner = isEmoji ? p.avatar_url.slice(6) : (isImg ? '' : initial)
-  const badges = earnedBadges({ streak, posts: stats.stories, umbrellasSent: stats.sent })
+    return () => { active = false }
+  }, [router])
 
   return (
     <>
       <TopBar />
-      <div className="shell">
-        <Nav active="" />
-        <main className="feed">
-          {/* presentable profile */}
-          <div className="profile-card" style={profileAccentStyle(p.accent_color)}>
-            <div className="pf-banner" style={bannerStyle(p.banner_theme)} />
-            <div className="pf-top">
-              <div className="pf-avatar" style={avStyle}>{avInner}</div>
-              <div className="pf-id">
-                <div className="pf-name">{p.display_name || p.username || 'you'}{badges.map((b) => <span key={b.label} className="streak-badge" title={b.label}>{b.icon}</span>)}</div>
-                <div className="pf-handle">@{p.username}{p.pronouns ? ' · ' + p.pronouns : ''}</div>
-                {p.status_weather && <div className="pf-status">{p.status_weather}</div>}
-              </div>
-            </div>
-            <div className="pf-stats">
-              <div><b>{stats.stories}</b> stories</div>
-              <div><b>{stats.received}</b> umbrellas received</div>
-              <div><b>{stats.sent}</b> umbrellas sent</div>
-              <div><b>{streak}</b> day streak</div>
-            </div>
-            {badges.length > 0 && (
-              <div className="pf-badges">
-                {badges.map((b) => (
-                  <span key={b.label} className="pf-badge"><span className="pf-badge-ic">{b.icon}</span>{b.label}</span>
-                ))}
-              </div>
-            )}
-            {p.about_me && <p className="pf-about">{p.about_me}</p>}
-            {p.tags.length > 0 && <div className="pf-tags">{p.tags.map((t) => <span key={t} className="tag">{t}</span>)}</div>}
-            {p.username && <Link className="pf-viewlink" href={`/u/${encodeURIComponent(p.username)}`}>View my public profile →</Link>}
-          </div>
-
-          <div className="profile-edit-bar">
-            <button type="button" className="btn prim sm" aria-expanded={editOpen}
-              aria-controls="profile-editor" onClick={() => setEditOpen((open) => !open)}>
-              {editOpen ? 'Done editing' : '✏️ Edit profile'}
-            </button>
-            <span className={'profile-autosave ' + saveState} aria-live="polite">
-              {saveState === 'pending' || saveState === 'saving'
-                ? 'Saving…'
-                : saveState === 'saved'
-                  ? '✓ Saved automatically'
-                  : saveState === 'error' ? 'Couldn’t save' : ''}
-            </span>
-          </div>
-
-          {/* editor stays tucked away until the member asks for it */}
-          {editOpen && <div className="pf-edit" id="profile-editor">
-            <div className="pf-edit-head">
-              <h3>Edit profile</h3>
-              <span>Changes save automatically</span>
-            </div>
-            <div className="pform">
-              <label>Avatar
-                <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
-              </label>
-              <p className="up-note">Choose an emoji, or upload a real profile photo below. Emoji changes save automatically.</p>
-              <ProfilePhotoPicker userId={user.id} />
-
-              <label>Display name<input value={p.display_name} maxLength={30} onChange={(e) => set('display_name', e.target.value)} placeholder={p.username} /></label>
-              <label>Pronouns<input value={p.pronouns} maxLength={30} onChange={(e) => set('pronouns', e.target.value)} placeholder="they/them (optional)" /></label>
-              <label>Today&apos;s weather (status)<input value={p.status_weather} maxLength={60} onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
-              <label>About me<textarea value={p.about_me} maxLength={300} onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
-              <p className="privacy-note">🔒 Don&apos;t put your real name, school, or address here. Combining identifying details can reveal who you are.</p>
-              <label>Accent color
-                <div className="swatches">
-                  {PROFILE_ACCENTS.map((c) => (
-                    <button key={c} type="button" title={accentName(c)} className={'sw' + (p.accent_color === c ? ' on' : '')} style={accentStyle(c)} onClick={() => set('accent_color', c)} aria-label={accentName(c)} />
-                  ))}
-                </div>
-              </label>
-              <label>Banner
-                <div className="swatches bnset">
-                  {BANNERS.map((b) => (
-                    <button key={b.key} type="button" title={b.name}
-                      className={'sw bn' + (p.banner_theme === b.key ? ' on' : '')}
-                      style={bannerStyle(b.key)} onClick={() => set('banner_theme', b.key)} aria-label={b.name} />
-                  ))}
-                </div>
-              </label>
-              <label>Interests / tags
-                <div className="tag-edit">
-                  {p.tags.map((t) => (
-                    <span key={t} className="tag rm" onClick={() => removeTag(t)}>{t} ✕</span>
-                  ))}
-                  {p.tags.length < 8 && (
-                    <input className="tag-input" value={tagInput} maxLength={20}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
-                      onBlur={addTag} placeholder="+ add a tag (Enter)" />
-                  )}
-                </div>
-              </label>
-              {saveError && <p className="profile-save-error" role="alert">{saveError}</p>}
-            </div>
-          </div>}
-        </main>
-        <Rail />
-      </div>
+      <main className="container"><p className="empty">Opening your profile...</p></main>
     </>
   )
 }

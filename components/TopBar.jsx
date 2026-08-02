@@ -79,7 +79,7 @@ export default function TopBar() {
         {email ? (
           <>
             <Link href="/inbox" className="bell" title="Your inbox">📨{unread > 0 && <span className="dotn">{unread}</span>}</Link>
-            <Link href="/profile" className="tb-avatar" style={avStyle} title={`Your profile${email ? ' · ' + email : ''}`}>
+            <Link href={av?.username ? `/u/${encodeURIComponent(av.username)}` : '/profile'} className="tb-avatar" style={avStyle} title={`Your profile${email ? ' · ' + email : ''}`}>
               {isEmoji ? url.slice(6) : (isImg ? '' : initial)}
             </Link>
             <button className="btn ghost sm tb-logout" onClick={logout}>Log out</button>
