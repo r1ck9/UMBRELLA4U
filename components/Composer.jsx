@@ -46,7 +46,7 @@ export default function Composer() {
   const [heavy, setHeavy] = useState(false)                  // heavy/crisis language detected → suggest "just listen"
   const [category, setCategory] = useState('school')
   const [anon, setAnon] = useState(false)
-  const [weather, setWeather] = useState(2)          // 0 heavy rain … 4 sunny; default cloudy
+  const [weather, setWeather] = useState(2)          // continuous 0–4 slider; rounded only for display/storage
   const [pollOn, setPollOn] = useState(false)
   const [pollOpts, setPollOpts] = useState(['', ''])   // 2–4 options
   const [confirming, setConfirming] = useState(false)
@@ -60,7 +60,7 @@ export default function Composer() {
   const [photo, setPhoto] = useState(null)
 
   const hasMedia = Boolean(giphyId || photo)
-  const selectedWeather = WEATHERS[weather]
+  const selectedWeather = WEATHERS[Math.round(weather)]
 
   function clearPhoto() {
     if (photo?.previewUrl) URL.revokeObjectURL(photo.previewUrl)
@@ -142,7 +142,7 @@ export default function Composer() {
     try {
       ({ data: created, error } = await withTimeout(
         supabase.from('stories')
-          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather, prompt_id: prompt?.key || null, giphy_id: giphyId, photo_path: photoPath }, (!anon && channelId) ? { channel_id: channelId } : {}))
+          .insert(Object.assign({ text: text.trim(), intent, category, anonymous: anon, weather: Math.round(weather), prompt_id: prompt?.key || null, giphy_id: giphyId, photo_path: photoPath }, (!anon && channelId) ? { channel_id: channelId } : {}))
           .select('id').single().abortSignal(insertController.signal),
         15000,
         'Story posting timed out. Please run the database fallback SQL and try again.'
@@ -296,66 +296,71 @@ export default function Composer() {
             </div>
             <div className="wx-slider-wrap">
               <input id="composer-weather" className="wx-slider" type="range"
-                min="0" max="4" step="1" value={weather}
+                min="0" max="4" step="0.01" value={weather}
                 onChange={(e) => setWeather(Number(e.target.value))}
                 aria-label="How is your weather today?" aria-valuetext={selectedWeather.l} />
               <div className="wx-slider-stops" aria-hidden="true">
                 {WEATHERS.map((w) => (
-                  <span key={w.v} className={weather === w.v ? 'on' : ''}>{w.e}</span>
+                  <span key={w.v} className={selectedWeather.v === w.v ? 'on' : ''}
+                    style={{ left: `${w.v * 25}%` }}>{w.e}</span>
                 ))}
               </div>
             </div>
           </div>
-          <label className="anon">
-            <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} />
-            🕶️ Post fully anonymously (not linked to your account name)
-          </label>
+          <div className="composer-tools">
+            {!anon && channels.length > 0 && (
+              <div className="compose-channel">
+                <span>📺 Channel:</span>
+                <select value={channelId} onChange={(e) => setChannelId(e.target.value)}>
+                  <option value="">None</option>
+                  {channels.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+            )}
+            <button type="button" className={'poll-toggle' + (pollOn ? ' on' : '')}
+              onClick={() => {
+                if (pollOn) setPollOpts(['', ''])
+                setPollOn(!pollOn)
+              }}>
+              📊 {pollOn ? 'Poll added' : 'Add a poll'}
+            </button>
+          </div>
 
-          {!anon && channels.length > 0 && (
-            <div className="compose-channel">
-              <span>📺 Channel:</span>
-              <select value={channelId} onChange={(e) => setChannelId(e.target.value)}>
-                <option value="">None</option>
-                {channels.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+          {pollOn && (
+            <div className="poll-build">
+              <div className="poll-build-head">
+                <span>📊 Poll</span>
+                <button type="button" className="poll-off" onClick={() => { setPollOn(false); setPollOpts(['', '']) }}>Remove poll</button>
+              </div>
+              {pollOpts.map((opt, i) => (
+                <div className="poll-opt-row" key={i}>
+                  <input type="text" className="poll-opt-input" value={opt} maxLength={80}
+                    placeholder={`Option ${i + 1}`}
+                    onChange={(e) => { const next = [...pollOpts]; next[i] = e.target.value; setPollOpts(next); if (rejected) setRejected('') }} />
+                  {pollOpts.length > 2 && (
+                    <button type="button" className="poll-opt-x" aria-label="Remove option"
+                      onClick={() => setPollOpts(pollOpts.filter((_, j) => j !== i))}>✕</button>
+                  )}
+                </div>
+              ))}
+              {pollOpts.length < 4 && (
+                <button type="button" className="poll-opt-add" onClick={() => setPollOpts([...pollOpts, ''])}>
+                  ＋ Add option
+                </button>
+              )}
+              <p className="poll-note">Everyone can vote once. Results are public and update live. ☂</p>
             </div>
           )}
 
-          <div className="poll-add">
-            {!pollOn ? (
-              <button type="button" className="poll-toggle" onClick={() => setPollOn(true)}>
-                📊 Add a poll
-              </button>
-            ) : (
-              <div className="poll-build">
-                <div className="poll-build-head">
-                  <span>📊 Poll</span>
-                  <button type="button" className="poll-off" onClick={() => { setPollOn(false); setPollOpts(['', '']) }}>Remove poll</button>
-                </div>
-                {pollOpts.map((opt, i) => (
-                  <div className="poll-opt-row" key={i}>
-                    <input type="text" className="poll-opt-input" value={opt} maxLength={80}
-                      placeholder={`Option ${i + 1}`}
-                      onChange={(e) => { const next = [...pollOpts]; next[i] = e.target.value; setPollOpts(next); if (rejected) setRejected('') }} />
-                    {pollOpts.length > 2 && (
-                      <button type="button" className="poll-opt-x" aria-label="Remove option"
-                        onClick={() => setPollOpts(pollOpts.filter((_, j) => j !== i))}>✕</button>
-                    )}
-                  </div>
-                ))}
-                {pollOpts.length < 4 && (
-                  <button type="button" className="poll-opt-add" onClick={() => setPollOpts([...pollOpts, ''])}>
-                    ＋ Add option
-                  </button>
-                )}
-                <p className="poll-note">Everyone can vote once. Results are public and update live. ☂</p>
-              </div>
-            )}
-          </div>
-
-          <div className="row end">
-            <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']); setGiphyId(null); clearPhoto() }}>Cancel</button>
-            <button className="btn prim sm" onClick={startShare}>☂ Share</button>
+          <div className="composer-actions">
+            <label className="anon" title="Your post will not be linked to your account name">
+              <input type="checkbox" checked={anon} onChange={(e) => setAnon(e.target.checked)} />
+              <span>🕶️ Post anonymously</span>
+            </label>
+            <div className="row end">
+              <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']); setGiphyId(null); clearPhoto() }}>Cancel</button>
+              <button className="btn prim sm" onClick={startShare}>☂ Share</button>
+            </div>
           </div>
         </div>
       )}
