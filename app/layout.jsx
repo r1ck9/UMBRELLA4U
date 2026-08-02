@@ -24,7 +24,15 @@ const nunitoSans = Nunito_Sans({
 
 export const metadata = {
   title: 'Haven, come in from the rain',
-  description: "An anonymous space to share what you're carrying, and to know someone will stand with you."
+  description: "An anonymous space to share what you're carrying, and to know someone will stand with you.",
+  icons: {
+    icon: [
+      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' }
+    ],
+    apple: '/apple-touch-icon.png',
+    shortcut: '/icon-192.png'
+  }
 }
 
 // Ensure phones render at device width so the responsive top-bar rules apply
@@ -35,6 +43,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${nunitoSans.variable}`}>
       <head>
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="shortcut icon" href="/icon-192.png" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#76509a" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
