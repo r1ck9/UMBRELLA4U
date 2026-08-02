@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 import Nav from '@/components/Nav'
@@ -40,7 +40,10 @@ const pick = (arr) => arr[Math.floor(Math.random() * arr.length)]
 export default function Profile() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [saved, setSaved] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [saveState, setSaveState] = useState('idle')
+  const [saveError, setSaveError] = useState('')
+  const saveRevision = useRef(0)
   const [stats, setStats] = useState({ stories: 0, received: 0, sent: 0 })
   const [streak, setStreak] = useState(0)
   const [tagInput, setTagInput] = useState('')
@@ -76,7 +79,12 @@ export default function Profile() {
     })()
   }, [])
 
-  function set(k, v) { setP((prev) => ({ ...prev, [k]: v })); setSaved(false) }
+  function set(k, v) {
+    saveRevision.current += 1
+    setP((prev) => ({ ...prev, [k]: v }))
+    setSaveError('')
+    setSaveState('pending')
+  }
 
   function addTag() {
     const t = tagInput.trim().replace(/^#/, '').slice(0, 20)
@@ -85,20 +93,37 @@ export default function Profile() {
   }
   function removeTag(t) { set('tags', p.tags.filter((x) => x !== t)) }
 
-  async function save() {
-    const { error } = await supabase.from('profiles').update({
-      display_name: p.display_name, pronouns: p.pronouns, status_weather: p.status_weather,
-      about_me: p.about_me, accent_color: normalizeAccent(p.accent_color), avatar_url: p.avatar_url,
-      banner_theme: p.banner_theme, tags: p.tags
-    }).eq('id', user.id)
-    if (error) {
-      alert(/blocked_content/i.test(error.message)
-        ? "Some of your profile text isn’t allowed, please remove any hurtful or unsafe words and try again. 💛"
-        : error.message)
-      return
+  useEffect(() => {
+    if (!supabase || !user || saveState !== 'pending') return
+    const revision = saveRevision.current
+    const profile = {
+      display_name: p.display_name,
+      pronouns: p.pronouns,
+      status_weather: p.status_weather,
+      about_me: p.about_me,
+      accent_color: normalizeAccent(p.accent_color),
+      avatar_url: p.avatar_url,
+      banner_theme: p.banner_theme,
+      tags: p.tags,
     }
-    setSaved(true)
-  }
+    const timer = setTimeout(async () => {
+      setSaveState('saving')
+      const { data, error } = await supabase.from('profiles')
+        .update(profile).eq('id', user.id).select('id').maybeSingle()
+      if (revision !== saveRevision.current) return
+      if (error || !data) {
+        const message = error?.message || 'Your profile could not be saved. Please try again.'
+        setSaveError(/blocked_content/i.test(message)
+          ? "Some of your profile text isn’t allowed. Please remove any hurtful or unsafe words. 💛"
+          : message)
+        setSaveState('error')
+        return
+      }
+      setSaveError('')
+      setSaveState('saved')
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [p, saveState, user])
 
   if (loading) return (<><TopBar /><main className="container"><p className="empty">Loading…</p></main></>)
   if (!user) return (<><TopBar /><main className="container"><h1>Your profile</h1><p className="sub" style={{ color: 'var(--ink-2)' }}>Log in to set up your profile.</p></main></>)
@@ -147,14 +172,31 @@ export default function Profile() {
             {p.username && <Link className="pf-viewlink" href={`/u/${encodeURIComponent(p.username)}`}>View my public profile →</Link>}
           </div>
 
-          {/* editor */}
-          <div className="pf-edit">
-            <h3>Edit profile</h3>
+          <div className="profile-edit-bar">
+            <button type="button" className="btn prim sm" aria-expanded={editOpen}
+              aria-controls="profile-editor" onClick={() => setEditOpen((open) => !open)}>
+              {editOpen ? 'Done editing' : '✏️ Edit profile'}
+            </button>
+            <span className={'profile-autosave ' + saveState} aria-live="polite">
+              {saveState === 'pending' || saveState === 'saving'
+                ? 'Saving…'
+                : saveState === 'saved'
+                  ? '✓ Saved automatically'
+                  : saveState === 'error' ? 'Couldn’t save' : ''}
+            </span>
+          </div>
+
+          {/* editor stays tucked away until the member asks for it */}
+          {editOpen && <div className="pf-edit" id="profile-editor">
+            <div className="pf-edit-head">
+              <h3>Edit profile</h3>
+              <span>Changes save automatically</span>
+            </div>
             <div className="pform">
               <label>Avatar
                 <EmojiPicker value={p.avatar_url} accent={p.accent_color} onSelect={(e) => set('avatar_url', 'emoji:' + e)} />
               </label>
-              <p className="up-note">Choose an emoji, or upload a real profile photo below. Emoji changes are applied when you save your profile.</p>
+              <p className="up-note">Choose an emoji, or upload a real profile photo below. Emoji changes save automatically.</p>
               <ProfilePhotoPicker userId={user.id} />
 
               <label>Display name<input value={p.display_name} maxLength={30} onChange={(e) => set('display_name', e.target.value)} placeholder={p.username} /></label>
@@ -191,12 +233,9 @@ export default function Profile() {
                   )}
                 </div>
               </label>
-              <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                <button className="btn prim" onClick={save}>Save profile</button>
-                {saved && <span className="psaved">✓ Saved</span>}
-              </div>
+              {saveError && <p className="profile-save-error" role="alert">{saveError}</p>}
             </div>
-          </div>
+          </div>}
         </main>
         <Rail />
       </div>
