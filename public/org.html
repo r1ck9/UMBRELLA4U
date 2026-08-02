@@ -160,7 +160,7 @@
   .scroll-cue i{font-style:normal;font-size:1.35rem;line-height:1;animation:scrollbob 1.8s ease-in-out infinite}
   @keyframes scrollbob{0%,100%{transform:translateY(0);opacity:.6}50%{transform:translateY(6px);opacity:1}}
   @media(prefers-reduced-motion:reduce){.scroll-cue i{animation:none}}
-  .hero canvas{position:absolute;inset:0;z-index:-2;width:100%;height:100%;opacity:1}
+  .hero canvas{position:absolute;inset:0;z-index:-2;width:100%;height:100%;opacity:1;contain:layout paint style}
   .hero canvas.meadow-canvas{inset:auto;width:auto;height:auto;pointer-events:none}
   #mobile-hero-rain{display:none}
   #meadow-back{z-index:-3}
@@ -1200,6 +1200,7 @@
     var canvas = document.getElementById('umb3d'); if(!canvas) return;
     if(window.innerWidth<=760) return;
     var ctx = canvas.getContext('2d',{alpha:true,desynchronized:true});
+    var hitCtx=document.createElement('canvas').getContext('2d');
     var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
     var W, H, DPR, raf=0, visible=true;
     function resize(){
@@ -1217,6 +1218,13 @@
     var panels=[];
     for(var i=0;i<S;i++){ panels.push({vs:[apex,ring1[i],ring1[i+1]]}); panels.push({vs:[ring1[i],ring2[i],ring2[i+1],ring1[i+1]]}); }
     var ribs=[]; for(var i=0;i<=S;i++) ribs.push([apex,ring1[i],ring2[i]]);
+    // Transform the shared canopy vertices once per frame. The old renderer
+    // transformed the same points again for every panel and rib, producing
+    // thousands of short-lived objects every second.
+    var canopyVertices=[apex].concat(ring1,ring2),canopyVertexIndex=new Map();
+    for(var i=0;i<canopyVertices.length;i++)canopyVertexIndex.set(canopyVertices[i],i);
+    var panelIndexes=panels.map(function(panel){return panel.vs.map(function(vertex){return canopyVertexIndex.get(vertex);});});
+    var ribIndexes=ribs.map(function(rib){return rib.map(function(vertex){return canopyVertexIndex.get(vertex);});});
     var poleBot=-h*2.9;
     var pole=[{x:0,y:h*1.02,z:0},{x:0,y:poleBot,z:0}];
     var handle=[{x:0,y:poleBot,z:0},{x:-0.16,y:poleBot+0.07,z:0},{x:-0.24,y:poleBot+0.20,z:0},{x:-0.19,y:poleBot+0.30,z:0}];
@@ -1273,9 +1281,14 @@
     var meadowLayerDPR=1,meadowLayerAcc=1,meadowLayersReady=false;
     var meadowStaticReady=false,meadowIdleHandle=0,meadowPending=null,meadowLayerGeneration=0;
     var meadowBackRect={x:0,y:0,w:1,h:1},meadowFrontRect={x:0,y:0,w:1,h:1};
+    var meadowFrameStep=1/30;
+    var shadowSprite=document.createElement('canvas'),shadowSpriteCtx=shadowSprite.getContext('2d',{alpha:true}),shadowSpriteScale=0;
     var pointer={x:0,y:0,active:false,lastMove:0}, aim={x:0,y:0,ready:false};
     function resizeMeadowLayers(){
-      meadowLayerDPR=Math.min(DPR||1,.82);
+      // Grass is made from thousands of tiny vector blades. A three-quarter
+      // resolution backing layer is visually indistinguishable at this scale,
+      // while cutting the meadow's pixel fill cost by roughly one third.
+      meadowLayerDPR=Math.min(DPR||1,.74);
       var sc=scene(),anchor=meadowAnchor(sc),rx=sc.scale*1.28;
       function crop(x,y,right,bottom){
         x=Math.max(0,Math.floor(x));y=Math.max(0,Math.floor(y));
@@ -1325,22 +1338,25 @@
       var bob=Math.sin(tt*0.8)*0.05;
       var tf=function(p){ var y1=p.y*ct-p.z*st, z1=p.y*st+p.z*ct, x1=p.x; var x2=x1*ca+z1*sa, z2=-x1*sa+z1*ca; return {x:x2,y:y1+bob,z:z2}; };
       var pr=function(P){ var f=fov/(camZ-P.z); return {x:sc.cx+P.x*f*sc.scale, y:sc.cy-P.y*f*sc.scale, z:P.z}; };
-      var hitSurfaces=[],minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
-      for(var pi=0;pi<panels.length;pi++){
-        var tv=panels[pi].vs.map(tf), zc=0;
-        for(var vi=0;vi<tv.length;vi++)zc+=tv[vi].z;
-        var pts=tv.map(pr),surfaceMinX=Infinity,surfaceMaxX=-Infinity,surfaceMinY=Infinity,surfaceMaxY=-Infinity;
+      var transformed=new Array(canopyVertices.length),projected=new Array(canopyVertices.length);
+      for(var vi=0;vi<canopyVertices.length;vi++){transformed[vi]=tf(canopyVertices[vi]);projected[vi]=pr(transformed[vi]);}
+      var hitSurfaces=[],hitPath=typeof Path2D==='function'?new Path2D():null,minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+      for(var pi=0;pi<panelIndexes.length;pi++){
+        var indexes=panelIndexes[pi],pts=new Array(indexes.length),zc=0,surfaceMinX=Infinity,surfaceMaxX=-Infinity,surfaceMinY=Infinity,surfaceMaxY=-Infinity;
+        for(var vi=0;vi<indexes.length;vi++){var point=projected[indexes[vi]];pts[vi]=point;zc+=transformed[indexes[vi]].z;}
         for(var vi=0;vi<pts.length;vi++){
           surfaceMinX=Math.min(surfaceMinX,pts[vi].x);surfaceMaxX=Math.max(surfaceMaxX,pts[vi].x);
           surfaceMinY=Math.min(surfaceMinY,pts[vi].y);surfaceMaxY=Math.max(surfaceMaxY,pts[vi].y);
         }
-        var n=norm(cross(sub(tv[1],tv[0]),sub(tv[2],tv[0]))),under=n.z<0;
+        var t0=transformed[indexes[0]],t1=transformed[indexes[1]],t2=transformed[indexes[2]];
+        var n=norm(cross(sub(t1,t0),sub(t2,t0))),under=n.z<0;
         if(under)n={x:-n.x,y:-n.y,z:-n.z};
         minX=Math.min(minX,surfaceMinX);maxX=Math.max(maxX,surfaceMaxX);minY=Math.min(minY,surfaceMinY);maxY=Math.max(maxY,surfaceMaxY);
-        hitSurfaces.push({z:zc/tv.length,pts:pts,color:shade(n,under),minX:surfaceMinX,maxX:surfaceMaxX,minY:surfaceMinY,maxY:surfaceMaxY});
+        if(hitPath){hitPath.moveTo(pts[0].x,pts[0].y);for(var hi=1;hi<pts.length;hi++)hitPath.lineTo(pts[hi].x,pts[hi].y);hitPath.closePath();}
+        hitSurfaces.push({z:zc/indexes.length,pts:pts,color:shade(n,under),minX:surfaceMinX,maxX:surfaceMaxX,minY:surfaceMinY,maxY:surfaceMaxY});
       }
       hitSurfaces.sort(function(a,b){return b.z-a.z;});
-      return {tf:tf,pr:pr,hitSurfaces:hitSurfaces,hitBounds:{minX:minX,maxX:maxX,minY:minY,maxY:maxY},handlePts:handle.map(tf).map(pr)};
+      return {tf:tf,pr:pr,transformed:transformed,projected:projected,hitPath:hitPath,hitSurfaces:hitSurfaces,hitBounds:{minX:minX,maxX:maxX,minY:minY,maxY:maxY},handlePts:handle.map(tf).map(pr)};
     }
     function pointInPoly(x,y,pts){
       var inside=false;
@@ -1353,6 +1369,8 @@
     function hitUmbrella(frame,x,y){
       var bounds=frame.hitBounds;
       if(x<bounds.minX||x>bounds.maxX||y<bounds.minY||y>bounds.maxY)return false;
+      // Let the browser's native path engine test the complete canopy at once.
+      if(frame.hitPath)return hitCtx.isPointInPath(frame.hitPath,x,y);
       for(var i=0;i<frame.hitSurfaces.length;i++){
         var surface=frame.hitSurfaces[i];
         if(x>=surface.minX&&x<=surface.maxX&&y>=surface.minY&&y<=surface.maxY&&pointInPoly(x,y,surface.pts))return true;
@@ -1362,9 +1380,9 @@
     function rainHit(frame,x0,y0,x1,y1){
       var bounds=frame.hitBounds;
       if(Math.max(x0,x1)<bounds.minX||Math.min(x0,x1)>bounds.maxX||Math.max(y0,y1)<bounds.minY||Math.min(y0,y1)>bounds.maxY)return null;
-      if(hitUmbrella(frame,x0,y0))return null;
-      for(var i=1;i<=8;i++){
-        var t=i/8, x=x0+(x1-x0)*t, y=y0+(y1-y0)*t;
+      var distance=Math.hypot(x1-x0,y1-y0),steps=Math.max(2,Math.min(4,Math.ceil(distance/6)));
+      for(var i=1;i<=steps;i++){
+        var t=i/steps, x=x0+(x1-x0)*t, y=y0+(y1-y0)*t;
         if(hitUmbrella(frame,x,y))return {x:x,y:y,nx:(x-W*0.5)/Math.max(W*0.5,1)};
       }
       return null;
@@ -1395,8 +1413,9 @@
     function rainHitMeadow(sc,x0,y0,x1,y1,rn){
       var anchor=meadowAnchor(sc),rx=sc.scale*1.28;
       if(Math.max(x0,x1)<anchor.x-rx||Math.min(x0,x1)>anchor.x+rx||Math.max(y0,y1)<anchor.y-sc.scale*.22||Math.min(y0,y1)>anchor.y+.02*sc.scale)return null;
-      for(var i=1;i<=8;i++){
-        var t=i/8,x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,u=(x-anchor.x)/rx;
+      var distance=Math.hypot(x1-x0,y1-y0),steps=Math.max(2,Math.min(4,Math.ceil(distance/6)));
+      for(var i=1;i<=steps;i++){
+        var t=i/steps,x=x0+(x1-x0)*t,y=y0+(y1-y0)*t,u=(x-anchor.x)/rx;
         if(Math.abs(u)>1)continue;
         var edge=meadowTaper(u);
         var surface=soilTopY(u,sc.scale,anchor.y);
@@ -1428,8 +1447,7 @@
         rn.x += rn.vx*dt;
         rn.y += rn.vy*dt;
         var hit = rainHit(frame,px,py,rn.x,rn.y);
-        if(hit || hitUmbrella(frame,rn.x,rn.y)){
-          if(!hit)hit={x:rn.x,y:rn.y,nx:(rn.x-W*0.5)/Math.max(W*0.5,1)};
+        if(hit){
           createSplash(hit.x,hit.y,hit.nx);
           rain.splice(i,1);
           continue;
@@ -1448,6 +1466,7 @@
         }
         if(rn.y>H+rn.len+40 || rn.x<-90 || rn.x>W+90)rain.splice(i,1);
       }
+      if(rain.length>520)rain.splice(0,rain.length-520);
       for(var si=splashes.length-1;si>=0;si--){
         var sp=splashes[si];
         sp.age += dt; sp.px=sp.x; sp.py=sp.y;
@@ -1596,6 +1615,8 @@
     }
     function grassPush(x,y,h,blade,field,dt){
       var py=y-h*.48,r=field.reach,best=r,nearestX=x,contact=false;
+      var bend=blade.bend||0,vel=blade.bendV||0;
+      if(!bend&&!vel&&(x<field.minX-r||x>field.maxX+r||py<field.minY-r||py>field.maxY+r))return 0;
       if(x>=field.minX-r&&x<=field.maxX+r&&py>=field.minY-r&&py<=field.maxY+r){
         for(var i=0;i<field.pts.length-1;i++){
           var a=field.pts[i],b=field.pts[i+1],dx=b.x-a.x,dy=b.y-a.y;
@@ -1611,7 +1632,6 @@
         blade.bendV=(blade.bendV||0)+dir*Math.min(h*20,field.speed*.7+h*7)*collisionResponse;
         blade.handleHit=true;
       }else if(!contact)blade.handleHit=false;
-      var bend=blade.bend||0,vel=blade.bendV||0;
       vel+=-bend*field.springStep;vel*=field.decay;bend+=vel*dt;
       var limit=h*.82;if(bend>limit){bend=limit;vel*=.25}else if(bend<-limit){bend=-limit;vel*=.25}
       if(Math.abs(bend)<.025&&Math.abs(vel)<.12){bend=0;vel=0}
@@ -1826,13 +1846,26 @@
         ctx.fillStyle=vividGreens[band];ctx.fill();
       }
       if(dynamicPass){
+        // Batch stems, petals and centres so the entire flower field takes a
+        // handful of paint calls instead of hundreds on every meadow frame.
+        ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();
         for(var fi=0;fi<meadowFlowers.length;fi++){
-          var fl=meadowFlowers[fi],fsway=Math.sin(tt*.9+fl.p)*fl.stem*.1,tx=fl.fx+fsway,ty=fl.fy-fl.stem;
-          ctx.strokeStyle='#20ff4e';ctx.lineWidth=1.7;ctx.beginPath();ctx.moveTo(fl.fx,fl.fy);ctx.quadraticCurveTo(fl.fx+fsway*.35,fl.fy-fl.stem*.55,tx,ty);ctx.stroke();
-          ctx.fillStyle=flowerColors[fl.c];
-          for(var pet=0;pet<fl.petals.length;pet++){var pp=fl.petals[pet];ctx.beginPath();ctx.ellipse(tx+pp.x,ty+pp.y,fl.pr,fl.pr*.62,pp.a,0,6.29);ctx.fill();}
-          ctx.fillStyle='#f4c84e';ctx.beginPath();ctx.arc(tx,ty,fl.pr*.65,0,6.29);ctx.fill();
+          var fl=meadowFlowers[fi],fsway=Math.sin(tt*.9+fl.p)*fl.stem*.1;
+          fl.tx=fl.fx+fsway;fl.ty=fl.fy-fl.stem;
+          ctx.moveTo(fl.fx,fl.fy);ctx.quadraticCurveTo(fl.fx+fsway*.35,fl.fy-fl.stem*.55,fl.tx,fl.ty);
         }
+        ctx.stroke();
+        for(var fc=0;fc<flowerColors.length;fc++){
+          ctx.fillStyle=flowerColors[fc];ctx.beginPath();
+          for(var fi=0;fi<meadowFlowers.length;fi++){
+            var fl=meadowFlowers[fi];if(fl.c!==fc)continue;
+            for(var pet=0;pet<fl.petals.length;pet++){var pp=fl.petals[pet];ctx.moveTo(fl.tx+pp.x+Math.cos(pp.a)*fl.pr,fl.ty+pp.y+Math.sin(pp.a)*fl.pr);ctx.ellipse(fl.tx+pp.x,fl.ty+pp.y,fl.pr,fl.pr*.62,pp.a,0,6.29);}
+          }
+          ctx.fill();
+        }
+        ctx.fillStyle='#f4c84e';ctx.beginPath();
+        for(var fi=0;fi<meadowFlowers.length;fi++){var fl=meadowFlowers[fi];ctx.moveTo(fl.tx+fl.pr*.65,fl.ty);ctx.arc(fl.tx,fl.ty,fl.pr*.65,0,6.29);}
+        ctx.fill();
       }
       // A separate foreground carpet of pure short grass, about one quarter of
       // the tall-grass height, to make the base feel fully grown-in.
@@ -1942,14 +1975,15 @@
     function runMeadowUpdate(deadline){
       meadowIdleHandle=0;
       if(!meadowPending)return;
-      if(deadline&&!deadline.didTimeout&&deadline.timeRemaining()<6){
-        meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:72});return;
+      if(deadline&&!deadline.didTimeout&&deadline.timeRemaining()<4){
+        meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:50});return;
       }
       var pending=meadowPending;meadowPending=null;meadowLayerAcc=0;
       paintMeadowLayers(pending);
     }
     function updateMeadowLayers(sc,frame,dt){
       meadowLayerAcc+=dt;
+      if(meadowLayersReady&&meadowLayerAcc<meadowFrameStep)return;
       var cursorMoving=pointer.active&&pointer.lastMove&&performance.now()-pointer.lastMove<400&&
         pointer.x>=meadowBackRect.x&&pointer.x<=meadowBackRect.x+meadowBackRect.w&&
         pointer.y>=meadowBackRect.y&&pointer.y<=meadowBackRect.y+meadowBackRect.h;
@@ -1963,11 +1997,24 @@
         runMeadowUpdate(null);
         return;
       }
-      if(meadowLayersReady&&meadowLayerAcc<.05)return;
       meadowPending={sc:sc,frame:frame,dt:Math.min(.08,Math.max(dt,meadowLayerAcc)),generation:meadowLayerGeneration};
       if(meadowIdleHandle)return;
-      if('requestIdleCallback' in window)meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:72});
+      if('requestIdleCallback' in window)meadowIdleHandle=requestIdleCallback(runMeadowUpdate,{timeout:50});
       else meadowIdleHandle=setTimeout(function(){runMeadowUpdate(null)},0);
+    }
+
+    function drawUmbrellaShadow(base,scale){
+      var key=Math.round(scale);
+      if(key!==shadowSpriteScale){
+        shadowSpriteScale=key;
+        var radius=Math.max(12,key*.62),sw=Math.ceil(radius*2+8),sh=Math.ceil(key*.28+8),cx=sw*.5,cy=sh*.5;
+        shadowSprite.width=sw;shadowSprite.height=sh;
+        shadowSpriteCtx.setTransform(1,0,0,1,0,0);shadowSpriteCtx.clearRect(0,0,sw,sh);
+        var gradient=shadowSpriteCtx.createRadialGradient(cx,cy,4,cx,cy,radius);
+        gradient.addColorStop(0,'rgba(36,24,47,.15)');gradient.addColorStop(.58,'rgba(36,24,47,.07)');gradient.addColorStop(1,'rgba(36,24,47,0)');
+        shadowSpriteCtx.fillStyle=gradient;shadowSpriteCtx.beginPath();shadowSpriteCtx.ellipse(cx,cy,key*.56,key*.13,0,0,6.29);shadowSpriteCtx.fill();
+      }
+      ctx.drawImage(shadowSprite,base.x-shadowSprite.width*.5,base.y+42-shadowSprite.height*.5);
     }
     function updateSkyButterflies(sc){
       var meadow=meadowAnchor(sc),grassTop=meadow.y-sc.scale*.19,canopyBottom=sc.cy+sc.scale*.02;
@@ -2054,15 +2101,7 @@
       ctx.clearRect(0,0,W,H);
       drawRain(frame);
       var base=pr(tf({x:0,y:poleBot,z:0}));
-      var sh=ctx.createRadialGradient(base.x,base.y+42,4,base.x,base.y+42,scale*.62);
-      sh.addColorStop(0,'rgba(36,24,47,.15)'); sh.addColorStop(.58,'rgba(36,24,47,.07)'); sh.addColorStop(1,'rgba(36,24,47,0)');
-      ctx.save();
-      ctx.translate(base.x,base.y+42);
-      ctx.fillStyle=sh;
-      ctx.beginPath();
-      ctx.ellipse(0,0,scale*.56,scale*.13,0,0,6.29);
-      ctx.fill();
-      ctx.restore();
+      drawUmbrellaShadow(base,scale);
       prepareMeadow(sc);
       updateMeadowBees(sc,dt);
       updateSkyButterflies(sc);
@@ -2071,7 +2110,10 @@
       for(var mi=0;mi<motes.length;mi++){ var mo=motes[mi]; var Pm=pr(tf(mo)); if(Pm.z<0.4){ var tw=0.10+0.10*Math.sin(tt+mo.p); ctx.fillStyle='rgba(216,182,244,'+tw+')'; ctx.beginPath(); ctx.arc(Pm.x,Pm.y,1.3,0,6.29); ctx.fill(); } }
       var list=[];
       for(var pi=0;pi<frame.hitSurfaces.length;pi++){var surface=frame.hitSurfaces[pi];list.push({z:surface.z,kind:'fill',pts:surface.pts,color:surface.color});}
-      for(var rbi=0;rbi<ribs.length;rbi++){ var tvp=ribs[rbi].map(tf); list.push({z:(tvp[0].z+tvp[1].z+tvp[2].z)/3-0.01,kind:'rib',pts:tvp.map(pr)}); }
+      for(var rbi=0;rbi<ribIndexes.length;rbi++){
+        var ids=ribIndexes[rbi],tvp0=frame.transformed[ids[0]],tvp1=frame.transformed[ids[1]],tvp2=frame.transformed[ids[2]];
+        list.push({z:(tvp0.z+tvp1.z+tvp2.z)/3-0.01,kind:'rib',pts:[frame.projected[ids[0]],frame.projected[ids[1]],frame.projected[ids[2]]]});
+      }
       (function(){ var tp=pole.map(tf); list.push({z:(tp[0].z+tp[1].z)/2,kind:'pole',pts:tp.map(pr)}); })();
       (function(){ var tp=handle.map(tf); var zc=0; tp.forEach(function(p){zc+=p.z;}); list.push({z:zc/tp.length,kind:'handle',pts:tp.map(pr)}); })();
       (function(){ var tp=finial.map(tf); list.push({z:(tp[0].z+tp[1].z)/2,kind:'finial',pts:tp.map(pr)}); })();
