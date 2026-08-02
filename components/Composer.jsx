@@ -321,8 +321,8 @@ export default function Composer() {
             </button>
           </div>
 
-          {pollOn && (
-            <div className="poll-build">
+          <div className={'poll-build' + (pollOn ? ' is-open' : ' is-closed')}
+            aria-hidden={!pollOn} inert={pollOn ? undefined : ''}>
               <div className="poll-build-head">
                 <span>📊 Poll</span>
                 <button type="button" className="poll-off" onClick={() => { setPollOn(false); setPollOpts(['', '']) }}>Remove poll</button>
@@ -344,8 +344,7 @@ export default function Composer() {
                 </button>
               )}
               <p className="poll-note">Everyone can vote once. Results are public and update live. ☂</p>
-            </div>
-          )}
+          </div>
 
           <div className="composer-actions">
             <label className="anon" title="Your post will not be linked to your account name">
