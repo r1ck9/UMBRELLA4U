@@ -327,7 +327,6 @@ export default function StoryCard({ story }) {
   const authorAvatarImage = avatarImageUrl(authorAvatar)
   const authorAvatarStyle = story.anonymous ? undefined : {
     ...accentStyle(story.author_accent_color),
-    ...(authorAvatarImage ? { backgroundImage: `url(${authorAvatarImage})` } : {}),
   }
   const authorAvatarContent = story.anonymous
     ? '🕶️'
@@ -350,7 +349,11 @@ export default function StoryCard({ story }) {
     <article className="card">
       <div className="chead">
         <span className={'avatar' + (story.anonymous ? ' anon' : '')}
-          style={authorAvatarStyle} aria-hidden="true">{authorAvatarContent}</span>
+          style={authorAvatarStyle} aria-hidden="true">
+          {authorAvatarImage
+            ? <img src={authorAvatarImage} alt="" loading="lazy" decoding="async" />
+            : authorAvatarContent}
+        </span>
         <div>
           <div className="name">
             {story.anonymous || !story.author_name
