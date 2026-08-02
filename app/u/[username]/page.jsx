@@ -10,7 +10,7 @@ import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 import { bannerStyle } from '@/lib/banners'
 import { earnedBadges } from '@/lib/badges'
-import { accentStyle } from '@/lib/palette'
+import { accentStyle, profileAccentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
 
 function since(ts) {
@@ -91,7 +91,7 @@ export default function PublicProfile({ params }) {
             : !prof ? <p className="empty">No one here by that name. 🌫️</p>
             : (
               <>
-                <div className="profile-card">
+                <div className="profile-card" style={profileAccentStyle(prof.accent_color)}>
                   <div className="pf-banner" style={bannerStyle(prof.banner_theme)} />
                   <div className="pf-top">
                     <div className="pf-avatar" style={avStyle}>{isEmoji ? av.slice(6) : (isImg ? '' : initial)}</div>

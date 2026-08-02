@@ -9,7 +9,7 @@ import { BANNERS, bannerStyle } from '@/lib/banners'
 import EmojiPicker from '@/components/EmojiPicker'
 import ProfilePhotoPicker from '@/components/ProfilePhotoPicker'
 import { earnedBadges } from '@/lib/badges'
-import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent } from '@/lib/palette'
+import { PALETTE, PROFILE_ACCENTS, accentName, accentStyle, normalizeAccent, profileAccentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
 
 // Rotating example bios, a fresh one is picked each time the page opens.
@@ -119,7 +119,7 @@ export default function Profile() {
         <Nav active="" />
         <main className="feed">
           {/* presentable profile */}
-          <div className="profile-card">
+          <div className="profile-card" style={profileAccentStyle(p.accent_color)}>
             <div className="pf-banner" style={bannerStyle(p.banner_theme)} />
             <div className="pf-top">
               <div className="pf-avatar" style={avStyle}>{avInner}</div>
