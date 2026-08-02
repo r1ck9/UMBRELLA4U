@@ -309,8 +309,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   .boost{padding:4px 9px}
 }
 
-/* right rail */
-.rail{position:sticky; top:80px; display:flex; flex-direction:column; gap:16px}
+/* right rail: move with the feed so every widget remains reachable */
+.rail{position:relative; display:flex; flex-direction:column; gap:16px}
 .panel{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
 .panel h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 12px}
 .bigcount{text-align:center}
