@@ -9,7 +9,6 @@ import FollowButton from '@/components/FollowButton'
 import { supabase } from '@/lib/supabase'
 import { getMe } from '@/lib/me'
 import { bannerStyle } from '@/lib/banners'
-import { earnedBadges } from '@/lib/badges'
 import { accentStyle, profileAccentStyle } from '@/lib/palette'
 import { avatarImageUrl } from '@/lib/avatar'
 
@@ -96,11 +95,7 @@ export default function PublicProfile({ params }) {
                   <div className="pf-top">
                     <div className="pf-avatar" style={avStyle}>{isEmoji ? av.slice(6) : (isImg ? '' : initial)}</div>
                     <div className="pf-id">
-                      <div className="pf-name">
-                        {prof.display_name || prof.username}
-                        {earnedBadges({ streak: prof.streak_count || 0, posts: stats.stories, umbrellasSent: stats.opened })
-                          .map((b) => <span key={b.label} className="streak-badge" title={b.label}>{b.icon}</span>)}
-                      </div>
+                      <div className="pf-name">{prof.display_name || prof.username}</div>
                       <div className="pf-handle">@{prof.username}{prof.pronouns ? ' · ' + prof.pronouns : ''}</div>
                       {prof.status_weather && <div className="pf-status">{prof.status_weather}</div>}
                     </div>
