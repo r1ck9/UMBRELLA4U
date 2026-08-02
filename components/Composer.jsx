@@ -27,6 +27,59 @@ const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
 const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
 const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous, no full names, schools, addresses, or contact info. 💛"
 
+const COMPOSER_PROMPTS = [
+  "What's your weather today?",
+  "How's your sky today?",
+  "What's on your mind?",
+  "What are you carrying today?",
+  "How are things, really?",
+  "Tell us how today feels.",
+  "What's weighing on you?",
+  "What's brightening your day?",
+  "Need to let something out?",
+  "Share a little of your day.",
+  "What's happening in your world?",
+  "How's your heart today?",
+  "What kind of day is it?",
+  "Want to talk about it?",
+  "What's been on your mind?",
+  "How are you holding up?",
+  "What's your inner forecast?",
+  "Is it sunny or stormy?",
+  "What's beneath the surface?",
+  "Share what's real today.",
+  "What do you need to say?",
+  "Got something to get off your chest?",
+  "What made today different?",
+  "What's following you around?",
+  "What deserves an umbrella today?",
+  "How's life feeling right now?",
+  "What's your mood saying?",
+  "Want someone to listen?",
+  "What's hard to say out loud?",
+  "What's one thing you're feeling?",
+  "What happened today?",
+  "What's taking up headspace?",
+  "What do you wish someone knew?",
+  "How's your day unfolding?",
+  "What are you thinking about?",
+  "What could use some shelter?",
+  "What's clouding your thoughts?",
+  "What brought you here today?",
+  "Need a judgment-free space?",
+  "What's your honest forecast?",
+  "What feels heavy right now?",
+  "What feels hopeful right now?",
+  "What's been keeping you up?",
+  "What are you proud of today?",
+  "What do you want to share?",
+  "How are you doing right now?",
+  "What's the story behind today?",
+  "What would help to say?",
+  "Take a breath. What's going on?",
+  "Your space is here. What's up?"
+]
+
 const withTimeout = (promise, ms, message) => Promise.race([
   promise,
   new Promise((_, reject) => setTimeout(() => reject(new Error(message)), ms))
@@ -37,6 +90,7 @@ export default function Composer() {
   const [open, setOpen] = useState(false)
   const [closing, setClosing] = useState(false)
   const closeTimerRef = useRef(null)
+  const [peekPrompt, setPeekPrompt] = useState(COMPOSER_PROMPTS[0])
   const [text, setText] = useState('')
   const [intent, setIntent] = useState('similar')   // default nudges toward "me too" replies → more interaction
   const [intentTouched, setIntentTouched] = useState(false)  // did the user pick an intent themselves?
@@ -85,8 +139,7 @@ export default function Composer() {
       }
     }
 
-    const animate = window.matchMedia('(max-width: 600px)').matches
-      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const animate = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!animate) {
       finish()
       return
@@ -98,6 +151,10 @@ export default function Composer() {
 
   useEffect(() => () => {
     if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current)
+  }, [])
+
+  useEffect(() => {
+    setPeekPrompt(COMPOSER_PROMPTS[Math.floor(Math.random() * COMPOSER_PROMPTS.length)])
   }, [])
 
   // The "Answer this" button in the Rail opens the composer with the prompt pinned.
@@ -255,7 +312,7 @@ export default function Composer() {
   return (
     <>
       {!open ? (
-        <button className="composer-peek" onClick={() => { setClosing(false); setOpen(true); track('click_create') }}>What&apos;s your weather today?</button>
+        <button className="composer-peek" onClick={() => { setClosing(false); setOpen(true); track('click_create') }}>{peekPrompt}</button>
       ) : (
         <div className={'composer composer-pop' + (closing ? ' is-closing' : '')}>
           {rejected && <div className="reject-banner">{rejected}</div>}
