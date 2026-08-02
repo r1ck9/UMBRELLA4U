@@ -8,7 +8,7 @@ import { CATEGORIES } from '@/lib/categories'
 export default function Nav({ active = 'all' }) {
   return (
     <nav className="nav" aria-label="Main">
-      <Link href="/feed" className={'navitem' + (active === 'all' ? ' on' : '')}><span className="ni-ic" aria-hidden="true">🏠</span>Home</Link>
+      <Link href="/feed" prefetch={true} className={'navitem' + (active === 'all' ? ' on' : '')}><span className="ni-ic" aria-hidden="true">🏠</span>Home</Link>
       <Link href="/inbox" className={'navitem' + (active === 'inbox' ? ' on' : '')}><span className="ni-ic" aria-hidden="true">📨</span>Inbox</Link>
       <NavReports active={active} />
       <Link href="/resources" className="navitem"><span className="ni-ic" aria-hidden="true">📎</span>Resources</Link>

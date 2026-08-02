@@ -1,5 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Keep recently visited Haven routes in the browser briefly so returning
+    // to the live feed is instant. FeedList refreshes this cached view in the
+    // background and listens for live story changes.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
+  },
   async rewrites() {
     return {
       // beforeFiles runs before app routes, so this replaces the homepage:

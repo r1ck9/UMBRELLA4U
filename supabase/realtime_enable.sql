@@ -16,6 +16,13 @@ begin
   ) then
     alter publication supabase_realtime add table poll_votes;  -- live poll results
   end if;
+
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'stories'
+  ) then
+    alter publication supabase_realtime add table stories;     -- live feed refresh
+  end if;
 end $$;
 
 -- Check what's live:

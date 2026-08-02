@@ -38,6 +38,10 @@ export default function MobileMenu() {
   const router = useRouter()
 
   useEffect(() => {
+    if (pathname !== '/feed') router.prefetch('/feed')
+  }, [pathname, router])
+
+  useEffect(() => {
     setMounted(true)
     setLanguage(savedLanguage())
     const sync = (event) => setLanguage(event?.detail?.language || savedLanguage())
@@ -159,7 +163,7 @@ export default function MobileMenu() {
 
             <div className="mm-grid">
               {LINKS.map((l) => (
-                <Link key={l.href} href={l.href} className="mm-item" onClick={closeMenu}>
+                <Link key={l.href} href={l.href} prefetch={l.href === '/feed' ? true : undefined} className="mm-item" onClick={closeMenu}>
                   <span className="mi-ic" aria-hidden="true">{l.icon}</span><span className="mi-label">{copy[l.key]}</span>
                 </Link>
               ))}
