@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { DAILY_UMBRELLA_LIMIT, DAILY_STORY_LIMIT } from '@/lib/config'
@@ -9,6 +9,7 @@ import { STREAK_MILESTONES } from '@/lib/badges'
 import CountUpNumber from '@/components/CountUpNumber'
 
 export default function Rail() {
+  const railRef = useRef(null)
   const [stats, setStats] = useState({ stories: null, umbrellas: null, sunny: null })
   const [left, setLeft] = useState(null) // umbrellas left today; null = guest / unknown
   const [postsLeft, setPostsLeft] = useState(null) // stories left today
@@ -62,8 +63,27 @@ export default function Rail() {
     return () => window.removeEventListener('umbrella:opened', onOpened)
   }, [])
 
+  useEffect(() => {
+    const rail = railRef.current
+    if (!rail) return
+    function updateStickTop() {
+      const viewport = window.innerHeight || document.documentElement.clientHeight || 0
+      const railHeight = rail.offsetHeight || 0
+      const top = Math.min(82, viewport - railHeight - 18)
+      rail.style.setProperty('--rail-stick-top', `${Math.round(top)}px`)
+    }
+    updateStickTop()
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateStickTop) : null
+    observer?.observe(rail)
+    window.addEventListener('resize', updateStickTop)
+    return () => {
+      observer?.disconnect()
+      window.removeEventListener('resize', updateStickTop)
+    }
+  }, [stats, left, postsLeft, streak])
+
   return (
-    <aside className="rail">
+    <aside className="rail" ref={railRef}>
       {streak !== null && streak > 0 && (
         <div className="panel streak">
           <h3>Your streak</h3>
