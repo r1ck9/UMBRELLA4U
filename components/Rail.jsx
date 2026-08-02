@@ -92,6 +92,7 @@ export default function Rail() {
 
     function placeWithPage(viewportTop) {
       mode = 'page'
+      rail.classList.remove('rail-settle-top', 'rail-settle-bottom')
       const localTop = viewportTop + window.scrollY - slotTop
       rail.style.position = 'absolute'
       rail.style.inset = `${Math.round(localTop)}px 0 auto`
@@ -99,14 +100,21 @@ export default function Rail() {
       rail.style.transform = 'none'
     }
 
-    function lockAt(edge) {
+    function lockAt(edge, settle = false) {
       const slotRect = slot.getBoundingClientRect()
       const { minTop, maxTop } = getStops()
       mode = edge
+      rail.classList.remove('rail-settle-top', 'rail-settle-bottom')
       rail.style.position = 'fixed'
       rail.style.inset = `${Math.round(edge === 'top' ? maxTop : minTop)}px auto auto ${Math.round(slotRect.left)}px`
       rail.style.width = `${Math.round(slotRect.width)}px`
       rail.style.transform = 'none'
+      if (settle) {
+        // Restart the tiny edge-settle animation only when scrolling actually
+        // reaches a stop, never while the rail is travelling with the page.
+        void rail.offsetWidth
+        rail.classList.add(`rail-settle-${edge}`)
+      }
     }
 
     function clearPosition() {
@@ -116,6 +124,7 @@ export default function Rail() {
       rail.style.inset = ''
       rail.style.width = ''
       rail.style.transform = ''
+      rail.classList.remove('rail-settle-top', 'rail-settle-bottom')
       slot.style.height = ''
     }
 
@@ -155,8 +164,8 @@ export default function Rail() {
       // there is no interpolated or spring-like movement.
       if ((mode === 'bottom' && delta < 0) || (mode === 'top' && delta > 0)) {
         const releasedTop = clampTop(rail.getBoundingClientRect().top - delta)
-        if (releasedTop <= minTop) lockAt('bottom')
-        else if (releasedTop >= maxTop) lockAt('top')
+        if (releasedTop <= minTop) lockAt('bottom', true)
+        else if (releasedTop >= maxTop) lockAt('top', true)
         else placeWithPage(releasedTop)
         return
       }
@@ -164,8 +173,8 @@ export default function Rail() {
       if (mode !== 'page') return
 
       const rect = rail.getBoundingClientRect()
-      if (delta > 0 && rect.bottom <= window.innerHeight - BOTTOM_STOP) lockAt('bottom')
-      else if (delta < 0 && rect.top >= TOP_STOP) lockAt('top')
+      if (delta > 0 && rect.bottom <= window.innerHeight - BOTTOM_STOP) lockAt('bottom', true)
+      else if (delta < 0 && rect.top >= TOP_STOP) lockAt('top', true)
     }
 
     measureRail()

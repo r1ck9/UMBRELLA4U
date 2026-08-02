@@ -316,6 +316,20 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 /* right rail: stays visible without becoming a separate scroll area */
 .rail-slot{position:relative; min-width:0}
 .rail{display:flex; flex-direction:column; gap:16px; padding-right:4px; transition:none}
+@media (min-width:1041px) and (prefers-reduced-motion:no-preference){
+  .rail.rail-settle-bottom{animation:railSettleBottom .17s cubic-bezier(.25,.75,.3,1)}
+  .rail.rail-settle-top{animation:railSettleTop .17s cubic-bezier(.25,.75,.3,1)}
+}
+@keyframes railSettleBottom{
+  0%,100%{transform:translateY(0)}
+  45%{transform:translateY(-3px)}
+  72%{transform:translateY(1px)}
+}
+@keyframes railSettleTop{
+  0%,100%{transform:translateY(0)}
+  45%{transform:translateY(3px)}
+  72%{transform:translateY(-1px)}
+}
 .panel{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
 .panel h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 12px}
 .bigcount{text-align:center}
