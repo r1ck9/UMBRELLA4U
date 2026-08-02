@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
@@ -35,6 +35,8 @@ const withTimeout = (promise, ms, message) => Promise.race([
 export default function Composer() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
+  const closeTimerRef = useRef(null)
   const [text, setText] = useState('')
   const [intent, setIntent] = useState('similar')   // default nudges toward "me too" replies → more interaction
   const [intentTouched, setIntentTouched] = useState(false)  // did the user pick an intent themselves?
@@ -62,10 +64,47 @@ export default function Composer() {
     setPhoto(null)
   }
 
+  function closeComposer({ resetAfterPost = false } = {}) {
+    if (closing) return
+
+    const finish = () => {
+      closeTimerRef.current = null
+      setOpen(false)
+      setClosing(false)
+      setPrompt(null)
+      setPollOn(false)
+      setPollOpts(['', ''])
+      setGiphyId(null)
+      clearPhoto()
+      if (resetAfterPost) {
+        setText('')
+        setAnon(false)
+        setWeather(DEFAULT_WEATHER)
+        setIntentTouched(false)
+        setHeavy(false)
+      }
+    }
+
+    const animate = window.matchMedia('(max-width: 600px)').matches
+      && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!animate) {
+      finish()
+      return
+    }
+
+    setClosing(true)
+    closeTimerRef.current = window.setTimeout(finish, 180)
+  }
+
+  useEffect(() => () => {
+    if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current)
+  }, [])
+
   // The "Answer this" button in the Rail opens the composer with the prompt pinned.
   useEffect(() => {
     function onAnswer(e) {
       setPrompt(e.detail)
+      setClosing(false)
       setOpen(true)
       setTimeout(() => document.querySelector('.composer textarea')?.focus(), 50)
     }
@@ -209,17 +248,16 @@ export default function Composer() {
         : { variant: 'post', message: "We can't stop the rain, but we can hold out an umbrella for each other." }
     }))
     setTimeout(() => {
-      setText(''); setOpen(false); setAnon(false); setWeather(DEFAULT_WEATHER); setPollOn(false); setPollOpts(['', ''])
-      setPrompt(null); setIntentTouched(false); setHeavy(false); setGiphyId(null); clearPhoto(); router.refresh()
+      closeComposer({ resetAfterPost: true }); router.refresh()
     }, 3100)
   }
 
   return (
     <>
       {!open ? (
-        <button className="composer-peek" onClick={() => { setOpen(true); track('click_create') }}>What&apos;s your weather today?</button>
+        <button className="composer-peek" onClick={() => { setClosing(false); setOpen(true); track('click_create') }}>What&apos;s your weather today?</button>
       ) : (
-        <div className="composer">
+        <div className={'composer composer-pop' + (closing ? ' is-closing' : '')}>
           {rejected && <div className="reject-banner">{rejected}</div>}
           {prompt ? (
             <div className="prompt-pin">
@@ -352,7 +390,7 @@ export default function Composer() {
               <span>🕶️ Post anonymously</span>
             </label>
             <div className="row end">
-              <button className="btn ghost sm" onClick={() => { if (text.trim()) track('compose_abandon'); setOpen(false); setPrompt(null); setPollOn(false); setPollOpts(['', '']); setGiphyId(null); clearPhoto() }}>Cancel</button>
+              <button className="btn ghost sm" disabled={closing} onClick={() => { if (text.trim()) track('compose_abandon'); closeComposer() }}>Cancel</button>
               <button className="btn prim sm" onClick={startShare}>☂ Share</button>
             </div>
           </div>

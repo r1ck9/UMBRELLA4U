@@ -855,6 +855,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 @media (max-width:600px){
   .card{width:100%;padding:14px;border-radius:14px}
   .composer{width:100%;padding:11px;border-radius:13px}
+  .composer-pop{transform-origin:top center;animation:composerMobileIn .18s cubic-bezier(.2,.9,.3,1.2) both}
+  .composer-pop.is-closing{pointer-events:none;animation:composerMobileOut .18s cubic-bezier(.4,0,1,1) both}
   .composer-peek{padding:13px 14px;font-size:14.5px}
   .composer textarea{font-size:14px;min-height:60px}
   .composer .row{gap:8px;margin-top:7px}
@@ -917,6 +919,15 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   html.umbrella-translated .poll-vote-btn{white-space:normal;overflow-wrap:anywhere;hyphens:auto}
   html.umbrella-translated .composer .row.end .btn{flex:1 1 130px;justify-content:center}
 }
+@keyframes composerMobileIn{
+  from{opacity:.15;transform:translateY(-7px) scale(.91)}
+  to{opacity:1;transform:none}
+}
+@keyframes composerMobileOut{
+  from{opacity:1;transform:none}
+  to{opacity:0;transform:translateY(-7px) scale(.91)}
+}
+@media (prefers-reduced-motion:reduce){.composer-pop,.composer-pop.is-closing{animation:none}}
 
 /* ---------- emoji avatar picker ---------- */
 .emoji-pick{margin-top:6px}
