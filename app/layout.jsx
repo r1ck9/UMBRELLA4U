@@ -23,7 +23,7 @@ const nunitoSans = Nunito_Sans({
 })
 
 export const metadata = {
-  title: 'Haven, come in from the rain',
+  title: 'Haven',
   description: "An anonymous space to share what you're carrying, and to know someone will stand with you.",
   icons: {
     icon: [
