@@ -75,9 +75,11 @@ export default function Rail() {
         return
       }
       const viewport = window.innerHeight || document.documentElement.clientHeight || 0
-      const pinnedTop = viewport - railHeight - 18
+      const minTop = viewport - railHeight - 18
+      const maxTop = 82
       const normalTop = baseTop - window.scrollY
-      const offset = Math.max(0, pinnedTop - normalTop)
+      const clampedTop = Math.min(maxTop, Math.max(minTop, normalTop))
+      const offset = clampedTop - normalTop
       rail.style.transform = offset ? `translate3d(0,${Math.round(offset)}px,0)` : ''
     }
     function measureRail() {
