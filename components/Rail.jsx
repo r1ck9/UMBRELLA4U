@@ -66,19 +66,43 @@ export default function Rail() {
   useEffect(() => {
     const rail = railRef.current
     if (!rail) return
-    function updateStickTop() {
+    let baseTop = 0
+    let railHeight = 0
+    let frame = 0
+    function applyRailPosition() {
+      if (window.matchMedia('(max-width: 1040px)').matches) {
+        rail.style.transform = ''
+        return
+      }
       const viewport = window.innerHeight || document.documentElement.clientHeight || 0
-      const railHeight = rail.offsetHeight || 0
-      const top = Math.min(82, viewport - railHeight - 18)
-      rail.style.setProperty('--rail-stick-top', `${Math.round(top)}px`)
+      const pinnedTop = viewport - railHeight - 18
+      const normalTop = baseTop - window.scrollY
+      const offset = Math.max(0, pinnedTop - normalTop)
+      rail.style.transform = offset ? `translate3d(0,${Math.round(offset)}px,0)` : ''
     }
-    updateStickTop()
-    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateStickTop) : null
+    function measureRail() {
+      rail.style.transform = ''
+      baseTop = rail.getBoundingClientRect().top + window.scrollY
+      railHeight = rail.offsetHeight || 0
+      applyRailPosition()
+    }
+    function schedulePosition() {
+      if (frame) return
+      frame = requestAnimationFrame(() => {
+        frame = 0
+        applyRailPosition()
+      })
+    }
+    measureRail()
+    const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(measureRail) : null
     observer?.observe(rail)
-    window.addEventListener('resize', updateStickTop)
+    window.addEventListener('resize', measureRail)
+    window.addEventListener('scroll', schedulePosition, { passive: true })
     return () => {
       observer?.disconnect()
-      window.removeEventListener('resize', updateStickTop)
+      window.removeEventListener('resize', measureRail)
+      window.removeEventListener('scroll', schedulePosition)
+      if (frame) cancelAnimationFrame(frame)
     }
   }, [stats, left, postsLeft, streak])
 
