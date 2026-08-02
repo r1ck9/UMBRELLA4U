@@ -316,7 +316,9 @@ export default function StoryCard({ story }) {
     }
   }
 
-  const who = story.anonymous ? 'Anonymous' : (story.author_name || 'someone')
+  const who = story.anonymous
+    ? 'Anonymous'
+    : (story.author_display_name || story.author_name || 'someone').trim()
   const authorAvatar = story.author_avatar_url || ''
   const authorAvatarIsEmoji = authorAvatar.startsWith('emoji:')
   const authorAvatarImage = avatarImageUrl(authorAvatar)
@@ -329,7 +331,7 @@ export default function StoryCard({ story }) {
       ? authorAvatar.slice(6)
       : authorAvatarImage
         ? ''
-        : (story.author_name || '☂').trim().charAt(0).toUpperCase()
+        : (who || '☂').charAt(0).toUpperCase()
   const badges = story.anonymous ? [] : earnedBadges({
     streak: story.author_streak || 0,
     posts: story.author_posts || 0,
