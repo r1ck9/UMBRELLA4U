@@ -308,10 +308,10 @@ export default function Composer() {
             </div>
           </div>
           <div className="composer-tools">
-            {!anon && channels.length > 0 && (
-              <div className="compose-channel">
+            {channels.length > 0 && (
+              <div className={'compose-channel' + (anon ? ' is-hidden' : '')} aria-hidden={anon}>
                 <span>📺 Channel:</span>
-                <select value={channelId} onChange={(e) => setChannelId(e.target.value)}>
+                <select value={channelId} disabled={anon} onChange={(e) => setChannelId(e.target.value)}>
                   <option value="">None</option>
                   {channels.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
