@@ -314,8 +314,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 }
 
 /* right rail: stays visible without becoming a separate scroll area */
-.rail{position:sticky; top:82px; align-self:start;
-  display:flex; flex-direction:column; gap:16px; padding-right:4px}
+.rail{display:flex; flex-direction:column; gap:16px; padding-right:4px}
 .panel{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
 .panel h3{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin:0 0 12px}
 .bigcount{text-align:center}
