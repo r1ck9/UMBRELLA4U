@@ -119,7 +119,7 @@ body{top:0!important}
 html.umbrella-translated body{overflow-wrap:break-word;word-break:normal}
 html.umbrella-translated .topbar{gap:8px;flex-wrap:wrap}
 html.umbrella-translated .tb-right{gap:7px;flex-wrap:wrap;justify-content:flex-end}
-html.umbrella-translated .tb-search{min-width:180px;max-width:300px}
+html.umbrella-translated .tb-search{min-width:220px;max-width:792px}
 html.umbrella-translated .btn,
 html.umbrella-translated .chip,
 html.umbrella-translated .navitem,
@@ -662,7 +662,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 @media (max-width:560px){ .prompt-suggest{flex-wrap:wrap} .prompt-suggest .ps-text{flex-basis:100%} }
 
 /* ---------- top-bar search ---------- */
-.tb-search{flex:1; max-width:340px; margin:0 8px}
+.tb-search{flex:1 1 640px; max-width:792px; margin:0 clamp(12px,2vw,22px)}
 .tb-search input{width:100%; border:1.5px solid var(--rain-2); background:var(--rain-1); border-radius:999px;
   padding:8px 15px; font:inherit; font-size:14px; color:var(--ink-1)}
 .tb-search input:focus{outline:none; border-color:var(--shelter); background:var(--panel)}
