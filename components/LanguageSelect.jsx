@@ -1,25 +1,21 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import CustomSelect from '@/components/CustomSelect'
 
 const LANGUAGES = [
-  ['en', 'English'],
-  ['fr', 'Français'],
-  ['zh-CN', '中文'],
-  ['es', 'Español'],
-  ['ar', 'العربية'],
-  ['hi', 'हिन्दी'],
-  ['pa', 'ਪੰਜਾਬੀ'],
-  ['ko', '한국어'],
-  ['ja', '日本語'],
-  ['fa', 'فارسی'],
-  ['tl', 'Filipino'],
+  ['en', 'English', 'EN'],
+  ['fr', 'Français', 'FR'],
+  ['zh-CN', '中文', '中文'],
+  ['es', 'Español', 'ES'],
+  ['ar', 'العربية', 'AR'],
+  ['hi', 'हिन्दी', 'HI'],
+  ['pa', 'ਪੰਜਾਬੀ', 'PA'],
+  ['ko', '한국어', 'KO'],
+  ['ja', '日本語', 'JA'],
+  ['fa', 'فارسی', 'FA'],
+  ['tl', 'Filipino', 'TL'],
 ]
-
-const MOBILE_LABELS = {
-  en: 'EN', fr: 'FR', 'zh-CN': '中文', es: 'ES', ar: 'AR', hi: 'HI',
-  pa: 'PA', ko: 'KO', ja: 'JA', fa: 'FA', tl: 'TL',
-}
 
 function currentLanguage() {
   if (typeof window === 'undefined') return 'en'
@@ -32,6 +28,9 @@ export default function LanguageSelect() {
   useEffect(() => {
     setLang(currentLanguage())
     window.UmbrellaI18n?.init?.()
+    const syncLanguage = (event) => setLang(event.detail?.language || currentLanguage())
+    window.addEventListener('umbrella:languagechange', syncLanguage)
+    return () => window.removeEventListener('umbrella:languagechange', syncLanguage)
   }, [])
 
   function changeLanguage(next) {
@@ -42,16 +41,15 @@ export default function LanguageSelect() {
 
   return (
     <div className="language-wrap notranslate">
-      <span className="language-mobile-label" aria-hidden="true">{MOBILE_LABELS[lang] || 'EN'}</span>
-      <select
-        className="language-select"
-        data-language-select
+      <CustomSelect
+        className="language-select-control"
+        menuClassName="notranslate language-select-menu"
+        options={LANGUAGES.map(([value, label, shortLabel]) => ({ value, label, shortLabel }))}
         value={lang}
-        onChange={(e) => changeLanguage(e.target.value)}
-        aria-label="Choose language"
-      >
-        {LANGUAGES.map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-      </select>
+        onChange={changeLanguage}
+        ariaLabel="Choose language"
+        align="end"
+      />
     </div>
   )
 }

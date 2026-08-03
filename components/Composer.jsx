@@ -11,10 +11,17 @@ import { track } from '@/lib/analytics'
 import { CRISIS, CRISIS_MESSAGE } from '@/lib/crisis'
 import GiphyPicker from '@/components/GiphyPicker'
 import PhotoPicker from '@/components/PhotoPicker'
+import CustomSelect from '@/components/CustomSelect'
 import { DEFAULT_WEATHER, POST_WEATHERS, WEATHER_MAX } from '@/lib/weather'
 
 // Post weather the author picks: heavier weather takes more umbrellas to clear.
 const WEATHERS = POST_WEATHERS
+const INTENT_OPTIONS = [
+  { value: 'similar', label: 'Similar stories' },
+  { value: 'listen', label: 'Just listen' },
+  { value: 'advice', label: 'Give advice' },
+  { value: 'resources', label: 'Resources' },
+]
 // Quick client-side check for obviously harmful language (the DATABASE is the real, unbypassable gate).
 // We normalize first, de-leet + strip non-letters, so "f u c k", "sh1t", "xxfaggotxx" are all caught.
 const LEET = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '8': 'b', '@': 'a', '$': 's', '!': 'i', '|': 'l' }
@@ -353,12 +360,12 @@ export default function Composer() {
           )}
           <div className="row">
             <label>Respond with
-              <select value={intent} onChange={(e) => { setIntent(e.target.value); setIntentTouched(true) }}>
-                <option value="similar">Similar stories</option>
-                <option value="listen">Just listen</option>
-                <option value="advice">Give advice</option>
-                <option value="resources">Resources</option>
-              </select>
+              <CustomSelect
+                value={intent}
+                options={INTENT_OPTIONS}
+                ariaLabel="Choose how people can respond"
+                onChange={(next) => { setIntent(next); setIntentTouched(true) }}
+              />
             </label>
           </div>
           {heavy && !intentTouched && intent === 'listen' && (
@@ -401,10 +408,13 @@ export default function Composer() {
             {channels.length > 0 && (
               <div className={'compose-channel' + (anon ? ' is-hidden' : '')} aria-hidden={anon}>
                 <span>📺 Channel:</span>
-                <select value={channelId} disabled={anon} onChange={(e) => setChannelId(e.target.value)}>
-                  <option value="">None</option>
-                  {channels.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
+                <CustomSelect
+                  value={channelId}
+                  disabled={anon}
+                  ariaLabel="Choose a channel"
+                  options={[{ value: '', label: 'None' }, ...channels.map((channel) => ({ value: channel.id, label: channel.name }))]}
+                  onChange={setChannelId}
+                />
               </div>
             )}
             <button type="button" className={'poll-toggle' + (pollOn ? ' on' : '')}
