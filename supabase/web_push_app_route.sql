@@ -50,4 +50,5 @@ $$;
 grant execute on function public.delete_web_push_sub(text) to authenticated;
 
 drop trigger if exists trg_push_umbrella on public.umbrellas;
+drop trigger if exists send_push_on_umbrella_insert on public.umbrellas;
 drop function if exists public.notify_push_on_umbrella();
