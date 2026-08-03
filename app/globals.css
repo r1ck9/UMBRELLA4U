@@ -93,12 +93,22 @@ a{color:inherit}
 .btn.ghost{background:transparent; border:1.5px solid var(--rain-2); color:var(--ink-1)}
 .btn.ghost:hover{border-color:var(--ink-3)}
 .btn:disabled{opacity:.5; cursor:not-allowed}
+:where(button:not(:disabled):not(.mm-backdrop),[role="button"],.btn,.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a){
+  transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s cubic-bezier(.2,.8,.2,1)
+}
+button:not(:disabled):not(.mm-backdrop):hover,button:not(:disabled):not(.mm-backdrop):focus-visible,
 .btn:not(:disabled):hover,.btn:not(:disabled):focus-visible,
 :where(.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a):hover,
 :where(.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a):focus-visible{
   box-shadow:var(--interactive-glow);
-  transform:translateY(-1px);
+  transform:translateY(-1px) scale(1.018);
 }
+:where(button:not(:disabled):not(.mm-backdrop),[role="button"],.btn,.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a):active{transform:scale(.955)!important;transition-duration:.07s!important}
+
+.emoji-panel,.giphy-panel,.giphy-selected,.avatar-photo-picker,.avatar-photo-pending,.media-review-note,.intent-hint{
+  transform-origin:top center;animation:microSurfaceIn .16s cubic-bezier(.2,.85,.3,1.12) both
+}
+@keyframes microSurfaceIn{from{opacity:0;transform:translateY(-4px) scale(.965)}to{opacity:1;transform:none}}
 
 /* consistent, browser-independent dropdowns */
 .custom-select{position:relative;display:inline-flex;min-width:0;font:inherit;text-transform:none;letter-spacing:normal}
@@ -116,6 +126,7 @@ a{color:inherit}
   border:1px solid var(--rain-2);border-radius:13px;background:color-mix(in srgb,var(--panel) 96%,var(--shelter-wash));color:var(--ink-1);
   box-shadow:0 18px 45px -18px color-mix(in srgb,var(--ui-plum) 55%,transparent),0 4px 16px -8px color-mix(in srgb,var(--ui-plum) 35%,transparent);
   outline:none;overscroll-behavior:contain;animation:customSelectIn .14s cubic-bezier(.2,.85,.3,1.12) both}
+.custom-select-menu.is-closing{pointer-events:none;animation:customSelectOut .12s cubic-bezier(.4,0,1,1) both}
 .custom-select-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-radius:9px;
   padding:9px 10px;background:transparent;color:var(--ink-2);font:inherit;font-size:13.5px;font-weight:700;line-height:1.2;text-align:left;cursor:pointer}
 .custom-select-option:hover,.custom-select-option.is-active{background:var(--shelter-wash);color:var(--shelter-deep)}
@@ -124,7 +135,8 @@ a{color:inherit}
 .custom-select-check{opacity:0;color:var(--shelter);font-weight:900}
 .custom-select-option.is-selected .custom-select-check{opacity:1}
 @keyframes customSelectIn{from{opacity:0;transform:translateY(-5px) scale(.97)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){.custom-select-menu,.custom-select-chevron{animation:none;transition:none}}
+@keyframes customSelectOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-3px) scale(.965)}}
+@media(prefers-reduced-motion:reduce){.custom-select-menu,.custom-select-chevron,.emoji-panel,.giphy-panel,.giphy-selected,.avatar-photo-picker,.avatar-photo-pending,.media-review-note,.intent-hint{animation:none;transition:none}}
 
 /* top bar */
 .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;

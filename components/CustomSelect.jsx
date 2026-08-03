@@ -22,15 +22,20 @@ export default function CustomSelect({
   const selectId = useId().replace(/:/g, '')
   const triggerRef = useRef(null)
   const menuRef = useRef(null)
+  const closeTimerRef = useRef(null)
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
   const [menuStyle, setMenuStyle] = useState({})
   const normalized = useMemo(() => normalizeOptions(options), [options])
   const selectedIndex = Math.max(0, normalized.findIndex((option) => String(option.value) === String(value)))
   const selected = normalized[selectedIndex] || normalized[0]
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    setMounted(true)
+    return () => window.clearTimeout(closeTimerRef.current)
+  }, [])
 
   function placeMenu() {
     const trigger = triggerRef.current
@@ -61,7 +66,7 @@ export default function CustomSelect({
   useEffect(() => {
     if (!open) return undefined
     const closeOutside = (event) => {
-      if (!triggerRef.current?.contains(event.target) && !menuRef.current?.contains(event.target)) setOpen(false)
+      if (!triggerRef.current?.contains(event.target) && !menuRef.current?.contains(event.target)) closeMenu()
     }
     document.addEventListener('pointerdown', closeOutside)
     return () => document.removeEventListener('pointerdown', closeOutside)
@@ -69,6 +74,8 @@ export default function CustomSelect({
 
   function openMenu(direction = 0) {
     if (disabled || !normalized.length) return
+    window.clearTimeout(closeTimerRef.current)
+    setClosing(false)
     const nextIndex = direction > 0
       ? Math.min(selectedIndex + 1, normalized.length - 1)
       : direction < 0
@@ -79,11 +86,21 @@ export default function CustomSelect({
     requestAnimationFrame(() => menuRef.current?.focus())
   }
 
+  function closeMenu(refocus = false) {
+    if (!open || closing) return
+    setClosing(true)
+    if (refocus) requestAnimationFrame(() => triggerRef.current?.focus())
+    window.clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = window.setTimeout(() => {
+      setOpen(false)
+      setClosing(false)
+    }, 120)
+  }
+
   function choose(option) {
     if (!option || option.disabled) return
     onChange?.(option.value)
-    setOpen(false)
-    requestAnimationFrame(() => triggerRef.current?.focus())
+    closeMenu(true)
   }
 
   function handleTriggerKeyDown(event) {
@@ -92,19 +109,18 @@ export default function CustomSelect({
       openMenu(event.key === 'ArrowDown' ? 1 : -1)
     } else if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      open ? setOpen(false) : openMenu()
+      open && !closing ? closeMenu() : openMenu()
     }
   }
 
   function handleMenuKeyDown(event) {
     if (event.key === 'Escape') {
       event.preventDefault()
-      setOpen(false)
-      triggerRef.current?.focus()
+      closeMenu(true)
       return
     }
     if (event.key === 'Tab') {
-      setOpen(false)
+      closeMenu()
       return
     }
     if (event.key === 'Home' || event.key === 'End') {
@@ -134,17 +150,17 @@ export default function CustomSelect({
   }
 
   return (
-    <div className={`custom-select ${open ? 'is-open' : ''} ${disabled ? 'is-disabled' : ''} ${className}`.trim()}>
+    <div className={`custom-select ${open && !closing ? 'is-open' : ''} ${disabled ? 'is-disabled' : ''} ${className}`.trim()}>
       <button
         ref={triggerRef}
         type="button"
         className="custom-select-trigger"
         aria-label={ariaLabel}
         aria-haspopup="listbox"
-        aria-expanded={open}
+        aria-expanded={open && !closing}
         aria-controls={`${selectId}-listbox`}
         disabled={disabled}
-        onClick={() => open ? setOpen(false) : openMenu()}
+        onClick={() => open && !closing ? closeMenu() : openMenu()}
         onKeyDown={handleTriggerKeyDown}
       >
         <span className="custom-select-value">
@@ -161,7 +177,7 @@ export default function CustomSelect({
           tabIndex={-1}
           aria-label={ariaLabel}
           aria-activedescendant={`${selectId}-option-${activeIndex}`}
-          className={`custom-select-menu ${menuClassName}`.trim()}
+          className={`custom-select-menu ${closing ? 'is-closing' : ''} ${menuClassName}`.trim()}
           style={menuStyle}
           onKeyDown={handleMenuKeyDown}
         >

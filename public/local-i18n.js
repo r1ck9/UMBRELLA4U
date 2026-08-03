@@ -31,6 +31,8 @@
     var options=Array.prototype.slice.call(sel.options);
     var active=Math.max(0,sel.selectedIndex);
     var open=false;
+    var closing=false;
+    var closeTimer=null;
 
     var trigger=document.createElement('button');
     trigger.type='button';
@@ -74,17 +76,27 @@
     }
 
     function close(refocus){
-      if(!open)return;
-      open=false;
-      menu.hidden=true;
+      if(!open||closing)return;
+      closing=true;
       trigger.setAttribute('aria-expanded','false');
       wrap.classList.remove('is-open');
+      menu.classList.add('is-closing');
       if(refocus)trigger.focus();
+      clearTimeout(closeTimer);
+      closeTimer=setTimeout(function(){
+        open=false;
+        closing=false;
+        menu.hidden=true;
+        menu.classList.remove('is-closing');
+      },120);
     }
 
     function show(){
-      if(open)return;
+      if(open&&!closing)return;
+      clearTimeout(closeTimer);
       open=true;
+      closing=false;
+      menu.classList.remove('is-closing');
       position();
       menu.hidden=false;
       trigger.setAttribute('aria-expanded','true');
@@ -112,7 +124,7 @@
       menu.appendChild(item);
     });
 
-    trigger.addEventListener('click',function(){open?close(false):show();});
+    trigger.addEventListener('click',function(){open&&!closing?close(false):show();});
     trigger.addEventListener('keydown',function(event){
       if(event.key==='ArrowDown'||event.key==='ArrowUp'){
         event.preventDefault();
@@ -130,7 +142,7 @@
       if(event.key==='Enter'||event.key===' '){event.preventDefault();menu.children[active]&&menu.children[active].click();}
     });
     document.addEventListener('pointerdown',function(event){
-      if(open&&!wrap.contains(event.target)&&!menu.contains(event.target))close(false);
+      if(open&&!closing&&!wrap.contains(event.target)&&!menu.contains(event.target))close(false);
     });
     window.addEventListener('resize',function(){if(open)position();});
     window.addEventListener('scroll',function(){if(open)position();},true);

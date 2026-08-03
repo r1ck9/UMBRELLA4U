@@ -9,6 +9,7 @@ select[data-language-select].custom-select-native{position:absolute!important;wi
   border:1px solid var(--line,rgba(74,45,92,.2));border-radius:999px;padding:8px 8px 8px 11px;background:var(--surface,#fff);color:var(--ink,#2e2037);
   font:700 .78rem var(--sans,system-ui,sans-serif);line-height:1;text-align:left;cursor:pointer;transition:border-color .14s ease,box-shadow .14s ease}
 .static-language-trigger:hover,.static-language-trigger:focus-visible,.custom-language-ready.is-open .static-language-trigger{border-color:var(--amber,var(--ui-violet,#74429a));box-shadow:var(--interactive-glow,0 0 18px rgba(151,93,190,.28));outline:none}
+.static-language-trigger:active,.static-language-option:active{transform:scale(.955);transition-duration:.07s}
 .static-language-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .static-language-chevron{display:grid;place-items:center;width:17px;height:17px;flex:0 0 17px;color:currentColor;font-size:19px;line-height:1;transform:translateY(-2px);transition:transform .16s ease}
 .custom-language-ready.is-open .static-language-chevron{transform:translateY(1px) rotate(180deg)}
@@ -16,12 +17,17 @@ select[data-language-select].custom-select-native{position:absolute!important;wi
   border:1px solid var(--line,rgba(74,45,92,.18));border-radius:13px;background:var(--surface,#fff);color:var(--ink,#2e2037);
   box-shadow:0 18px 45px -18px rgba(57,28,77,.48),0 4px 16px -8px rgba(57,28,77,.26);outline:none;overscroll-behavior:contain;animation:staticSelectIn .14s cubic-bezier(.2,.85,.3,1.12) both}
 .static-language-menu[hidden]{display:none}
+.static-language-menu.is-closing{pointer-events:none;animation:staticSelectOut .12s cubic-bezier(.4,0,1,1) both}
 .static-language-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;border:0;border-radius:9px;
   padding:9px 10px;background:transparent;color:var(--ink-2,#5e4a69);font:700 .82rem var(--sans,system-ui,sans-serif);line-height:1.2;text-align:left;cursor:pointer}
 .static-language-option:hover,.static-language-option.is-active{background:var(--violet-wash,#f2e7f8);color:var(--violet,var(--ui-violet,#74429a))}
 .static-language-check{opacity:0;color:var(--violet,var(--ui-violet,#74429a));font-weight:900}.static-language-option.is-selected .static-language-check{opacity:1}
 .nav:not(.scrolled) .static-language-trigger{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.1);color:#fff}
 @keyframes staticSelectIn{from{opacity:0;transform:translateY(-5px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes staticSelectOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-3px) scale(.965)}}
+:where(.btn,.cta-link,.site-links a,.nav nav a,.chip,.tag,.haves span){transition:transform .16s cubic-bezier(.2,.8,.2,1),box-shadow .16s ease,border-color .16s ease,background-color .16s ease}
+:where(.btn,.cta-link,.site-links a,.nav nav a,.chip,.tag,.haves span):hover{transform:translateY(-1px) scale(1.018)!important}
+:where(.btn,.cta-link,.site-links a,.nav nav a,.chip,.tag,.haves span):active{transform:scale(.955)!important;transition-duration:.07s!important}
 #google_translate_element{position:fixed!important;left:-9999px!important;top:-9999px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 body>.skiptranslate,iframe.skiptranslate,iframe.goog-te-banner-frame,.goog-te-banner-frame,#goog-gt-tt,.goog-tooltip{display:none!important;visibility:hidden!important;width:0!important;height:0!important;opacity:0!important;pointer-events:none!important}
 body{top:0!important}
