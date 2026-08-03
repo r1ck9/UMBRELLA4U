@@ -1332,3 +1332,46 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .wx-sunny{display:flex;align-items:center;gap:12px;margin:12px 0 2px}
 .wx-sun{font-size:2.1rem;line-height:1;filter:drop-shadow(0 0 9px color-mix(in srgb,var(--ui-lilac) 55%,transparent))}
 .wx-sun-txt{font-weight:700;color:var(--shelter-deep)}
+
+/* ---------- consistent mobile spacing rhythm ---------- */
+@media(max-width:600px){
+  :root{--m-space-1:4px;--m-space-2:8px;--m-space-3:12px;--m-gutter:14px}
+
+  .topbar{padding-left:max(10px,env(safe-area-inset-left));padding-right:max(10px,env(safe-area-inset-right));gap:6px}
+  .shell{padding-left:max(var(--m-gutter),env(safe-area-inset-left));padding-right:max(var(--m-gutter),env(safe-area-inset-right));gap:var(--m-space-3)}
+  .container,.auth{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+  .feed,.inbox-list,.notif-list,.media-review-list,.wl-steps{gap:var(--m-space-3)}
+
+  .card{padding:14px}
+  .composer{padding:12px}
+  .panel,.set-group,.ibx,.notif,.activity,.media-review-card{padding-left:14px;padding-right:14px}
+  .set-group{margin-bottom:var(--m-space-3)}
+  .notice,.care-banner,.seen-banner,.pulse,.empty{margin-left:0;margin-right:0}
+
+  .composer .row,.composer-tools,.composer-actions,.photo-actions,.giphy-search,
+  .giphy-selected-actions,.photo-selected-actions,.media-review-actions,.profile-edit-bar,
+  .avatar-photo-actions,.people-row,.tour-actions,.tour-nav,.thanks-row,.noterow,.note-foot,
+  .cfoot,.cfoot-actions,.hug-faces,.pf-actions{gap:var(--m-space-2)}
+  .composer .cat-pick{margin:var(--m-space-2) 0 var(--m-space-1)}
+  .composer .wx-pick{margin:var(--m-space-2) 0}
+  .composer .media-attachers{gap:7px;margin:var(--m-space-2) 0}
+  .cat-chips{gap:7px}
+  .composer-tools{margin-top:var(--m-space-2)}
+  .composer-actions{margin-top:10px;padding-top:10px}
+
+  .custom-select-menu{padding:7px;gap:var(--m-space-1)}
+  .custom-select-option{padding:10px}
+  .giphy-panel,.emoji-panel,.respond,.avatar-photo-picker,.avatar-photo-pending{padding:var(--m-space-3)}
+  .giphy-grid{gap:var(--m-space-2)}
+
+  :where(.takedown,.report,.notrel,.addword,.hug-more,.poll-off,.poll-opt-x,.giphy-close,.sb-x,.sn-x,.modal-x,.tour-skip){
+    margin:0;padding:5px 6px;border-radius:7px
+  }
+  .cfoot-actions{padding-top:var(--m-space-1)}
+  .chead{margin-bottom:var(--m-space-3)}
+  .story-giphy,.story-photo,.poll-card,.respond,.hug-faces{margin-top:var(--m-space-3)}
+
+  .mm-panel{padding-left:11px;padding-right:11px}
+  .mm-grid,.mm-cats{gap:7px}
+  .mm-section{margin-top:var(--m-space-3);margin-bottom:6px}
+}

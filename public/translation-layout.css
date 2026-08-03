@@ -41,9 +41,10 @@ html.umbrella-translated .btn{font-size:clamp(.78rem,1.4vw,1rem);padding-inline:
 html.umbrella-translated :where(.lead-card,.card,.val,.cat,.cta-box,.feature .row){min-width:0}
 
 @media(max-width:760px){
-  .site-nav{flex-wrap:wrap;padding:9px 14px;gap:8px 12px}
-  .site-links{width:100%;justify-content:center;flex-wrap:wrap;gap:8px 12px;font-size:.8rem}
+  .site-nav{flex-wrap:wrap;padding:10px 15px;gap:10px 12px}
+  .site-links{width:100%;justify-content:center;flex-wrap:wrap;gap:9px 12px;font-size:.8rem}
   .site-links a{white-space:nowrap}
+  .language-wrap,.lang-wrap{margin-inline:2px}
   .site-nav .language-select{font-size:.72rem;padding-block:7px;max-width:116px}
   .static-language-trigger{min-width:92px;max-width:116px;padding-block:7px;font-size:.72rem}
   html.umbrella-translated .site-links{width:100%;justify-content:center;gap:7px 10px;font-size:clamp(.7rem,2.8vw,.8rem)}
