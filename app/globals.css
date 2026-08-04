@@ -86,6 +86,7 @@ a{color:inherit}
 /* buttons */
 .btn{display:inline-flex; align-items:center; gap:7px; border:none; border-radius:999px;
   padding:12px 20px; font-weight:700; font-size:15px; cursor:pointer; text-decoration:none;
+  white-space:nowrap;word-break:normal;overflow-wrap:normal;justify-content:center;
   transition:background .16s,border-color .16s,color .16s,box-shadow .16s,transform .16s}
 .btn.sm{padding:9px 15px; font-size:14px}
 .btn.prim{background:var(--shelter); color:var(--on-accent)}
@@ -93,6 +94,9 @@ a{color:inherit}
 .btn.ghost{background:transparent; border:1.5px solid var(--rain-2); color:var(--ink-1)}
 .btn.ghost:hover{border-color:var(--ink-3)}
 .btn:disabled{opacity:.5; cursor:not-allowed}
+:where(.giphy-toggle,.photo-toggle,.umb,.hug,.boost,.takedown,.report,.notrel,.thanks-chip,.addword,.up-btn,.sugg,.tag,.poll-toggle,.poll-off,.poll-opt-add,.range-btn,.followbtn,.chan-tab){
+  white-space:nowrap;word-break:normal;overflow-wrap:normal
+}
 :where(button:not(:disabled):not(.mm-backdrop),[role="button"],.btn,.chip,.navitem,.composer-peek,.cw,.boost,.bell,.thanks-chip,.addword,.up-btn,.person-chip,.toggle,.sugg,.cat-chip,.mm-item,.mm-cat,.emoji-current,.emoji-cell,.tb-help,.theme-card,.poll-toggle,.poll-vote-btn,.hug,.hug-more,.range-btn,.reslist a){
   transition:background-color .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease,transform .16s cubic-bezier(.2,.8,.2,1)
 }
@@ -142,8 +146,9 @@ button:not(:disabled):not(.mm-backdrop):hover,button:not(:disabled):not(.mm-back
 .topbar{position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between;
   padding:14px 22px; background:color-mix(in srgb,var(--panel) 90%,transparent);
   backdrop-filter:blur(10px); border-bottom:1px solid var(--rain-2)}
-.brand{font-weight:800; font-size:20px; text-decoration:none}
-.tb-right{display:flex; gap:10px; align-items:center}
+.brand{display:inline-flex;align-items:center;flex:0 0 auto;font-weight:800;font-size:20px;text-decoration:none;white-space:nowrap;word-break:keep-all;overflow-wrap:normal}
+.tb-right{display:flex;gap:10px;align-items:center;white-space:nowrap}
+.tb-right>*{flex-shrink:0}
 .language-wrap{position:relative;display:inline-flex;align-items:center}
 .language-select-control{width:132px}
 .language-select-control .custom-select-trigger{border-radius:999px;padding:7px 8px 7px 11px;font-size:13px;font-weight:800;line-height:1}
@@ -185,7 +190,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .nav{position:sticky; top:80px; display:flex; flex-direction:column; gap:1px}
 .navitem{display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px;
   color:var(--ink-2); text-decoration:none; font-weight:600; font-size:14px; line-height:1.2;
-  background:none; border:none; width:100%; text-align:left; cursor:pointer; font-family:inherit}
+  background:none; border:none; width:100%; text-align:left; cursor:pointer; font-family:inherit;
+  white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .navitem:hover{background:var(--rain-1); color:var(--ink-1)}
 .navitem.on{background:var(--shelter-wash); color:var(--shelter-deep)}
 .ni-ic{width:20px; text-align:center; font-size:15px; line-height:1; flex:0 0 auto}
@@ -718,7 +724,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 @media (max-width:560px){ .prompt-suggest{flex-wrap:wrap} .prompt-suggest .ps-text{flex-basis:100%} }
 
 /* ---------- top-bar search ---------- */
-.tb-search{flex:1 1 640px; max-width:792px; margin:0 clamp(12px,2vw,22px)}
+.tb-search{flex:1 1 640px;min-width:0;max-width:792px;margin:0 clamp(12px,2vw,22px)}
 .tb-search input{width:100%; border:1.5px solid var(--rain-2); background:var(--rain-1); border-radius:999px;
   padding:8px 15px; font:inherit; font-size:14px; color:var(--ink-1)}
 .tb-search input:focus{outline:none; border-color:var(--shelter); background:var(--panel)}
