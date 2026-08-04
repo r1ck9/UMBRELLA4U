@@ -22,21 +22,23 @@ export default function Rail() {
     if (!supabase) return
     let active = true
     ;(async () => {
-      const [s, u, sun, auth] = await Promise.all([
-        supabase.from('stories').select('*', { count: 'exact', head: true }).eq('state', 'live'),
-        supabase.rpc('community_umbrellas'), // aggregate count (umbrella rows are private)
+      const [pulse, sun, auth] = await Promise.all([
+        supabase.rpc('community_pulse'), // privacy-safe aggregate; story rows stay private
         supabase.rpc('sunny_count'),
         supabase.auth.getUser(),
       ])
       if (!active) return
 
-      const nextStats = {
-        stories: s.count ?? 0,
-        umbrellas: Number(u.data) || 0,
-        sunny: Number(sun.data) || 0,
+      const pulseRow = Array.isArray(pulse.data) ? pulse.data[0] : pulse.data
+      if (!pulse.error && pulseRow) {
+        const nextStats = {
+          stories: Number(pulseRow.stories) || 0,
+          umbrellas: Number(pulseRow.umbrellas) || 0,
+          sunny: sun.error ? (initialCache.stats.sunny ?? 0) : Number(sun.data) || 0,
+        }
+        setStats(nextStats)
+        updateRailUiCache({ statsReady: true, stats: nextStats })
       }
-      setStats(nextStats)
-      updateRailUiCache({ statsReady: true, stats: nextStats })
 
       const user = auth.data.user
       if (user) {
