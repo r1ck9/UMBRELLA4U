@@ -27,11 +27,11 @@ export const metadata = {
   description: "An anonymous space to share what you're carrying, and to know someone will stand with you.",
   icons: {
     icon: [
-      { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
-      { url: '/icon-512.png', type: 'image/png', sizes: '512x512' }
+      { url: '/icon-192.png?v=20260813', type: 'image/png', sizes: '192x192' },
+      { url: '/icon-512.png?v=20260813', type: 'image/png', sizes: '512x512' }
     ],
-    apple: '/apple-touch-icon.png',
-    shortcut: '/icon-192.png'
+    apple: '/apple-touch-icon.png?v=20260813',
+    shortcut: '/icon-192.png?v=20260813'
   }
 }
 
@@ -43,11 +43,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${nunitoSans.variable}`}>
       <head>
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-        <link rel="shortcut icon" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=20260813" />
+        <link rel="shortcut icon" href="/icon-192.png?v=20260813" />
         <link rel="manifest" href="/manifest.webmanifest" />
         <meta name="theme-color" content="#76509a" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260813" />
         <script dangerouslySetInnerHTML={{ __html: "try{var t=localStorage.getItem('umbrella_theme');if(t==='dusk')document.documentElement.setAttribute('data-ui-theme',t);else if(t)localStorage.removeItem('umbrella_theme')}catch(e){}" }} />
         <script src="/local-i18n.js" defer />
       </head>

@@ -4,10 +4,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Umbrella4U</title>
 <script src="/site-fit.js"></script>
-<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-<link rel="shortcut icon" href="/icon-192.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png?v=20260813">
+<link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png?v=20260813">
+<link rel="shortcut icon" href="/icon-192.png?v=20260813">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260813">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&amp;family=Nunito+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
@@ -93,7 +93,7 @@
     border-bottom-color:var(--line-2);box-shadow:0 8px 24px -22px rgba(32,14,44,.42)}
   .nav .wrap{max-width:none;margin:0;padding-left:clamp(24px,8vw,110px);padding-right:clamp(24px,5vw,48px);display:flex;align-items:center;gap:28px;height:74px}
   .brand{display:flex;align-items:center;gap:13px;font-family:var(--serif);font-weight:700;font-size:1.72rem;letter-spacing:-.01em}
-  .brand .mark{width:46px;height:46px;flex:0 0 auto}
+  .brand .mark{display:block;width:46px;height:46px;flex:0 0 auto;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px color-mix(in srgb,var(--ui-lilac) 60%,transparent)}
   .nav nav{margin-left:auto;display:flex;gap:26px;align-items:center}
   .nav .brand{color:#f8f2fc}
   .nav.scrolled .brand{color:var(--ink)}
@@ -499,20 +499,7 @@
 <header class="nav">
   <div class="wrap">
     <a class="brand notranslate" href="#top" aria-label="Umbrella4U home">
-      <svg class="mark" viewBox="0 0 200 200" aria-hidden="true">
-        <circle cx="100" cy="100" r="94" fill="var(--ui-cloud)"/>
-        <circle cx="100" cy="100" r="90" fill="var(--ui-lavender)"/>
-        <circle cx="100" cy="100" r="90" fill="none" stroke="var(--ui-lilac)" stroke-width="1.5"/>
-        <g stroke-linecap="round" stroke-linejoin="round">
-          <path d="M100 96 V150 Q100 166 85 166 Q73 166 73 154" fill="none" stroke="var(--ui-violet)" stroke-width="7"/>
-          <path d="M40 98 Q100 26 160 98 Q145 86 130 98 Q115 86 100 98 Q85 86 70 98 Q55 86 40 98 Z" fill="var(--ui-violet)"/>
-          <g stroke="var(--ui-plum)" stroke-width="1.6" opacity=".55">
-            <path d="M100 60 L40 98"/><path d="M100 60 L70 98"/><path d="M100 60 V98"/><path d="M100 60 L130 98"/><path d="M100 60 L160 98"/>
-          </g>
-          <path d="M100 60 V50" stroke="var(--ui-violet)" stroke-width="5"/>
-          <circle cx="100" cy="48" r="3.4" fill="var(--ui-violet)"/>
-        </g>
-      </svg>
+      <img class="mark" src="/umbrella4u-logo.jpg" alt="">
       Umbrella4U
     </a>
     <nav>
@@ -911,7 +898,7 @@
 
 <footer>
   <div class="wrap">
-    <div class="brand notranslate"><span aria-hidden="true">☂</span> Umbrella4U</div>
+    <div class="brand notranslate"><img class="mark" src="/umbrella4u-logo.jpg" alt=""> Umbrella4U</div>
     <div class="fnav">
       <a href="#about">About</a>
       <a href="#goals">Goals</a>

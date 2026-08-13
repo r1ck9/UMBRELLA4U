@@ -201,10 +201,13 @@ footer::before{
 footer .brand,footer a:hover,footer a:focus-visible{color:var(--ui-cloud)}
 footer .fine{color:var(--ui-lilac)}
 footer .fine{border-color:color-mix(in srgb,var(--ui-cloud) 10%,transparent)}
+.site-brand{display:inline-flex;align-items:center;gap:9px;white-space:nowrap}
+.site-brand-logo{display:block;width:34px;height:34px;flex:0 0 34px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px color-mix(in srgb,var(--ui-lilac) 55%,transparent)}
 
 @media(max-width:640px){
   .site-nav{gap:10px;padding:10px 14px}
   .site-brand{font-size:1rem;white-space:nowrap}
+  .site-brand-logo{width:28px;height:28px;flex-basis:28px}
   .site-links{gap:0;min-width:0}
   .site-links a:not(.site-cta){display:none}
   .site-cta{padding:7px 12px;white-space:nowrap}
