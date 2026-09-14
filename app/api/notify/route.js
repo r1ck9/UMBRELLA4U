@@ -50,7 +50,7 @@ const digestHtml = (n) => shell(
 const promptHtml = (text) => shell(
   `<p style="font-size:15px;line-height:1.6">This week’s prompt is up:</p>
    <p style="font-size:16px;line-height:1.5;font-family:Georgia,serif;color:${PALETTE.plum};border-left:3px solid ${PALETTE.violet};padding-left:12px;margin:12px 0">${text}</p>
-   <p style="font-size:15px;line-height:1.6">Share your answer — someone out there feels the same.</p>
+   <p style="font-size:15px;line-height:1.6">Share your answer. Someone out there feels the same.</p>
    ${btn(`${SITE}/feed`, 'Answer this week’s prompt ☂')}`)
 
 const reengageHtml = () => shell(

@@ -58,7 +58,7 @@ export default function EnableWebPush() {
       </button>
       {state === 'denied' && (
         <p className="hint" style={{ marginTop: 10 }}>
-          Notifications are blocked in your browser settings — allow them for this site, then try again.
+          Notifications are blocked in your browser settings. Allow them for this site, then try again.
           On iPhone, first add Haven to your Home Screen (Share → Add to Home Screen), then open it and enable.
         </p>
       )}
