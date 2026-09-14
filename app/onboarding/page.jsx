@@ -76,7 +76,7 @@ export default function Onboarding() {
     setSaving(false)
     if (error) {
       if (/duplicate|unique/i.test(error.message)) { setErr('That username is taken, try another.'); setStep(1) }
-      else if (/blocked_content/i.test(error.message)) { setErr('Please remove any hurtful or unsafe words from your name, bio, or tags. 💛'); setStep(1) }
+      else if (/blocked_content/i.test(error.message)) { setErr('There’s something in your name, bio or tags that can’t go through. Take out anything hurtful or unsafe and try again. 💛'); setStep(1) }
       else setErr(error.message)
       return
     }
@@ -101,20 +101,20 @@ export default function Onboarding() {
         {step === 0 && (
           <div className="onb-step">
             <h1>Welcome in from the rain ☂</h1>
-            <p className="onb-lead">Umbrella is a quiet place to share what you’re carrying and to stand with others. Let’s set up your anonymous profile, it takes a minute.</p>
+            <p className="onb-lead">Let’s set up your profile. Takes about a minute, and none of it uses your real name.</p>
             <ul className="onb-quick">
-              <li>🕶️ You’re anonymous, no real names, ever.</li>
-              <li>☂ People respond with one umbrella, the way you asked to be met.</li>
-              <li>🛟 Word filter, AI screening, reports and human moderators keep it safe.</li>
+              <li>You’re anonymous. No real names, ever.</li>
+              <li>People respond with one umbrella, and only the way you asked to be met.</li>
+              <li>A word filter, an AI check, reports and human moderators keep it safe.</li>
             </ul>
-            <p className="onb-more"><Link href="/welcome">Read the full “how it works &amp; why you’re safe” →</Link></p>
+            <p className="onb-more"><Link href="/welcome">The longer version: how it works, and why you’re safe →</Link></p>
           </div>
         )}
 
         {step === 1 && (
           <div className="onb-step">
             <h1>Pick a name</h1>
-            <p className="onb-lead">This is your handle, make it something that isn’t your real name.</p>
+            <p className="onb-lead">This is your handle. Make it something that isn’t your real name.</p>
             <label>Username<input value={p.username} maxLength={20}
               onChange={(e) => set('username', e.target.value)} placeholder={ph.names[0]} /></label>
             <div className="onb-suggest">
@@ -154,12 +154,12 @@ export default function Onboarding() {
         {step === 3 && (
           <div className="onb-step">
             <h1>A little about you</h1>
-            <p className="onb-lead">All optional. Whatever you’re into, there’s a corner here for it, tags help you find your people.</p>
+            <p className="onb-lead">All optional. Tags are how people find each other, so put down what you’re actually into.</p>
             <label>Today’s weather (status)<input value={p.status_weather} maxLength={60}
               onChange={(e) => set('status_weather', e.target.value)} placeholder={ph.status} /></label>
             <label>About me<textarea value={p.about_me} maxLength={300}
               onChange={(e) => set('about_me', e.target.value)} placeholder={`e.g. ${ph.bio}`} /></label>
-            <p className="privacy-note">🔒 Skip your real name, school, or address. Staying anonymous is what keeps you safe here.</p>
+            <p className="privacy-note">Leave out your real name, your school, and where you live. Staying anonymous is what keeps this safe.</p>
             <label>Interests / tags
               <div className="tag-edit">
                 {p.tags.map((t) => <span key={t} className="tag rm" onClick={() => set('tags', p.tags.filter((x) => x !== t))}>{t} ✕</span>)}
@@ -183,11 +183,11 @@ export default function Onboarding() {
 
         {step === 4 && (
           <div className="onb-step">
-            <h1>Keep it a shelter</h1>
-            <p className="onb-lead">We know struggling is hard. Please keep your words safe and kind, to yourself, and to everyone here. 🫂</p>
-            <ul className="rulelist">
-              {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
-            </ul>
+            <h1>One last thing</h1>
+            <p className="onb-lead">Hard days are allowed here. Taking them out on other people isn’t.</p>
+            <ol className="rulelist">
+              {GUIDELINES.map((r, i) => <li key={i}>{r.t}</li>)}
+            </ol>
             <label className="agree-check">
               <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
               I’ve read this and I’ll follow it.

@@ -18,10 +18,10 @@ export default function GuidelinesModal() {
     <div className="modal-scrim" onClick={(e) => { if (e.target === e.currentTarget) setOpen(false) }}>
       <div className="modal-box" role="dialog" aria-label="Community guidelines">
         <h2>Community guidelines</h2>
-        <p className="ms-sub">Umbrella only works because people keep it safe.</p>
-        <ul className="rulelist">
-          {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
-        </ul>
+        <p className="ms-sub">This place only works because the people in it keep it that way.</p>
+        <ol className="rulelist">
+          {GUIDELINES.map((r, i) => <li key={i}>{r.t}</li>)}
+        </ol>
         <button className="btn prim" onClick={() => setOpen(false)}>Got it</button>
       </div>
     </div>

@@ -1,39 +1,46 @@
 import Link from 'next/link'
 import IntroHero from '@/components/IntroHero'
 
+const POINTS = [
+  {
+    t: 'Anonymous by default',
+    d: 'You never need a real name. Your email logs you in and resets your password, and that’s all it does. A post can also be detached from your profile completely, so nobody can trace it back to the rest of you.'
+  },
+  {
+    t: 'One way to respond',
+    d: 'There’s no comment box. People open an umbrella, which means they’re standing with you, and they can leave one word with it if that’s what you asked for. Nobody gets to argue underneath your worst day.'
+  },
+  {
+    t: 'A few umbrellas a day',
+    d: 'You get a handful. Once they’re gone they’re gone until tomorrow. Which is the point: someone spent one of theirs on you.'
+  }
+]
+
 export default function Landing() {
   return (
     <>
       <IntroHero />
       <section className="introabout">
-        <h2>What Haven is</h2>
+        <h2>What this is</h2>
         <p className="lead">
-          Umbrella is a space for young people to share what&apos;s really going on, the hard days,
-          the small wins, the things you can&apos;t say out loud yet, and to feel less alone.
-          It&apos;s built to be safe, honest, and kind.
+          Haven is where you put the thing you’ve been carrying around all week. Someone reads it.
+          Someone opens an umbrella for you. It shows up in your inbox, and that’s the end of it.
         </p>
-        <div className="cols">
-          <div>
-            <h3>Anonymous by default</h3>
-            <p>No real name required. Share as much or as little as you want, or post with your identity fully hidden.</p>
-          </div>
-          <div>
-            <h3>Support, not judgment</h3>
-            <p>The only way to respond is to &ldquo;open an umbrella&rdquo;, a small signal that says <em>I&apos;m here with you.</em> No comment wars.</p>
-          </div>
-          <div>
-            <h3>Every umbrella counts</h3>
-            <p>You get a few to give each day, so choosing to send one actually means something to the person who receives it.</p>
-          </div>
-        </div>
-        <p className="care-intro">🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here, just be kind to yourself, and to everyone else.</p>
+        <dl className="points">
+          {POINTS.map((p) => (
+            <div className="point" key={p.t}>
+              <dt>{p.t}</dt>
+              <dd>{p.d}</dd>
+            </div>
+          ))}
+        </dl>
         <div className="cta">
-          <Link className="btn prim" href="/signup">Create or log in to an account</Link>
+          <Link className="btn prim" href="/signup">Make an account</Link>
           <Link className="btn ghost" href="/feed">Browse as a guest</Link>
         </div>
       </section>
       <footer className="site-footer">
-        <div>☂ Haven, peer support, not a substitute for professional or crisis help.</div>
+        <div>☂ Haven is peer support. It’s not a crisis line, and it’s not a replacement for a counsellor.</div>
         <nav>
           <Link href="/welcome">How it works</Link>
           <Link href="/resources">Resources</Link>

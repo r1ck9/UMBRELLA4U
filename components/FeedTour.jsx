@@ -4,26 +4,26 @@ import { useEffect, useState, useCallback } from 'react'
 // A step-by-step spotlight tour of the main feed. Each step points at a real
 // element on the page; missing elements (e.g. no stories yet) are skipped.
 const STEPS = [
-  { sel: '.composer-peek, .composer', title: 'Share your weather',
-    body: 'Tap here to post whatever you’re carrying, a hard day, a worry, a small win. You choose how you’d like people to respond.' },
+  { sel: '.composer-peek, .composer', title: 'Post something',
+    body: 'Tap here to post. A hard day, a worry, a small win, whatever it is. You pick how you want people to respond.' },
   { sel: '.hamburger', title: 'The menu', pad: 4,
-    body: 'Tap here anytime for categories, the resource hub, settings, how-to-use, and to replay this tour.' },
+    body: 'Categories, the resource hub, settings, and how to use the place. You can replay this tour from here too.' },
   { sel: '.nav', title: 'Browse by weather', pad: 6,
-    body: 'Filter stories by what they’re about, school, identity, mental health, small wins, venting, and more.' },
+    body: 'Filter by what a story is about: school, identity, mental health, small wins, venting.' },
   { sel: '.umb', title: 'Open an umbrella',
-    body: 'Instead of comments, you open one umbrella to say “I’m standing with you.” One each, no threads, no pile-ons, no arguing.' },
+    body: 'Instead of commenting, you open one umbrella. It means “I’m standing with you.” One each, and there are no threads.' },
   { sel: '.hug', title: 'Send a hug 🫂',
-    body: 'A hug is a warmer, lighter “I’m here with you.” Tap it as many times as you like, no daily limit, unlike umbrellas. Opening an umbrella sends a hug too, and the little faces show who’s standing with you.' },
+    body: 'Lighter than an umbrella, and there’s no daily limit, so tap it as much as you want. Opening an umbrella sends a hug too. The little faces show who’s there.' },
   { sel: '.bell', title: 'Your inbox',
-    body: 'When someone opens an umbrella on your story, it lands here. The little number is unread support waiting for you.' },
+    body: 'When someone opens an umbrella on your story, it lands here. The number is how many you haven’t looked at.' },
   { sel: '.tb-search', title: 'Find anything', pad: 4,
     body: 'Search stories and people by name or by tag.' },
   { sel: '.tb-avatar', title: 'Your profile', pad: 4,
-    body: 'Tap your avatar to open your profile, customize your picture, banner colour, display name, pronouns, status, tags and bio. It’s how people get to know who they’re standing with, while you stay anonymous.' },
+    body: 'Set your picture, banner, display name, pronouns, status, tags and bio. It’s how people get a sense of you while you stay anonymous.' },
   { sel: '.quota', title: 'Your umbrellas today',
-    body: 'You get a handful each day, so every umbrella you open really means something.' },
+    body: 'A handful a day. Running out is the point.' },
   { sel: '.prompt', title: 'This week’s prompt',
-    body: 'Not sure what to share? Answer the weekly prompt in one tap.' }
+    body: 'Stuck for something to post? Answer the weekly prompt in one tap.' }
 ]
 const KEY = 'umbrella_tour_v1'
 

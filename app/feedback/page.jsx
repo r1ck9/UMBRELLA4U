@@ -32,23 +32,23 @@ export default function Feedback() {
           <h2 className="feedhead">Send feedback</h2>
           {sent ? (
             <div className="fb-thanks">
-              <p>🫂 Thank you. Your feedback landed with us, and it genuinely helps make Umbrella better and safer.</p>
+              <p>Got it, thank you. We read all of these.</p>
               <Link className="btn prim sm" href="/feed">Back to the feed</Link>
             </div>
           ) : (
             <>
               <p className="sub" style={{ color: 'var(--ink-2)', margin: '0 0 14px', lineHeight: 1.6 }}>
-                Found a bug? Have an idea? Something feel off or unsafe? Tell us anything, it&apos;s read by the team, and you can share it without your name.
+                Bugs, ideas, or something that felt off. It goes to the team, and you don&apos;t have to put your name on it.
               </p>
               <textarea className="fb-box" value={text} maxLength={1500}
                 onChange={(e) => setText(e.target.value)}
-                placeholder="What's on your mind? What would make Umbrella better for you?" />
+                placeholder="What would make this better?" />
               {err && <p className="msg" style={{ color: 'var(--care)' }}>{err}</p>}
               <div className="row end" style={{ marginTop: 12 }}>
                 <button className="btn prim" onClick={submit} disabled={!text.trim() || busy}>{busy ? 'Sending…' : 'Send feedback'}</button>
               </div>
               <p className="sub" style={{ color: 'var(--ink-3)', fontSize: 13, marginTop: 14 }}>
-                If it&apos;s an emergency or you&apos;re in danger, please use the <Link href="/resources">Resource hub</Link>, this box isn&apos;t monitored in real time.
+                Nobody watches this box in real time. If something is urgent, use the <Link href="/resources">Resource hub</Link>.
               </p>
             </>
           )}

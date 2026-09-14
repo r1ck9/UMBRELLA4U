@@ -23,7 +23,7 @@ export default function Forgot() {
     <main className="auth">
       <h1>Reset your password</h1>
       {sent ? (
-        <p className="msg">If an account exists for that email, we just sent a reset link, click it to choose a new password. Don’t see it? Check your spam / junk folder. ☂</p>
+        <p className="msg">If there’s an account for that email, a reset link is on its way. Check spam if it doesn’t show up. ☂</p>
       ) : (
         <>
           <p className="sub">Enter your email and we’ll send you a link to set a new password.</p>

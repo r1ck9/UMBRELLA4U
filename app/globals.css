@@ -400,8 +400,12 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .reslist a{display:block; background:var(--panel); border:1px solid var(--rain-2); border-radius:12px; padding:14px 16px; text-decoration:none; font-weight:600}
 .reslist a:hover{border-color:var(--shelter)}
 .reslist a small{display:block; font-weight:400; color:var(--ink-3); margin-top:2px}
-.rulelist{list-style:none; padding:0; margin:14px 0 0}
-.rulelist li{padding:12px 0; border-bottom:1px solid var(--rain-2); font-size:15px}
+/* Numbered rules. The numeral is CSS-generated, so the list stays plain text. */
+.rulelist{list-style:none; counter-reset:rule; padding:0; margin:14px 0 0}
+.rulelist li{counter-increment:rule; position:relative; padding:12px 0 12px 30px;
+  border-bottom:1px solid var(--rain-2); font-size:15px; line-height:1.5}
+.rulelist li::before{content:counter(rule); position:absolute; left:0; top:13px;
+  font-family:ui-monospace,monospace; font-size:12px; font-weight:700; color:var(--shelter)}
 .rulelist li:last-child{border-bottom:none}
 
 /* intro hero (animated) */
@@ -439,12 +443,19 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 /* intro "what it is" section */
 .introabout{position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:84px 24px}
 .introabout h2{font-size:clamp(26px,4vw,36px); margin:0 0 14px}
-.introabout .lead{font-size:18px; color:var(--ink-2); max-width:60ch; margin:0 0 44px; line-height:1.6}
-.introabout .cols{display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-bottom:40px}
-.introabout .cols h3{font-size:18px; margin:0 0 8px}
-.introabout .cols p{color:var(--ink-2); font-size:15px; margin:0; line-height:1.55}
+.introabout .lead{font-size:19px; color:var(--ink-1); max-width:54ch; margin:0 0 52px; line-height:1.6}
+/* Hanging-label definition list instead of a row of equal feature cards: the
+   label sits in its own column so the prose runs as one readable measure. */
+.points{margin:0 0 44px; border-top:1px solid var(--rain-2)}
+.point{display:grid; grid-template-columns:15rem 1fr; gap:0 32px;
+  padding:24px 0; border-bottom:1px solid var(--rain-2)}
+.point dt{font-family:var(--serif); font-size:18px; font-weight:700; color:var(--ink-1); line-height:1.3}
+.point dd{margin:0; color:var(--ink-2); font-size:15.5px; line-height:1.65; max-width:56ch}
 .introabout .cta{display:flex; gap:14px; flex-wrap:wrap}
-@media (max-width:760px){ .introabout .cols{grid-template-columns:1fr} }
+@media (max-width:760px){
+  .point{grid-template-columns:1fr; gap:6px}
+  .introabout .lead{font-size:17px; margin-bottom:36px}
+}
 
 /* (old) landing */
 .landing{min-height:100vh; display:grid; place-items:center;
@@ -625,8 +636,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .care-line{background:var(--shelter-wash); color:var(--shelter-deep); border-radius:12px; padding:12px 14px;
   font-size:14px; line-height:1.5; font-weight:600; margin:0 0 14px}
 .modal-box .rulelist{margin:0 0 4px}
-.modal-box .rulelist li{display:flex; gap:11px; align-items:flex-start; font-size:14.5px; padding:10px 0}
-.modal-box .ri{font-size:16px; flex:0 0 auto}
+.modal-box .rulelist li{font-size:14.5px; padding:10px 0 10px 28px}
+.modal-box .rulelist li::before{top:11px}
 .modal-box .btn.prim{margin-top:10px}
 .agree-check{display:flex; gap:10px; align-items:flex-start; margin-top:14px; font-size:14px; color:var(--ink-2); cursor:pointer}
 .agree-check input{margin-top:3px; width:18px; height:18px; accent-color:var(--shelter); flex:0 0 auto}
@@ -761,18 +772,26 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .wl-lead{text-align:center; font-size:17px; color:var(--ink-2); line-height:1.55; max-width:56ch; margin:14px auto 34px}
 .wl-sec{margin:34px 0}
 .wl-sec > h2{font-family:var(--serif); font-size:26px; margin:0 0 18px; text-wrap:balance}
-.wl-steps{display:flex; flex-direction:column; gap:14px}
-.wl-step{display:flex; gap:16px; background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:16px 18px; box-shadow:var(--shadow)}
-.wl-step h3{margin:0 0 4px; font-size:16px}
-.wl-step p{margin:0; font-size:14.5px; color:var(--ink-2); line-height:1.55}
-.wl-ico{font-size:26px; line-height:1; flex:0 0 auto}
-.wl-safe{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-.wl-card{background:var(--panel); border:1px solid var(--rain-2); border-radius:16px; padding:18px; box-shadow:var(--shadow)}
-.wl-card .wl-ico{display:block; margin-bottom:8px}
-.wl-card h3{margin:0 0 6px; font-size:16px}
-.wl-card p{margin:0; font-size:14px; color:var(--ink-2); line-height:1.55}
+/* Numbered steps as a two-column grid, rather than a stack of shadowed cards. */
+.wl-steps{list-style:none; padding:0; margin:0; border-top:1px solid var(--rain-2)}
+.wl-step{display:grid; grid-template-columns:2.2rem 1fr; gap:0 16px;
+  padding:20px 0; border-bottom:1px solid var(--rain-2)}
+.wl-num{font-family:var(--serif); font-size:24px; font-weight:800; color:var(--shelter); line-height:1.05}
+.wl-step h3{margin:0 0 5px; font-size:17px}
+.wl-step p{margin:0; font-size:15px; color:var(--ink-2); line-height:1.6; max-width:60ch}
+/* Safety points as a hanging-label list, no icons and no card chrome. */
+.wl-safe{margin:0; border-top:1px solid var(--rain-2)}
+.wl-card{display:grid; grid-template-columns:13rem 1fr; gap:0 28px;
+  padding:18px 0; border-bottom:1px solid var(--rain-2)}
+.wl-card dt{font-weight:700; font-size:15px; color:var(--ink-1); line-height:1.4}
+.wl-card dd{margin:0; font-size:14.5px; color:var(--ink-2); line-height:1.6; max-width:58ch}
 .wl-cta{display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin:38px 0 10px}
-@media (max-width:620px){ .wl-safe{grid-template-columns:1fr} .wl-title{font-size:36px} }
+@media (max-width:620px){
+  .wl-card{grid-template-columns:1fr; gap:5px}
+  .wl-title{font-size:36px}
+  .wl-step{grid-template-columns:1.8rem 1fr; gap:0 12px}
+  .wl-num{font-size:20px}
+}
 
 /* ---------- onboarding ---------- */
 .onb{max-width:560px}
@@ -787,8 +806,8 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .onb-step input:not(.tag-input):not([type=checkbox]), .onb-step textarea{display:block; width:100%; margin-top:6px;
   border:1.5px solid var(--rain-2); border-radius:12px; padding:11px 14px; font:inherit; font-size:15px; background:var(--panel); color:var(--ink-1)}
 .onb-step textarea{min-height:90px; resize:vertical}
-.onb-quick{list-style:none; padding:0; margin:0 0 18px; display:flex; flex-direction:column; gap:10px}
-.onb-quick li{background:var(--panel); border:1px solid var(--rain-2); border-radius:12px; padding:12px 15px; font-size:14.5px; color:var(--ink-2)}
+.onb-quick{list-style:none; padding:0; margin:0 0 18px; border-top:1px solid var(--rain-2)}
+.onb-quick li{padding:11px 0; border-bottom:1px solid var(--rain-2); font-size:14.5px; color:var(--ink-2); line-height:1.5}
 .onb-more a{color:var(--shelter); text-decoration:none; font-weight:600; font-size:14px}
 .onb-preview{position:relative; border-radius:16px; overflow:hidden; margin-bottom:22px; border:1px solid var(--rain-2)}
 .onb-preview .pf-banner{height:90px}
@@ -1091,7 +1110,6 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .gw-note{color:var(--ink-3); font-size:13px; margin-top:16px}
 
 /* rail care reminder */
-.qcare{margin:10px 0 0; font-size:13px; line-height:1.55; color:var(--shelter-deep); background:var(--shelter-wash); border-radius:10px; padding:10px 12px}
 
 /* moderator stats */
 .stats-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px}

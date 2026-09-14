@@ -7,10 +7,10 @@ export default function IntroHero() {
       <InvisibleShelter />
       <div className="inner">
         <div className="ih-brand">☂ Haven</div>
-        <h1>A place to say what you actually feel.</h1>
-        <p>An anonymous community where young people share what they&apos;re going through, and show up for each other. No real names. No pile-ons. No judgment.</p>
+        <h1>Say the thing you’ve been sitting on.</h1>
+        <p>An anonymous place for young people to post what’s actually going on. Nobody can reply, so nobody can pile on. All anyone can do is open an umbrella for you.</p>
         <div className="cta">
-          <Link className="btn prim" href="/signup">Create or log in to an account</Link>
+          <Link className="btn prim" href="/signup">Make an account</Link>
           <Link className="btn ghost light" href="/feed">Look around first</Link>
         </div>
       </div>

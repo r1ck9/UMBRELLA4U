@@ -75,7 +75,7 @@ export default function Rail() {
             if (localStorage.getItem('umb_streak_seen') !== String(sc)) {
               localStorage.setItem('umb_streak_seen', String(sc))
               window.dispatchEvent(new CustomEvent('umbrella:burst', {
-                detail: { variant: 'open', message: `${sc} days in a row. You keep showing up for people. ☂` }
+                detail: { variant: 'open', message: `${sc} days in a row. You keep showing up. ☂` }
               }))
             }
           } catch {}
@@ -244,8 +244,8 @@ export default function Rail() {
           <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> <CountUpNumber value={streak} initialValue={initialCache.userReady ? streak : undefined} /> day{streak === 1 ? '' : 's'}</div>
           <p className="streak-msg">
             {streak === 1
-              ? 'You showed up today. That’s the whole thing, come back tomorrow to keep it going. 🫂'
-              : `${streak} days in a row. Every day you’re here, someone feels a little less alone.`}
+              ? 'You showed up today. Come back tomorrow and it keeps going.'
+              : `${streak} days in a row. That’s a habit now.`}
           </p>
         </div>
       )}
@@ -265,8 +265,7 @@ export default function Rail() {
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
           : <p className="qbig"><b><CountUpNumber value={left} initialValue={initialCache.userReady ? left : undefined} /></b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
         {postsLeft !== null && <p className="qbig"><b><CountUpNumber value={postsLeft} initialValue={initialCache.userReady ? postsLeft : undefined} /></b> of {DAILY_STORY_LIMIT} posts left</p>}
-        <p className="qhint">You get {DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day, so each one really counts.</p>
-        <p className="qcare">🫂 One umbrella can mean the world to someone. Spend yours kindly, and help make this a place worth standing in.</p>
+        <p className="qhint">{DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day. That’s the cap, so pick where yours go.</p>
       </div>
 
       <div className="panel prompt">
@@ -281,7 +280,7 @@ export default function Rail() {
       <div className="panel">
         <h3>Need help now?</h3>
         <Link className="crisis" href="/resources">Resource hub &amp; crisis lines →</Link>
-        <p className="safe">Peer support, not a substitute for professional counselling or crisis services.</p>
+        <p className="safe">Haven is peer support. For anything urgent, use these instead.</p>
       </div>
       </aside>
     </div>

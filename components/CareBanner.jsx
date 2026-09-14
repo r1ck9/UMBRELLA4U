@@ -20,7 +20,7 @@ export default function CareBanner() {
 
   return (
     <aside className="care-banner" role="note">
-      <span>🫂 We know some days are heavy. However you&apos;re feeling, you&apos;re welcome here, just be kind to yourself, and to everyone else.</span>
+      <span>Whatever kind of day you&apos;re having, you can put it here. Just be kind to yourself, and to everyone else.</span>
       <button type="button" className="care-banner-close" onClick={dismiss}
         aria-label="Dismiss this message" title="Dismiss">×</button>
     </aside>

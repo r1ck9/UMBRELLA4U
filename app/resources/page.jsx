@@ -9,8 +9,7 @@ export default function Resources() {
       <main className="container">
         <h1>Resource hub</h1>
         <p className="sub" style={{ color: 'var(--ink-2)' }}>
-          If things feel heavy, real help is here. Umbrella is peer support, <b>not</b> a
-          substitute for professional counselling or crisis services.
+          Haven is peer support. These are the people who can actually help.
         </p>
         <div className="reslist">
           <a href="tel:988">☎ 988, Suicide Crisis Helpline<small>Call or text, anytime (Canada &amp; US)</small></a>

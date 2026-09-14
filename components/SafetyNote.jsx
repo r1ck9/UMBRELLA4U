@@ -11,8 +11,8 @@ export default function SafetyNote() {
     <div className="safety-note" role="note">
       <span className="sn-ic" aria-hidden="true">🛟</span>
       <div className="sn-body">
-        <b>You’re safe to be honest here.</b>
-        <p>Hate, harassment, slurs, and harmful content are automatically blocked before they post, and real moderators review every report. Say what you actually feel. This is a protected space, and we keep it that way.</p>
+        <b>Say what you actually feel.</b>
+        <p>Slurs, harassment and hate get blocked before they ever post, and a real person reviews every report. Nobody is going to tear you apart in here.</p>
       </div>
       <button className="sn-x" onClick={dismiss} aria-label="Dismiss">✕</button>
     </div>

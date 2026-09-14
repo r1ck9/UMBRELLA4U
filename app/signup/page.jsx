@@ -25,20 +25,20 @@ export default function Signup() {
     // Existing account: Supabase returns a user with EMPTY identities (and sends
     // no new email) when the address is already registered. Tell them to log in.
     if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-      setMsg('You already have an account with this email, no need to sign up again. Just log in below. ☂')
+      setMsg('You already have an account with this email. Just log in below. ☂')
       return
     }
     // If email confirmation is OFF, a session exists now → go straight to setup.
     if (data.session) { router.push('/onboarding'); return }
-    setMsg('Account created! We just emailed you a confirmation link, click it, then log in and we’ll set you up. Don’t see it? Check your spam / junk folder (and mark it “Not spam” so we always land in your inbox). It can take a minute to arrive.')
+    setMsg('Account created. There’s a confirmation link in your email. Click it, then come back and log in. If it hasn’t shown up in a minute, look in spam or junk, and mark it Not Spam so we land properly next time.')
   }
 
   return (
     <main className="auth">
       <h1>Come in from the rain</h1>
-      <p className="sub">Create an anonymous account. No real name, your email is only for logging in and password resets.</p>
+      <p className="sub">Create an anonymous account. You don’t need a real name. The email logs you in and resets your password, and that’s all it does.</p>
       <form onSubmit={submit}>
-        <input type="email" placeholder="Email (a fresh one just for Umbrella is fine)" value={email} onChange={(e) => setEmail(e.target.value)} required />
+        <input type="email" placeholder="Email (a fresh one just for Haven is fine)" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <input type="password" placeholder="Password (8+ characters)" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required />
         <label className="auth-agree">
           <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />

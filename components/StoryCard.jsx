@@ -282,7 +282,7 @@ export default function StoryCard({ story }) {
     if (opened || isOwn) return
     if (note && CRISIS.test(note)) { alert(CRISIS_MESSAGE); return }
     if (note && /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/.test(note)) {
-      alert('Please remove the email from your note, keep everyone anonymous. 💛'); return
+      alert('Take the email out of your note. Everyone stays anonymous here. 💛'); return
     }
     if (!supabase) { setOpened(true); setCount((c) => c + 1); if (note) setSent(note); fireBurst(); return } // sample mode
     const { data } = await supabase.auth.getUser()
@@ -299,7 +299,7 @@ export default function StoryCard({ story }) {
       } else if (/self_umbrella/i.test(error.message)) {
         // can't umbrella your own story, just quietly undo (UI already hides this)
       } else if (/blocked_content|personal_info/i.test(error.message)) {
-        alert('That note can’t be sent, please keep it kind and leave out personal info (names, emails, and the like). 💛')
+        alert('That note can’t send. Keep it kind, and leave out names and emails. 💛')
       } else {
         alert(error.message)
       }
@@ -433,7 +433,7 @@ export default function StoryCard({ story }) {
           {isOwn
             ? 'Your story. Umbrellas people open for you land in your inbox. ☂'
             : story.intent === 'listen'
-              ? 'Just listen, the umbrella is the whole message.'
+              ? 'They asked to just be listened to. The umbrella is the whole message.'
               : (opened ? 'One umbrella each, no threads.' : 'Add a word below, or just open an umbrella.')}
         </span>
         <span className="cfoot-actions">

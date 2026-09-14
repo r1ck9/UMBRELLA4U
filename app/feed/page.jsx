@@ -37,7 +37,7 @@ export default async function Feed({ searchParams }) {
           <CareBanner />
           <Composer />
           {stories.length === 0
-            ? <p className="empty">No stories here yet. Be the first to share this weather. ☂</p>
+            ? <p className="empty">Nothing here yet. You could be the first. ☂</p>
             : <FeedList stories={stories} category={cat === 'all' ? null : cat} />}
         </main>
         <Rail />

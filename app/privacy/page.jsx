@@ -1,23 +1,23 @@
 import Link from 'next/link'
 import TopBar from '@/components/TopBar'
 
-export const metadata = { title: 'Privacy Policy, Umbrella' }
+export const metadata = { title: 'Privacy Policy, Haven' }
 
 export default function Privacy() {
   return (
     <>
       <TopBar />
       <main className="container legal">
-        <p className="legal-eyebrow">Umbrella</p>
+        <p className="legal-eyebrow">Haven</p>
         <h1>Privacy Policy</h1>
         <p className="legal-date">Last updated: August 1, 2026</p>
 
         <div className="legal-tldr">
-          <strong>The short version:</strong> You're anonymous here. We only ask for an email so you can log in, it's never shown to anyone. We don't sell your data or run ads. You can edit or delete what you share. Umbrella is peer support, not a crisis service, if you're in danger, contact the lines in our <Link href="/resources">Resource Hub</Link>.
+          <strong>The short version:</strong> You're anonymous here. The only thing we ask for is an email to log you in, and it's never shown to anyone. We don't sell your data and we don't run ads. You can edit or delete anything you share. Haven is peer support and not a crisis service, so if you're in danger, use the lines in our <Link href="/resources">Resource Hub</Link>.
         </div>
 
         <h2>Who we are</h2>
-        <p>Umbrella is an anonymous peer-support community for young people. It began as a student project and is run by a small volunteer team with adult guidance. It is <strong>not</strong> a counseling, medical, or crisis service.</p>
+        <p>Haven is an anonymous peer-support community for young people. It began as a student project and is run by a small volunteer team with adult guidance. It is <strong>not</strong> a counseling, medical, or crisis service.</p>
 
         <h2>What we collect</h2>
         <ul>
@@ -35,7 +35,7 @@ export default function Privacy() {
 
         <h2>How we use your information</h2>
         <ul>
-          <li>To run Umbrella, show your stories, count umbrellas, and let you customize your profile.</li>
+          <li>To run Haven, show your stories, count umbrellas, and let you customize your profile.</li>
           <li>To keep the community safe, screen content, review reports and every photo or GIF submission, and act on anything harmful.</li>
           <li>To let you know when someone opens an umbrella on your story.</li>
         </ul>
@@ -54,13 +54,13 @@ export default function Privacy() {
         <p>We do <strong>not</strong> sell your data. We use trusted providers to run the service (secure hosting and email delivery), and they only process data on our behalf. If you search for, view, or attach a GIF, GIPHY delivers that content and may receive standard technical information such as your IP address, browser details, and the GIF or search you requested. We may disclose information if the law requires it, or if we genuinely believe it's needed to prevent serious harm to someone.</p>
 
         <h2>Safety &amp; crisis</h2>
-        <p>If content suggests someone may be in danger, we may show crisis resources and take protective action. Umbrella is peer support, <strong>not a substitute for professional counseling or emergency services</strong>. In an emergency, contact local emergency services or a crisis line (Canada: <strong>988</strong>; Kids Help Phone: <strong>text CONNECT to 686868</strong>).</p>
+        <p>If content suggests someone may be in danger, we may show crisis resources and take protective action. Haven is peer support, <strong>not a substitute for professional counseling or emergency services</strong>. In an emergency, contact local emergency services or a crisis line (Canada: <strong>988</strong>; Kids Help Phone: <strong>text CONNECT to 686868</strong>).</p>
 
         <h2>Your choices &amp; keeping your data</h2>
         <p>You can edit or delete your profile details and delete your own stories anytime. To delete your whole account and associated data, contact us (below). We keep information only as long as needed to run and protect the community.</p>
 
         <h2>Age</h2>
-        <p>Umbrella is for people <strong>13 and older</strong>. If you're under 13, please don't create an account. If we learn an account belongs to someone under 13, we'll remove it.</p>
+        <p>Haven is for people <strong>13 and older</strong>. If you're under 13, please don't create an account. If we learn an account belongs to someone under 13, we'll remove it.</p>
 
         <h2>Your rights</h2>
         <p>Depending on where you live (for example, under Canada's PIPEDA), you can ask to access, correct, or delete the personal information we hold about you. Contact us and we'll help.</p>

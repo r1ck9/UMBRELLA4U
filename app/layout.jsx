@@ -23,8 +23,8 @@ const nunitoSans = Nunito_Sans({
 })
 
 export const metadata = {
-  title: 'Haven',
-  description: "An anonymous space to share what you're carrying, and to know someone will stand with you.",
+  title: 'Haven · come in from the rain',
+  description: "An anonymous place for young people to post what’s actually going on, and be met by someone who gets it.",
   icons: {
     icon: [
       { url: '/icon-192.png?v=20260813', type: 'image/png', sizes: '192x192' },

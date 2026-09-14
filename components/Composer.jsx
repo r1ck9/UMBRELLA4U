@@ -29,10 +29,10 @@ const norm = (t) => t.toLowerCase().replace(/[0134578@$!|]/g, (c) => LEET[c] || 
 // terms matched even when hidden inside other text (mirror of the DB 'substr' list, worst offenders)
 const HARM_EMBEDDED = ['killyourself', 'killurself', 'godie', 'youshoulddie', 'faggot', 'nigger', 'nigga', 'kike', 'motherfucker', 'fuck']
 const HARM = (t) => { const n = norm(t); return HARM_EMBEDDED.some((w) => n.includes(w)) }
-const REJECT_MSG = "This can't be posted, it looks like it may contain harmful or hateful language. Umbrella is a place to be kind, even on hard days. Please rephrase. 💛"
+const REJECT_MSG = "This one can't post. It looks like there's harmful or hateful language in it. Rewrite it and try again. 💛"
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/
-const PII_MSG = "Please remove the personal contact info (an email address). Keeping yourself and others anonymous is what keeps this place safe. 💛"
-const DOX_MSG = "This looks like it could identify a real person. Please keep everyone anonymous, no full names, schools, addresses, or contact info. 💛"
+const PII_MSG = "Take the email address out. Staying anonymous is what keeps this safe. 💛"
+const DOX_MSG = "This could identify a real person. No full names, schools, addresses or contact info. 💛"
 
 const COMPOSER_PROMPTS = [
   "What's your weather today?",
@@ -341,7 +341,7 @@ export default function Composer() {
             </div>
           )}
           <textarea value={text} onChange={(e) => { setText(e.target.value); if (e.target.value.trim()) track('compose_start'); if (rejected) setRejected('') }}
-            placeholder="You don't have to share your worst moment, just whatever you're carrying right now." />
+            placeholder="It doesn't have to be your worst moment. Just whatever's going on right now." />
           <p className="compose-privacy">🔒 Keep it anonymous, please don&apos;t include your (or anyone else&apos;s) full name, school, address, phone, email, or socials.</p>
           <div className="media-attachers">
             <GiphyPicker value={giphyId} onChange={(id) => {
@@ -369,7 +369,7 @@ export default function Composer() {
             </label>
           </div>
           {heavy && !intentTouched && intent === 'listen' && (
-            <p className="intent-hint">🫂 This sounds heavy, we set this to <b>Just listen</b> so you can share without getting advice. Change it anytime.</p>
+            <p className="intent-hint">This one sounds heavy, so we set it to <b>Just listen</b>. Change it if you’d rather have advice.</p>
           )}
           <div className="cat-pick">
             <span className="cat-lbl">What&apos;s this about?</span>
@@ -468,12 +468,12 @@ export default function Composer() {
         <div className="modal-scrim" onClick={(e) => { if (e.target === e.currentTarget) setConfirming(false) }}>
           <div className="modal-box" role="dialog" aria-label="Agree to community guidelines">
             <h2>Before you share</h2>
-            <p className="care-line">We know struggling is hard. Please keep your words safe and kind, to yourself, and to everyone else here. 🫂</p>
+            <p className="care-line">Hard days are allowed here. Taking them out on other people isn’t.</p>
             {hasMedia && <p className="media-modal-note">Your photo or GIF will stay private until a human moderator approves it. It will not appear in Haven right away.</p>}
-            <p className="ms-sub">A quick reminder, this keeps Haven safe for everyone.</p>
-            <ul className="rulelist">
-              {GUIDELINES.map((r, i) => <li key={i}><span className="ri">{r.i}</span>{r.t}</li>)}
-            </ul>
+            <p className="ms-sub">Quick reminder before this goes up.</p>
+            <ol className="rulelist">
+              {GUIDELINES.map((r, i) => <li key={i}>{r.t}</li>)}
+            </ol>
             <label className="agree-check">
               <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
               I&apos;ve read this and I&apos;ll follow it.
