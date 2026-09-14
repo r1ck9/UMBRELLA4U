@@ -354,3 +354,33 @@ footer a{color:#e6d9f3}
   .vals .val:nth-child(n),.ideas .cat:nth-child(n),.name-ex .n:nth-child(n),.pull{rotate:0deg}
   .pull{font-size:1.35rem}
 }
+
+/* =====================================================================
+   team.html
+   One card per person: photo on one side, bio on the other, alternating.
+   These keep a solid ink border instead of the squiggled one, because the
+   card has to clip its photo to the rounded corners, and that clip would
+   also cut off an outline drawn outside the edge.
+   ===================================================================== */
+.lead-card,.member{background:var(--hd-white);border:3px solid var(--hd-ink);
+  border-radius:var(--hd-r);box-shadow:var(--hd-shadow)}
+.lead-card{margin-bottom:34px}
+.lead-card .photo,.lead-card .ava{border-right:3px solid var(--hd-ink)}
+.lead-card.rev .photo,.lead-card.rev .ava{border-right:0;border-left:3px solid var(--hd-ink)}
+.lead-card:nth-of-type(4n+1){rotate:-.35deg}
+.lead-card:nth-of-type(4n+2){background:var(--hd-cream);rotate:.3deg}
+.lead-card:nth-of-type(4n+3){background:var(--hd-mint);rotate:-.25deg}
+.lead-card:nth-of-type(4n+4){background:var(--hd-sky);rotate:.35deg}
+.lead-card .name,.member .name{font-family:var(--serif);font-weight:800;color:var(--hd-ink)}
+.lead-card .role,.member .role{font-family:var(--hand);font-size:1.35rem;font-weight:700;line-height:1.2;
+  letter-spacing:0;text-transform:none;color:var(--hd-violet);margin-top:4px}
+.lead-card .bio,.member .bio{color:var(--hd-ink-2)}
+.member .photo,.member .ava{border-bottom:3px solid var(--hd-ink)}
+
+@media(max-width:720px){
+  .lead-card .photo,.lead-card .ava,.lead-card.rev .photo,.lead-card.rev .ava{
+    border-right:0;border-left:0;border-bottom:3px solid var(--hd-ink)}
+  .lead-card:nth-of-type(n){rotate:0deg}
+  .lead-card,.member{box-shadow:4px 4px 0 var(--hd-ink)}
+  .lead-card .role,.member .role{font-size:1.15rem}
+}
