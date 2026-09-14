@@ -1406,3 +1406,60 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
   .mm-grid,.mm-cats{gap:7px}
   .mm-section{margin-top:var(--m-space-3);margin-bottom:6px}
 }
+
+
+/* =====================================================================
+   Feed stickers (components/FeedDecor.jsx)
+   The same hand-drawn doodles as the org pages. The layer is fixed behind
+   .topbar and .shell (both z-index 1), so posts and controls always paint on
+   top of it. Stickers only go where the layout is empty: the side gutters on
+   wide screens, and under the sticky nav when the window is tall enough to
+   clear it. Nothing is placed on stories or on the crisis panel.
+   ===================================================================== */
+:root{--deco-ink:var(--ink-1)}
+.fd{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='1.3' fill='rgba(59,42,84,.10)'/%3E%3C/svg%3E");background-size:24px 24px}
+.fd-stk{position:absolute;display:none;height:auto;filter:drop-shadow(3px 4px 0 var(--deco-ink));animation:fdfloat 7s ease-in-out infinite}
+.fd .ink{stroke:var(--deco-ink);stroke-width:5;stroke-linejoin:round;stroke-linecap:round}
+.fd .squig{stroke:var(--ui-violet);stroke-width:7;stroke-linecap:round}
+@keyframes fdfloat{0%,100%{translate:0 0}50%{translate:0 -7px}}
+
+/* side gutters: centred in the space outside the 1280px shell */
+@media (min-width:1440px){
+  .fd-gl1,.fd-gl2,.fd-gl3,.fd-gr1,.fd-gr2,.fd-gr3{display:block}
+  .fd-gl1{width:84px;top:20%;left:calc(25vw - 320px - 42px);rotate:-8deg}
+  .fd-gl2{width:30px;top:47%;left:calc(25vw - 320px - 15px);rotate:10deg;animation-delay:-2s}
+  .fd-gl3{width:46px;top:72%;left:calc(25vw - 320px - 23px);rotate:-12deg;animation-delay:-4s}
+  .fd-gr1{width:52px;top:24%;right:calc(25vw - 320px - 26px);rotate:12deg;animation-delay:-1s}
+  .fd-gr2{width:42px;top:52%;right:calc(25vw - 320px - 21px);rotate:-14deg;animation-delay:-3s}
+  .fd-gr3{width:38px;top:78%;right:calc(25vw - 320px - 19px);animation-delay:-5s}
+}
+/* under the sticky nav, which ends around 620px down */
+@media (min-width:781px) and (min-height:820px){
+  .fd-n1,.fd-n2{display:block}
+  .fd-n1{width:58px;bottom:34px;left:calc(max(20px, 50vw - 620px) + 8px);rotate:-10deg;animation-delay:-2.5s}
+  .fd-n2{width:96px;bottom:48px;left:calc(max(20px, 50vw - 620px) + 76px);rotate:-6deg;animation-delay:-4.5s}
+}
+@media (min-width:781px) and (min-height:980px){
+  .fd-n3,.fd-n4{display:block}
+  .fd-n3{width:58px;bottom:140px;left:calc(max(20px, 50vw - 620px) + 90px);rotate:12deg;animation-delay:-1.5s}
+  .fd-n4{width:34px;bottom:210px;left:calc(max(20px, 50vw - 620px) + 24px);animation-delay:-3.5s}
+}
+
+/* small corner stickers on the "How are you holding up?" box and the streak panel */
+.composer-peek,.panel.streak{position:relative}
+.composer-peek::before,.composer-peek::after,.panel.streak::after{
+  content:"";position:absolute;pointer-events:none;background-repeat:no-repeat;background-size:contain;
+  filter:drop-shadow(2px 3px 0 var(--deco-ink))}
+.composer-peek::before{width:26px;height:26px;left:-11px;top:-12px;rotate:-10deg;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 6 C54 34 66 46 94 50 C66 54 54 66 50 94 C46 66 34 54 6 50 C34 46 46 34 50 6 Z' fill='%23ffffff' stroke='%233b2a54' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.composer-peek::after{width:32px;height:32px;right:-10px;top:-14px;rotate:12deg;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 88 C18 64 8 46 14 30 C20 14 42 12 50 30 C58 12 80 14 86 30 C92 46 82 64 50 88 Z' fill='%23f49ac1' stroke='%233b2a54' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.panel.streak::after{width:38px;height:38px;right:-12px;top:-14px;rotate:14deg;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8 L61 36 L91 38 L67 57 L75 87 L50 70 L25 87 L33 57 L9 38 L39 36 Z' fill='%23ffc94d' stroke='%233b2a54' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+
+@media (prefers-color-scheme:dark){
+  .fd{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Ccircle cx='12' cy='12' r='1.3' fill='rgba(216,182,244,.12)'/%3E%3C/svg%3E")}
+  .fd .squig{stroke:var(--ui-lilac)}
+  .composer-peek::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 6 C54 34 66 46 94 50 C66 54 54 66 50 94 C46 66 34 54 6 50 C34 46 46 34 50 6 Z' fill='%23ffffff' stroke='%23faf7ff' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+  .composer-peek::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 88 C18 64 8 46 14 30 C20 14 42 12 50 30 C58 12 80 14 86 30 C92 46 82 64 50 88 Z' fill='%23f49ac1' stroke='%23faf7ff' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+  .panel.streak::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8 L61 36 L91 38 L67 57 L75 87 L50 70 L25 87 L33 57 L9 38 L39 36 Z' fill='%23ffc94d' stroke='%23faf7ff' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E")}
+}
+@media (prefers-reduced-motion:reduce){.fd-stk{animation:none}}

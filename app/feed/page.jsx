@@ -9,6 +9,7 @@ import SafetyNote from '@/components/SafetyNote'
 import SeenBanner from '@/components/SeenBanner'
 import CommunityPulse from '@/components/CommunityPulse'
 import CareBanner from '@/components/CareBanner'
+import FeedDecor from '@/components/FeedDecor'
 
 export const dynamic = 'force-dynamic'
 
@@ -23,6 +24,7 @@ export default async function Feed({ searchParams }) {
 
   return (
     <>
+      <FeedDecor />
       <TopBar />
       <div className="shell">
         <Nav active={cat} />
