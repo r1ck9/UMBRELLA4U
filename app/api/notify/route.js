@@ -2,6 +2,7 @@ import { adminSupabase } from '@/lib/supabaseAdmin'
 import { WEEKLY_PROMPT } from '@/lib/prompt'
 import { sendPush } from '@/lib/push'
 import { PALETTE } from '@/lib/palette'
+import { timingSafeEqual } from 'node:crypto'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,12 +63,15 @@ const reportHtml = (n) => shell(
    ${btn(`${SITE}/moderation`, 'Open the moderation queue 🛑', PALETTE.plum)}`)
 
 export async function GET(request) {
+  // Fail closed. Without CRON_SECRET, anyone could trigger an email to every
+  // member. Vercel Cron sends "Authorization: Bearer $CRON_SECRET" by itself.
+  // The secret is header-only, never a query param, so it can't leak into logs.
   const secret = process.env.CRON_SECRET
-  const url = new URL(request.url)
-  const ok = !secret ||
-    request.headers.get('authorization') === `Bearer ${secret}` ||
-    url.searchParams.get('secret') === secret
-  if (!ok) return new Response('unauthorized', { status: 401 })
+  const given = Buffer.from(request.headers.get('authorization') || '')
+  const expected = Buffer.from(`Bearer ${secret || ''}`)
+  if (!secret || given.length !== expected.length || !timingSafeEqual(given, expected)) {
+    return new Response('unauthorized', { status: 401 })
+  }
   const sb = adminSupabase()
   if (!sb) return Response.json({ error: 'admin not configured (missing SUPABASE_SERVICE_ROLE_KEY)' }, { status: 500 })
 

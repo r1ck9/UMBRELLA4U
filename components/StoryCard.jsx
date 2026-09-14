@@ -189,6 +189,10 @@ export default function StoryCard({ story }) {
         .on('postgres_changes',
           { event: 'INSERT', schema: 'public', table: 'poll_votes', filter: 'story_id=eq.' + story.id },
           () => refreshPollCounts())
+        // Other members' votes are private, so also follow the public tallies.
+        .on('postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'poll_options', filter: 'story_id=eq.' + story.id },
+          () => refreshPollCounts())
         .subscribe()
     })()
     return () => { if (channel) supabase.removeChannel(channel) }

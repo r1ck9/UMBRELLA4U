@@ -46,7 +46,7 @@ export default function Onboarding() {
       const { data } = await supabase.auth.getUser()
       if (!data.user) { setLoading(false); return }
       setUser(data.user)
-      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,created_at').eq('id', data.user.id).single()
+      const { data: prof } = await supabase.from('profiles').select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,created_at').eq('id', data.user.id).single()
       if (prof?.onboarded) { router.replace('/feed'); return }
       if (prof) setP((prev) => ({
         ...prev,

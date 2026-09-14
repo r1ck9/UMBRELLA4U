@@ -41,7 +41,7 @@ export default function PublicProfile({ params }) {
       setReported(false)
 
       const { data: prof } = await supabase.from('profiles')
-        .select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,is_moderator,created_at')
+        .select('id,username,display_name,pronouns,status_weather,about_me,accent_color,avatar_url,banner_url,banner_theme,tags,discoverable,notify_email,onboarded,post_count,streak_count,umbrellas_sent,created_at')
         .eq('username', username).single()
       if (!active) return
       if (!prof) { setState({ loading: false, prof: null }); return }

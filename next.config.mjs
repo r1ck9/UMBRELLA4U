@@ -9,6 +9,20 @@ const nextConfig = {
       static: 180,
     },
   },
+  // Baseline browser protections on every route: no framing by other sites
+  // (clickjacking), no MIME sniffing, no full URLs leaked to other origins, and
+  // camera/mic/location limited to this site.
+  async headers() {
+    return [{
+      source: '/:path*',
+      headers: [
+        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(self), payment=(), usb=()' },
+      ],
+    }]
+  },
   async rewrites() {
     return {
       // beforeFiles runs before app routes, so this replaces the homepage:

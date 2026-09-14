@@ -1,4 +1,19 @@
+import { createClient } from '@supabase/supabase-js'
+
 export const runtime = 'nodejs'
+
+// Only signed-in members may call this. Otherwise it's a free, unmetered
+// proxy to our OpenAI key for anyone on the internet.
+const MAX_CHARS = 5000
+async function signedInUser(req) {
+  const match = (req.headers.get('authorization') || '').match(/^Bearer\s+(.+)$/i)
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!match || !url || !anon) return null
+  const sb = createClient(url, anon, { auth: { persistSession: false } })
+  const { data } = await sb.auth.getUser(match[1])
+  return data?.user || null
+}
 
 // Free AI content moderation via OpenAI's moderation endpoint (omni-moderation-latest).
 // Runs server-side so the key is never exposed to the browser. No-ops (allows the
@@ -32,8 +47,12 @@ Do NOT flag (dox: false):
 Respond ONLY with JSON: {"dox": true} or {"dox": false}.`
 
 export async function POST(req) {
+  if (!(await signedInUser(req))) return Response.json({ error: 'unauthorized' }, { status: 401 })
+
   let text = ''
   try { ({ text } = await req.json()) } catch {}
+  if (typeof text !== 'string') text = ''
+  if (text.length > MAX_CHARS) return Response.json({ allowed: false, reason: 'too_long', configured: true }, { status: 413 })
   if (!text || !text.trim()) return Response.json({ allowed: true, configured: false })
 
   const key = process.env.OPENAI_API_KEY

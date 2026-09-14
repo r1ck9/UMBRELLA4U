@@ -47,12 +47,18 @@ export async function POST(req) {
 
   const userId = auth.user.id
   const { data: umbrella, error: umbrellaError } = await sb.from('umbrellas')
-    .select('id,note')
+    .select('id,note,created_at')
     .eq('story_id', storyId)
     .eq('user_id', userId)
     .maybeSingle()
   if (umbrellaError) return Response.json({ error: umbrellaError.message }, { status: 500 })
   if (!umbrella) return Response.json({ error: 'no_umbrella' }, { status: 404 })
+  // Only notify for an umbrella opened in the last couple of minutes. Without
+  // this, whoever opened one could call the route over and over and spam the
+  // author's devices.
+  if (Date.now() - new Date(umbrella.created_at).getTime() > 2 * 60 * 1000) {
+    return Response.json({ ok: true, skipped: true, reason: 'not_recent' })
+  }
 
   let authorId
   try {

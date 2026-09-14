@@ -224,8 +224,10 @@ export default function Composer() {
     try {
       const moderationController = new AbortController()
       const moderationTimeout = setTimeout(() => moderationController.abort(), 8000)
+      const { data: sessionData } = await supabase.auth.getSession()
       const res = await fetch('/api/moderate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionData?.session?.access_token || ''}` },
         body: JSON.stringify({ text: text.trim() }), signal: moderationController.signal
       })
       clearTimeout(moderationTimeout)
