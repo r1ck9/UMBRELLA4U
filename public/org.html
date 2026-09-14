@@ -392,23 +392,6 @@
   .cta h2{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.02em;max-width:20ch;margin:0 auto}
   .cta p{margin:18px auto 0;max-width:48ch;color:#dfcfe9;font-size:1.12rem}
   .cta .cta-row{margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-  .cta-rain{position:absolute;inset:0;z-index:1;width:100%;height:100%;pointer-events:none}
-  .cta-shield{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
-  .cta-umbrella{position:absolute;left:50%;top:50%;width:min(1120px,112vw);height:auto;
-    transform:translate(-50%,-48%) scaleX(.035) scaleY(.16) rotate(-8deg);transform-origin:50% 46%;opacity:0;
-    transition:transform 1.05s cubic-bezier(.16,.82,.2,1),opacity .22s ease}
-  .cta.is-open .cta-umbrella{opacity:.97;transform:translate(-50%,-48%) scale(1) rotate(0)}
-  .cta-umbrella .canopy{fill:url(#cta-canopy);stroke:rgba(246,232,255,.38);stroke-width:3}
-  .cta-umbrella .underside{fill:url(#cta-under);opacity:.82}
-  .cta-umbrella .rib{fill:none;stroke:rgba(30,12,43,.45);stroke-width:4;stroke-linecap:round}
-  .cta-umbrella .pole{fill:none;stroke:#2b1838;stroke-width:12;stroke-linecap:round}
-  .cta-umbrella .pole-hi{fill:none;stroke:#b98cdb;stroke-width:3;stroke-linecap:round;opacity:.75}
-  .cta-umbrella .sheen{fill:none;stroke:rgba(255,248,255,.2);stroke-width:8;stroke-linecap:round}
-  @media(max-width:700px){
-    .cta-umbrella{width:940px;top:48%;transform:translate(-50%,-48%) scaleX(.035) scaleY(.16) rotate(-8deg)}
-    .cta.is-open .cta-umbrella{transform:translate(-50%,-48%) scale(1) rotate(0)}
-  }
-  @media(prefers-reduced-motion:reduce){.cta-umbrella{transition:none}.cta.is-open .cta-umbrella{transform:translate(-50%,-48%) scale(1)}}
 
   footer{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#1c0f29,var(--footer) 56%,#2a1838);color:#d4bee2;padding:44px 0}
   footer::before{content:"";position:absolute;z-index:0;inset:0;opacity:.74;background:
@@ -457,7 +440,7 @@
     .hero{min-height:0;padding:90px 0 82px;align-items:flex-start}
     .hero::before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:128px;z-index:0;pointer-events:none;
       background:linear-gradient(180deg,rgba(61,37,78,0) 0%,rgba(122,82,156,.62) 36%,#f8f4fb 100%)}
-    .hero canvas:not(#mobile-hero-rain),.stormflash,#rainall,.cta-rain{display:none}
+    .hero canvas:not(#mobile-hero-rain),.stormflash,#rainall{display:none}
     #mobile-hero-rain{display:block;position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
     .hero .wrap{margin:0 auto;text-align:center;max-width:430px;padding:0 20px}
     .hero h1,.haven-title{justify-content:center;font-size:clamp(2.52rem,12.4vw,3.38rem);margin:8px auto 0;max-width:9.8ch;line-height:.9;text-align:center}
@@ -486,7 +469,7 @@
     .map-panel{padding:14px;border-radius:12px}.map-panel b{font-size:1.12rem}.map-panel p{font-size:.82rem}.map-list{gap:7px}.map-list li{font-size:.76rem}
     .role-cols{margin-top:22px}.role-list li{padding:9px 0;font-size:.8rem}.apply-cta{margin-top:18px;padding:16px;gap:11px}.apply-cta h3{font-size:1.05rem}.apply-cta p{font-size:.82rem}
     .story-wall{padding:42px 0}.polaroids{margin-top:20px;gap:12px;max-width:320px}.polaroid{min-height:0;padding:12px 12px 16px}.polaroid::before{height:78px;margin-bottom:10px}.polaroid b{font-size:1.02rem}.polaroid p{font-size:.78rem}
-    .cta{padding:52px 0}.cta-shield{display:none}.cta h2{font-size:clamp(1.42rem,6.8vw,1.82rem);line-height:1.14}.cta p{font-size:.86rem;line-height:1.48;margin-top:12px}
+    .cta{padding:52px 0}.cta h2{font-size:clamp(1.42rem,6.8vw,1.82rem);line-height:1.14}.cta p{font-size:.86rem;line-height:1.48;margin-top:12px}
     .cta .cta-row{margin-top:18px;flex-direction:row;align-items:center}.cta .cta-row .btn{width:auto;justify-content:center}
     footer{padding:34px 0;text-align:center}footer .wrap{flex-direction:column;align-items:center;gap:16px}footer .fnav{justify-content:center;gap:12px 18px}footer .fine{margin-top:2px;padding-top:14px}
   }
@@ -865,26 +848,6 @@
 
   <!-- CTA -->
   <section class="cta" id="cta">
-    <canvas class="cta-rain" aria-hidden="true"></canvas>
-    <div class="cta-shield" aria-hidden="true">
-      <svg class="cta-umbrella" viewBox="0 0 1200 620" role="presentation">
-        <defs>
-          <linearGradient id="cta-canopy" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="var(--ui-lavender)"/><stop offset=".32" stop-color="var(--ui-lilac)"/><stop offset=".7" stop-color="var(--ui-violet)"/><stop offset="1" stop-color="var(--ui-plum)"/>
-          </linearGradient>
-          <linearGradient id="cta-under" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="var(--ui-violet)"/><stop offset="1" stop-color="var(--ui-plum)"/>
-          </linearGradient>
-        </defs>
-        <ellipse cx="600" cy="505" rx="355" ry="34" fill="rgba(36,24,47,.26)"/>
-        <path class="pole" d="M600 280 L600 510 Q600 552 634 552 Q662 552 662 525 Q662 507 646 507"/>
-        <path class="pole-hi" d="M596 287 L596 506 Q596 545 626 545"/>
-        <path class="underside" d="M94 285 Q165 220 266 229 Q370 172 478 221 Q600 150 722 221 Q830 172 934 229 Q1035 220 1106 285 Q1037 324 962 300 Q868 343 762 302 Q600 350 438 302 Q332 343 238 300 Q163 324 94 285Z"/>
-        <path class="canopy" d="M94 285 Q160 82 360 143 Q468 30 600 111 Q732 30 840 143 Q1040 82 1106 285 Q1037 324 962 300 Q868 343 762 302 Q600 350 438 302 Q332 343 238 300 Q163 324 94 285Z"/>
-        <path class="rib" d="M600 111 Q600 224 600 338 M600 111 Q465 170 438 302 M600 111 Q734 170 762 302 M600 111 Q312 157 238 300 M600 111 Q888 157 962 300 M600 111 Q163 199 94 285 M600 111 Q1037 199 1106 285"/>
-        <path class="sheen" d="M201 222 Q330 77 493 137"/>
-      </svg>
-    </div>
     <div class="wrap">
       <h2 class="reveal">If you want to help, there's room.</h2>
       <p class="reveal">Schools, funders, clinicians, and people who just wish this had existed when they were fifteen. Email us and we'll answer.</p>
@@ -923,89 +886,6 @@
     els.forEach(function(e){io.observe(e)});
   })();
 
-  // Final CTA umbrella: opens as the section arrives, and folds back up when
-  // scrolling away. Its local rain layer is clipped by the opening canopy.
-  (function(){
-    var cta=document.getElementById('cta');
-    var canvas=cta && cta.querySelector('.cta-rain');
-    if(!cta || !canvas) return;
-    if(window.innerWidth<=760) return;
-    var reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
-    var ctx=canvas.getContext('2d'), W=0,H=0,DPR=1,last=null,open=0,target=0,acc=0,drops=[],visible=false,running=false;
-    function resize(){
-      DPR=Math.min(window.devicePixelRatio||1,1.5)*(window.__siteFit||1);
-      W=canvas.clientWidth; H=canvas.clientHeight;
-      canvas.width=Math.round(W*DPR); canvas.height=Math.round(H*DPR);
-      ctx.setTransform(DPR,0,0,DPR,0,0);
-    }
-    function setTarget(next){
-      target=next?1:0;
-      cta.classList.toggle('is-open',!!target);
-    }
-    function updateState(){
-      var r=cta.getBoundingClientRect();
-      setTarget(r.top<window.innerHeight*.80 && r.bottom>window.innerHeight*.12);
-    }
-    function spawn(y){
-      drops.push({x:Math.random()*(W+190)-20,y:y,len:24+Math.random()*42,
-        vx:-44+Math.random()*18,vy:480+Math.random()*300,a:.14+Math.random()*.18});
-    }
-    function canopyAt(x){
-      var rx=Math.min(W*.45,505)*open, base=H*.50, ry=Math.min(H*.34,168)*open;
-      if(rx<2 || Math.abs(x-W*.5)>rx) return null;
-      var n=(x-W*.5)/rx;
-      return {top:base-ry*Math.sqrt(Math.max(0,1-n*n)),bottom:base+13*open};
-    }
-    function blocked(x,y){
-      var edge=canopyAt(x);
-      return edge && y>=edge.top && y<=edge.bottom;
-    }
-    function update(dt){
-      open+=(target-open)*Math.min(1,dt*4.5);
-      acc+=dt*W*.105;
-      while(acc>1){acc--;spawn(-55);}
-      for(var i=drops.length-1;i>=0;i--){
-        var d=drops[i]; d.x+=d.vx*dt; d.y+=d.vy*dt;
-        if(blocked(d.x,d.y) || d.y>H+d.len+30 || d.x<-100) drops.splice(i,1);
-      }
-      if(drops.length>500)drops.splice(0,drops.length-500);
-    }
-    function draw(){
-      ctx.clearRect(0,0,W,H); ctx.lineCap='round';
-      for(var i=0;i<drops.length;i++){
-        var d=drops[i];
-        if(blocked(d.x,d.y) || blocked(d.x-d.vx*.04,d.y-d.vy*.04)) continue;
-        var speed=Math.hypot(d.vx,d.vy)||1;
-        ctx.strokeStyle='rgba(216,182,244,'+d.a+')'; ctx.lineWidth=1.05;
-        ctx.beginPath(); ctx.moveTo(d.x,d.y);
-        ctx.lineTo(d.x-d.vx/speed*d.len,d.y-d.vy/speed*d.len); ctx.stroke();
-      }
-    }
-    function loop(ts){
-      if(!visible){running=false;last=null;return;}
-      if(last===null)last=ts;
-      var dt=Math.min((ts-last)/1000,.05); last=ts;
-      update(dt); draw(); requestAnimationFrame(loop);
-    }
-    function start(){if(!visible || running || reduced)return;running=true;last=null;requestAnimationFrame(loop)}
-    resize(); updateState();
-    var targetObserver=null;
-    if(!reduced && 'IntersectionObserver' in window){
-      targetObserver=new IntersectionObserver(function(entries){
-        setTarget(entries[0].isIntersecting);
-      },{rootMargin:'-12% 0px -20% 0px',threshold:0});
-      targetObserver.observe(cta);
-    }else if(!reduced){
-      window.addEventListener('scroll',updateState,{passive:true});
-    }
-    window.addEventListener('resize',function(){resize();if(!targetObserver)updateState()},{passive:true});
-    if(reduced){target=1;open=1;cta.classList.add('is-open');for(var i=0;i<55;i++)spawn(Math.random()*H);draw();}
-    else {
-      for(var j=0;j<55;j++)spawn(Math.random()*H);
-      if('IntersectionObserver' in window){new IntersectionObserver(function(entries){visible=entries[0].isIntersecting;if(visible)start();else ctx.clearRect(0,0,W,H)},{threshold:.03}).observe(cta)}
-      else {visible=true;start();}
-    }
-  })();
 
   // Mobile hero rain only: confined to the purple first screen and splashing at the transition.
   (function(){
