@@ -1,0 +1,358 @@
+/* Hand-drawn look for the static org pages.
+
+   Loaded last, after brand-fonts.css and color-palette.css, so it wins on
+   order rather than by piling on !important. The rules of the look:
+   one ink colour does every outline, shadows are hard offsets with no blur,
+   corners are slightly uneven, fills are flat, and there are no gradients.
+
+   The hero's 3D umbrella and meadow are drawn on canvas by org.html's own
+   script. Nothing here touches them; the hero just gets framed like a card. */
+
+:root,
+:root:not([data-theme="light"]),
+:root[data-theme="light"],
+:root[data-theme="dark"]{
+  --hd-ink:#3b2a54;
+  --hd-ink-2:#5b4776;
+  --hd-violet:#5e3d96;
+  --hd-paper:#fbf7ff;
+  --hd-lav:#ede3fb;
+  --hd-white:#ffffff;
+  --hd-yellow:#ffc94d;
+  --hd-cream:#fff0c9;
+  --hd-mint:#cdefd8;
+  --hd-pink:#f49ac1;
+  --hd-sky:#e3f1fc;
+  --hd-night:#241533;
+  --hd-lilac:#c49aea;
+  --hd-dash:rgba(59,42,84,.32);
+
+  --hd-r:20px 15px 22px 16px;
+  --hd-r-sm:12px 9px 13px 10px;
+  --hd-shadow:5px 6px 0 var(--hd-ink);
+  --hd-shadow-sm:3px 3px 0 var(--hd-ink);
+
+  --serif:"Shantell Sans","Comic Neue",system-ui,sans-serif;
+  --sans:"Nunito","Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --hand:"Caveat","Shantell Sans",cursive;
+
+  /* color-palette.css swaps these to dark values under a dark OS theme.
+     This page is paper either way. */
+  --paper:var(--hd-paper);
+  --surface:var(--hd-white);
+  --surface-2:var(--hd-lav);
+  --ink:var(--hd-ink);
+  --ink-2:var(--hd-ink-2);
+  --ink-3:var(--hd-violet);
+  --forest:var(--hd-violet);
+  --forest-deep:var(--hd-ink);
+  --amber:var(--hd-yellow);
+  --amber-soft:var(--hd-cream);
+  --on-accent:var(--hd-ink);
+  --line:var(--hd-ink);
+  --line-2:var(--hd-dash);
+  --shadow:var(--hd-shadow);
+  --interactive-glow:var(--hd-shadow-sm);
+}
+
+body{background:var(--hd-lav);color:var(--hd-ink);font-family:var(--sans)}
+h1,h2,h3{font-weight:800;letter-spacing:-.01em}
+:focus-visible{outline:3px dashed var(--hd-ink);outline-offset:4px}
+
+/* ---------- flat sections, torn-paper dashes between them ---------- */
+.visual-section::before,.visual-section::after{content:none;display:none}
+.sec-head h2,.about-intro h2,.havensec h2{text-shadow:none}
+.about{background:var(--hd-paper)}
+.havensec{background:var(--hd-lav)}
+.goals{background:var(--hd-paper)}
+.chapters{background:var(--hd-lav)}
+.about,.havensec,.goals,.chapters{border-top:2.5px dashed var(--hd-dash)}
+
+.eyebrow{font-family:var(--hand);font-size:1.5rem;font-weight:700;line-height:1;
+  letter-spacing:0;text-transform:none;color:var(--hd-violet)}
+.eyebrow::before{content:none}
+
+/* ---------- nav: ink on paper, since the hero no longer sits under it ---------- */
+header.nav{background:transparent;border-bottom:0}
+header.nav.scrolled{background:var(--hd-paper);border-bottom:2.5px solid var(--hd-ink);box-shadow:none}
+.nav .brand,.nav.scrolled .brand{color:var(--hd-ink);font-family:var(--serif);font-weight:800}
+.brand .mark{box-shadow:0 0 0 2.5px var(--hd-ink)}
+.nav nav a,.nav.scrolled nav a{color:var(--hd-ink-2);font-weight:700}
+.nav nav a:not(.btn):hover,.nav nav a:not(.btn):focus-visible{color:var(--hd-ink);box-shadow:none;
+  text-decoration:underline wavy var(--hd-yellow) 2px;text-underline-offset:6px}
+
+.lang-select,.nav.scrolled .lang-select{background:var(--hd-white);color:var(--hd-ink);
+  border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.static-language-trigger,.nav:not(.scrolled) .static-language-trigger{background:var(--hd-white);color:var(--hd-ink);
+  border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.static-language-menu{border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow)}
+
+/* ---------- buttons ---------- */
+.btn{font-family:var(--serif);font-weight:800;color:var(--hd-ink);background:var(--hd-white);
+  border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm);
+  transition:translate .12s ease,box-shadow .12s ease,background-color .12s ease}
+.btn:hover,.btn:focus-visible{box-shadow:5px 5px 0 var(--hd-ink);translate:-1px -1px}
+.btn:active{box-shadow:0 0 0 var(--hd-ink);translate:3px 3px}
+.btn.big{border-radius:var(--hd-r)}
+.btn.primary,.btn.light{background:var(--hd-yellow);color:var(--hd-ink)}
+.btn.ghost{background:var(--hd-white);color:var(--hd-ink);border-color:var(--hd-ink)}
+.btn.ghost:hover{background:var(--hd-cream)}
+
+/* ---------- hero: the umbrella scene, framed like a card on the page ---------- */
+.hero{
+  margin:84px clamp(10px,2.4vw,28px) 0;
+  min-height:calc(var(--site-viewport-height,100svh) - 112px);
+  background:var(--hd-night);color:var(--hd-paper);
+  border:3px solid var(--hd-ink);border-radius:40px 30px 42px 32px;
+  box-shadow:8px 10px 0 var(--hd-ink);
+}
+.hero::after{content:none}
+.haven-title{color:var(--hd-paper);font-weight:800}
+.hero .lede{color:#e4d6f1}
+.splash{font-family:var(--hand)!important;font-style:normal;font-weight:700;color:var(--hd-yellow);
+  text-shadow:none;font-size:clamp(1.2rem,2vw,1.6rem)}
+.scroll-cue{font-family:var(--hand);font-size:1.15rem;letter-spacing:0;text-transform:none;color:#d8c4e8}
+
+/* things inside the dark card cast their shadow in lilac, so they still read */
+.mobile-app-note{background:var(--hd-cream);color:var(--hd-ink);border:2.5px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:4px 5px 0 var(--hd-lilac)}
+.mobile-app-note span{color:var(--hd-ink-2)}
+.mobile-app-note i{background:var(--hd-yellow);border:2px solid var(--hd-ink);border-radius:9px 7px 10px 8px}
+
+.hero-keys li{color:var(--hd-ink);font-weight:800;border:2px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:3px 3px 0 var(--hd-lilac)}
+.hero-keys li:nth-child(4n+1){background:var(--hd-yellow);rotate:-1.5deg}
+.hero-keys li:nth-child(4n+2){background:var(--hd-mint);rotate:1deg}
+.hero-keys li:nth-child(4n+3){background:var(--hd-pink);rotate:-.6deg}
+.hero-keys li:nth-child(4n+4){background:var(--hd-sky);rotate:1.4deg}
+
+.hero .btn{box-shadow:4px 5px 0 var(--hd-lilac)}
+.hero .btn:hover,.hero .btn:focus-visible{box-shadow:6px 6px 0 var(--hd-lilac)}
+.hero .btn:active{box-shadow:0 0 0 var(--hd-lilac)}
+.hero .btn.ghost{background:transparent!important;color:var(--hd-paper)!important;border-color:var(--hd-paper)!important}
+.hero .btn.ghost:hover{background:rgba(251,247,255,.1)!important}
+
+/* ---------- cards ----------
+   The real border goes transparent and an ::after draws it instead, run
+   through the #squiggle SVG filter. Filtering the outline alone keeps the
+   text inside perfectly crisp. */
+.goal,.role-card,.pillars,.apply-cta,.map-panel,.mapwrap,.cta .wrap{
+  position:relative;overflow:visible;border:2.5px solid transparent;
+  border-radius:var(--hd-r);box-shadow:var(--hd-shadow)}
+.goal::after,.role-card::after,.pillars::after,.apply-cta::after,.map-panel::after,.mapwrap::after,.cta .wrap::after{
+  content:"";position:absolute;inset:-2.5px;z-index:3;pointer-events:none;
+  border:3px solid var(--hd-ink);border-radius:inherit;filter:url(#squiggle)}
+
+/* Keep each card's fill inside its border, so where the squiggled outline
+   wobbles inward the fill doesn't poke out past it. !important because the
+   per-card background shorthands below would otherwise reset the clip. */
+.goal,.role-card,.pillars,.apply-cta,.map-panel,.mapwrap,.cta .wrap,
+.feature,.vals .val,.cta-box,.reqs,.cat,.free-note{background-clip:padding-box!important}
+
+/* about */
+.about-intro{border-bottom:2.5px dashed var(--hd-dash)}
+.about-intro h2 b{color:inherit;box-shadow:inset 0 -.36em 0 var(--hd-yellow);padding:0 .06em}
+/* .body opens with its eyebrow, so the page's "first paragraph is the lead"
+   rule was landing on the eyebrow. Point each style at the right element. */
+.about .body p.eyebrow:first-child{font-family:var(--hand);font-size:1.5rem;font-weight:700;line-height:1;color:var(--hd-violet)}
+.about .body .eyebrow + p{font-family:var(--serif);font-weight:600;font-size:1.22rem;line-height:1.5;color:var(--hd-ink);margin-top:12px}
+.pillars{gap:0;background:var(--hd-white)}
+.pillar{background:transparent}
+.pillar + .pillar{border-top:2px dashed var(--hd-dash)}
+.pillar h3{font-family:var(--serif);font-weight:800}
+.pillar p{color:var(--hd-ink-2)}
+.pillar .n{width:2.1em;height:2.1em;display:grid;place-items:center;flex:0 0 2.1em;
+  font-family:var(--serif);font-weight:800;font-size:1rem;color:var(--hd-ink);
+  background:var(--hd-yellow);border:2px solid var(--hd-ink);border-radius:50% 46% 52% 48%}
+.pillar:nth-child(2) .n{background:var(--hd-mint)}
+.pillar:nth-child(3) .n{background:var(--hd-pink)}
+.pillar:nth-child(4) .n{background:var(--hd-sky)}
+
+/* haven */
+.havensec .eyebrow{color:var(--hd-violet)}
+.havensec .lede2{color:var(--hd-ink-2)}
+.havensec .feat li{color:var(--hd-ink);font-weight:800;border:2px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.havensec .feat li:nth-child(4n+1){background:var(--hd-yellow)}
+.havensec .feat li:nth-child(4n+2){background:var(--hd-mint)}
+.havensec .feat li:nth-child(4n+3){background:var(--hd-pink)}
+.havensec .feat li:nth-child(4n+4){background:var(--hd-sky)}
+
+/* goals: pastel index cards, slightly off-square */
+.goal{background:var(--hd-cream)}
+.g-grid .goal:nth-child(1){rotate:-1deg}
+.g-grid .goal:nth-child(2){background:var(--hd-mint);rotate:.8deg}
+.g-grid .goal:nth-child(3){background:var(--hd-sky);rotate:-.5deg}
+.goal .num{color:var(--hd-ink);font-family:var(--serif);font-weight:800}
+.goal .lbl{font-family:var(--serif);font-weight:700}
+.goal p{color:var(--hd-ink-2)}
+.goals .foot{font-family:var(--hand);font-style:normal;font-size:1.3rem;color:var(--hd-violet)}
+
+/* chapters */
+.mapwrap{background:var(--hd-white)}
+.mapwrap::before{content:none;display:none}
+.map-board{background:var(--hd-lav);border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);
+  box-shadow:none;transform:none}
+.map-board::before{content:none;display:none}
+.map-board.has-map{background:var(--hd-night)}
+.map-placeholder{background:var(--hd-paper);border:2.5px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.map-placeholder .mark{background:var(--hd-yellow);color:var(--hd-ink);border:2px solid var(--hd-ink);box-shadow:none}
+.map-panel{background:var(--hd-cream);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.map-panel .tagm{font-family:var(--hand);font-size:1.35rem;letter-spacing:0;text-transform:none;color:var(--hd-violet)}
+.map-panel b{font-family:var(--serif);font-weight:800}
+.map-list i{width:13px;height:13px;background:var(--hd-yellow);border:2px solid var(--hd-ink);box-shadow:none}
+.mapboxgl-popup-content{font-family:var(--sans);color:var(--hd-ink);border:2px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.mapboxgl-popup-content b{font-family:var(--serif);color:var(--hd-ink)}
+
+.role-card{background:var(--hd-white)}
+.role-cols .role-card:nth-child(1){rotate:-.4deg}
+.role-cols .role-card:nth-child(2){background:var(--hd-paper);rotate:.4deg}
+.role-card .kicker{font-family:var(--hand);font-size:1.35rem;letter-spacing:0;text-transform:none;color:var(--hd-violet)}
+.role-card h3{font-family:var(--serif);font-weight:800}
+.role-card > p{color:var(--hd-ink-2)}
+.role-list li{border-top:2px dashed var(--hd-dash)}
+.role-list span{color:var(--hd-ink-2)}
+
+.apply-cta{background:var(--hd-cream);rotate:-.3deg}
+.apply-cta h3{font-family:var(--serif);font-weight:800}
+.apply-cta p{color:var(--hd-ink-2)}
+
+/* ---------- closing call: a big yellow card on paper ---------- */
+.cta{background:var(--hd-paper);color:var(--hd-ink);border-top:2.5px dashed var(--hd-dash)}
+.cta .wrap{width:min(860px,calc(100% - 32px));margin:0 auto;background:var(--hd-yellow);
+  border-radius:38px 28px 40px 30px;box-shadow:8px 10px 0 var(--hd-ink);
+  padding:clamp(34px,5vw,58px) clamp(22px,4vw,48px);rotate:-.5deg}
+.cta h2,.cta p{color:var(--hd-ink)}
+.cta .btn.primary{background:var(--hd-white)}
+
+/* ---------- footer ---------- */
+footer{background:var(--hd-ink);color:#e6d9f3}
+footer::before{content:none;display:none}
+footer .brand{color:var(--hd-paper)}
+footer .brand .mark{box-shadow:0 0 0 2.5px var(--hd-paper)}
+footer a:hover,footer a:focus-visible{color:var(--hd-yellow);box-shadow:none}
+footer .fine{color:#c9b6de;border-top:2px dashed rgba(251,247,255,.25)}
+
+/* ---------- phones ---------- */
+@media(max-width:760px){
+  .eyebrow,.about .body p.eyebrow:first-child{font-size:1.15rem}
+  .about .body .eyebrow + p{font-size:1rem}
+  .nav nav a.cta-link:not(.btn){background:var(--hd-yellow);color:var(--hd-ink);
+    border:2px solid var(--hd-ink);box-shadow:var(--hd-shadow-sm)}
+  .hero{margin:62px 8px 0;min-height:0;padding:34px 0 42px;
+    border-width:2.5px;border-radius:26px 20px 28px 22px;box-shadow:5px 6px 0 var(--hd-ink)}
+  .goal,.role-card,.pillars,.apply-cta,.mapwrap{box-shadow:4px 4px 0 var(--hd-ink)}
+  .g-grid .goal:nth-child(n),.role-cols .role-card:nth-child(n),.apply-cta,.hero-keys li:nth-child(n){rotate:0deg}
+  .cta .wrap{rotate:0deg;border-radius:26px 20px 28px 22px;box-shadow:5px 6px 0 var(--hd-ink)}
+  .goals .foot,.map-panel .tagm,.role-card .kicker{font-size:1.1rem}
+}
+@media(prefers-reduced-motion:reduce){.btn{transition:none}}
+
+/* =====================================================================
+   about.html and handbook.html
+   Same system, their own markup: .site-nav, a .cover header, plain
+   sections of .col, and a handful of card shapes.
+   ===================================================================== */
+.site-nav{background:var(--hd-paper);backdrop-filter:none;border-bottom:2.5px solid var(--hd-ink)}
+.site-brand{color:var(--hd-ink);font-family:var(--serif);font-weight:800}
+.site-brand-logo{box-shadow:0 0 0 2.5px var(--hd-ink)}
+.site-links a{color:var(--hd-ink-2);font-weight:700}
+.site-links a:not(.site-cta):hover,.site-links a:not(.site-cta):focus-visible{color:var(--hd-ink);box-shadow:none;
+  text-decoration:underline wavy var(--hd-yellow) 2px;text-underline-offset:6px}
+.site-links a.here{color:var(--hd-ink);text-decoration:underline wavy var(--hd-violet) 2px;text-underline-offset:6px}
+.site-cta{background:var(--hd-yellow)!important;color:var(--hd-ink)!important;border:2.5px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.site-cta:hover,.site-cta:focus-visible{box-shadow:5px 5px 0 var(--hd-ink)}
+.site-nav .language-select{background:var(--hd-white);color:var(--hd-ink);border:2px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+
+/* the cover gets framed the same way the homepage hero does */
+.cover{position:relative;z-index:2;margin:18px clamp(10px,2.4vw,28px) 0;background:var(--hd-night)!important;color:var(--hd-paper);
+  border:3px solid var(--hd-ink);border-radius:40px 30px 42px 32px;box-shadow:8px 10px 0 var(--hd-ink)}
+.cover .eyebrow{color:var(--hd-yellow)}
+.cover h1{color:var(--hd-paper)}
+.cover p.sub{color:#e4d6f1}
+.cover .tag{font-family:var(--hand);font-size:1.2rem;letter-spacing:0;color:var(--hd-ink);background:var(--hd-cream);
+  border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:3px 3px 0 var(--hd-lilac)}
+
+.cover ~ section{background:var(--hd-lav)}
+.cover ~ section:nth-of-type(odd){background:var(--hd-paper)}
+.cover ~ section + section{border-top:2.5px dashed var(--hd-dash)}
+h2.sec{font-weight:800}
+.amber-eye{color:var(--hd-violet)}
+.lead{font-family:var(--serif);font-weight:600;color:var(--hd-ink)}
+p.body b{color:var(--hd-ink)}
+footer a{color:#e6d9f3}
+
+/* a pull quote written on a sticky note */
+.pull{margin:28px 0;padding:16px 22px;background:var(--hd-cream);color:var(--hd-ink);
+  border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm);
+  font-family:var(--hand);font-size:1.7rem;line-height:1.2;rotate:-.6deg}
+
+.feature,.vals .val,.cta-box,.reqs,.cat,.free-note{position:relative;overflow:visible;
+  border:2.5px solid transparent;border-radius:var(--hd-r);box-shadow:var(--hd-shadow);background:var(--hd-white)}
+.feature::after,.vals .val::after,.cta-box::after,.reqs::after,.cat::after,.free-note::after{
+  content:"";position:absolute;inset:-2.5px;z-index:3;pointer-events:none;
+  border:3px solid var(--hd-ink);border-radius:inherit;filter:url(#squiggle)}
+
+.feature{gap:0}
+.feature .row{background:transparent}
+.feature .row + .row{border-top:2px dashed var(--hd-dash)}
+.feature .row b{font-family:var(--serif);font-weight:800}
+.feature .row span{color:var(--hd-ink-2)}
+
+.vals .val:nth-child(1){background:var(--hd-cream);rotate:-.8deg}
+.vals .val:nth-child(2){background:var(--hd-mint);rotate:.6deg}
+.vals .val:nth-child(3){background:var(--hd-sky);rotate:-.4deg}
+.vals .val:nth-child(4){rotate:.7deg}
+.val h3{font-family:var(--serif);font-weight:800}
+.val p{color:var(--hd-ink-2)}
+.checks li b{color:var(--hd-ink)}
+.checks li::before{background:var(--hd-violet)}
+
+.cta-box{background:var(--hd-yellow)}
+.cta-box p{color:var(--hd-ink)}
+.cta-box .btn.primary{background:var(--hd-white)}
+
+/* handbook */
+.name-ex .n{font-family:var(--hand);font-size:1.55rem;color:var(--hd-ink);background:var(--hd-white);
+  border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.name-ex .n:nth-child(odd){rotate:-.5deg}
+.name-ex .n:nth-child(even){rotate:.5deg}
+.haves span{color:var(--hd-ink);font-weight:800;border:2px solid var(--hd-ink);
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
+.haves span:nth-child(4n+1){background:var(--hd-yellow)}
+.haves span:nth-child(4n+2){background:var(--hd-mint)}
+.haves span:nth-child(4n+3){background:var(--hd-pink)}
+.haves span:nth-child(4n+4){background:var(--hd-sky)}
+
+.reqs{gap:0}
+.reqs li{background:transparent}
+.reqs li + li{border-top:2px dashed var(--hd-dash)}
+.reqs li::before,.steps li::before{background:var(--hd-yellow);color:var(--hd-ink);border:2px solid var(--hd-ink);
+  border-radius:50% 46% 52% 48%;font-family:var(--serif);font-weight:800;width:30px;height:30px}
+.reqs .d,.steps li{color:var(--hd-ink-2)}
+.thats-it{font-family:var(--hand);font-size:2rem;color:var(--hd-ink)}
+.thats-it span{color:var(--hd-ink);box-shadow:inset 0 -.3em 0 var(--hd-yellow)}
+
+.ideas .cat:nth-child(1){background:var(--hd-cream);rotate:-.8deg}
+.ideas .cat:nth-child(2){background:var(--hd-mint);rotate:.6deg}
+.ideas .cat:nth-child(3){background:var(--hd-sky);rotate:-.5deg}
+.cat h3{font-weight:800}
+.cat h3 .ic{background:var(--hd-white);border:2px solid var(--hd-ink);border-radius:9px 7px 10px 8px}
+.cat li{color:var(--hd-ink-2)}
+.cat li::before{color:var(--hd-violet);opacity:1}
+.free-note{background:var(--hd-cream);color:var(--hd-ink-2)}
+
+/* handbook's .cta is a row of buttons, not the homepage's closing section */
+.col > .cta{background:transparent;border-top:0;padding:0;color:inherit}
+.col > .cta .btn.primary{background:var(--hd-yellow)}
+
+@media(max-width:760px){
+  .cover{margin:10px 8px 0;border-width:2.5px;border-radius:26px 20px 28px 22px;box-shadow:5px 6px 0 var(--hd-ink)}
+  .feature,.vals .val,.cta-box,.reqs,.cat,.free-note{box-shadow:4px 4px 0 var(--hd-ink)}
+  .vals .val:nth-child(n),.ideas .cat:nth-child(n),.name-ex .n:nth-child(n),.pull{rotate:0deg}
+  .pull{font-size:1.35rem}
+}
