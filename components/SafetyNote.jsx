@@ -12,7 +12,7 @@ export default function SafetyNote() {
       <span className="sn-ic" aria-hidden="true">🛟</span>
       <div className="sn-body">
         <b>Say what you actually feel.</b>
-        <p>Slurs, harassment and hate get blocked before they ever post, and a real person reviews every report. Nobody is going to tear you apart in here.</p>
+        <p>Slurs, harassment and hate get blocked before they ever make it onto the feed, and a real person reads every report that comes in. Nobody is going to tear you apart in here.</p>
       </div>
       <button className="sn-x" onClick={dismiss} aria-label="Dismiss">✕</button>
     </div>

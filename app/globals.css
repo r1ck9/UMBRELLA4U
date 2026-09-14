@@ -333,7 +333,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .chead{display:flex; align-items:center; gap:11px; margin-bottom:12px}
 .avatar{width:34px; height:34px; border-radius:50%; background:var(--sky-glow); flex:0 0 auto; display:grid; place-items:center; overflow:hidden; font-size:17px; font-weight:800}
 .avatar>img{display:block; width:100%; height:100%; border-radius:inherit; object-fit:cover; object-position:center}
-.avatar.anon{background:linear-gradient(135deg,var(--ui-violet),var(--ui-plum))}
+.avatar.anon{background:var(--ui-violet)}
 .name{font-weight:700; font-size:14px}
 .name .lock{color:var(--ink-3); font-weight:600}
 .meta{font-size:12px; color:var(--ink-3); text-transform:capitalize}
@@ -411,7 +411,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 /* intro hero (animated) */
 .introhero{position:relative; z-index:1; height:100vh; min-height:620px; overflow:hidden;
   display:flex; align-items:center; justify-content:flex-start;
-  background:linear-gradient(180deg,var(--ui-plum) 0%,color-mix(in srgb,var(--ui-violet) 22%,var(--ui-plum)) 55%,var(--ui-violet) 100%)}
+  background:var(--ui-plum)}
 .introcanvas{position:absolute; inset:0; width:100%; height:100%; z-index:1}
 .introhero .inner{position:relative; z-index:2; text-align:left; max-width:500px; margin-left:clamp(24px,8vw,110px); padding:0 24px; color:var(--ui-cloud)}
 /* start immediately, unspool slowly, one line after another (premium) */
@@ -459,7 +459,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 
 /* (old) landing */
 .landing{min-height:100vh; display:grid; place-items:center;
-  background:radial-gradient(120% 80% at 80% -10%,var(--sky-glow),transparent 55%),linear-gradient(180deg,var(--rain-1),var(--rain-0))}
+  background:var(--rain-0)}
 .hero{max-width:640px; text-align:center; padding:60px 24px}
 .hero-umb{font-size:64px}
 .eyebrow{font-family:var(--sans); font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--shelter-deep); margin:16px 0}
@@ -1080,7 +1080,7 @@ html.umbrella-translated h3{text-wrap:balance;overflow-wrap:normal;word-break:no
 .auth-agree a{color:var(--shelter); font-weight:600}
 
 /* streak */
-.panel.streak{background:linear-gradient(135deg, var(--shelter-wash), var(--panel))}
+.panel.streak{background:var(--shelter-wash)}
 .streak-n{display:flex; align-items:center; gap:9px; font-family:var(--serif); font-size:28px; font-weight:800; color:var(--shelter-deep); line-height:1}
 .streak-ico{font-size:26px}
 .streak-msg{margin:8px 0 0; font-size:13px; line-height:1.5; color:var(--ink-2)}

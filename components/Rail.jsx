@@ -244,8 +244,8 @@ export default function Rail() {
           <div className="streak-n"><span className="streak-ico" aria-hidden="true">☂</span> <CountUpNumber value={streak} initialValue={initialCache.userReady ? streak : undefined} /> day{streak === 1 ? '' : 's'}</div>
           <p className="streak-msg">
             {streak === 1
-              ? 'You showed up today. Come back tomorrow and it keeps going.'
-              : `${streak} days in a row. That’s a habit now.`}
+              ? 'You showed up today, and if you come back tomorrow it keeps going.'
+              : `${streak} days in a row, which is starting to look like a habit.`}
           </p>
         </div>
       )}
@@ -265,7 +265,7 @@ export default function Rail() {
           ? <p className="qmsg"><Link href="/login">Log in</Link> to open umbrellas.</p>
           : <p className="qbig"><b><CountUpNumber value={left} initialValue={initialCache.userReady ? left : undefined} /></b> of {DAILY_UMBRELLA_LIMIT} umbrellas left</p>}
         {postsLeft !== null && <p className="qbig"><b><CountUpNumber value={postsLeft} initialValue={initialCache.userReady ? postsLeft : undefined} /></b> of {DAILY_STORY_LIMIT} posts left</p>}
-        <p className="qhint">{DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day. That’s the cap, so pick where yours go.</p>
+        <p className="qhint">{DAILY_UMBRELLA_LIMIT} umbrellas and {DAILY_STORY_LIMIT} posts a day, and that’s the cap, so it’s worth picking where yours go.</p>
       </div>
 
       <div className="panel prompt">
@@ -280,7 +280,7 @@ export default function Rail() {
       <div className="panel">
         <h3>Need help now?</h3>
         <Link className="crisis" href="/resources">Resource hub &amp; crisis lines →</Link>
-        <p className="safe">Haven is peer support. For anything urgent, use these instead.</p>
+        <p className="safe">Haven is peer support, so for anything urgent these are the people to go to instead.</p>
       </div>
       </aside>
     </div>

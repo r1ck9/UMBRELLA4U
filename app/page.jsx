@@ -8,11 +8,11 @@ const POINTS = [
   },
   {
     t: 'One way to respond',
-    d: 'There’s no comment box. People open an umbrella, which means they’re standing with you, and they can leave one word with it if that’s what you asked for. Nobody gets to argue underneath your worst day.'
+    d: 'There’s no comment box at all. People open an umbrella, which means they’re standing with you, and they can leave a word with it if that’s what you asked for. Nobody gets to argue underneath your worst day.'
   },
   {
     t: 'A few umbrellas a day',
-    d: 'You get a handful. Once they’re gone they’re gone until tomorrow. Which is the point: someone spent one of theirs on you.'
+    d: 'You get a handful, and once they’re gone they’re gone until tomorrow, which is rather the point: whoever opened one for you spent something to do it.'
   }
 ]
 
@@ -23,8 +23,8 @@ export default function Landing() {
       <section className="introabout">
         <h2>What this is</h2>
         <p className="lead">
-          Haven is where you put the thing you’ve been carrying around all week. Someone reads it.
-          Someone opens an umbrella for you. It shows up in your inbox, and that’s the end of it.
+          Haven is where you put the thing you’ve been carrying around all week. Someone reads it and opens
+          an umbrella for you, that shows up in your inbox, and there the whole exchange ends.
         </p>
         <dl className="points">
           {POINTS.map((p) => (

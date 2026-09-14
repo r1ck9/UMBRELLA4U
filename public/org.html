@@ -67,14 +67,6 @@
   /* ---------- atmospheric visual language ---------- */
   .visual-section{position:relative;isolation:isolate;overflow:hidden}
   .visual-section>.wrap{position:relative;z-index:2}
-  .visual-section::before{content:"";position:absolute;z-index:0;inset:0;pointer-events:none;opacity:.68;
-    background:radial-gradient(42rem 15rem at -8% 16%,rgba(164,117,201,.15),transparent 68%),
-      radial-gradient(34rem 13rem at 109% 72%,rgba(111,66,148,.11),transparent 70%),
-      radial-gradient(1.8px 1.8px at 10% 26%,rgba(130,85,169,.3) 0 70%,transparent 76%),
-      radial-gradient(1.4px 1.4px at 92% 70%,rgba(130,85,169,.24) 0 70%,transparent 78%);
-    background-size:auto,auto,78px 108px,96px 126px}
-  .visual-section::after{content:"";position:absolute;z-index:1;left:-8%;right:-8%;top:-42px;height:86px;pointer-events:none;
-    border-radius:0 0 50% 50%;background:radial-gradient(52% 108% at 50% 0,rgba(157,109,193,.12) 0 45%,transparent 46%)}
   .visual-section:nth-of-type(even)::before{animation-direction:alternate-reverse}
   .eyebrow::before{content:"☂";display:inline-grid;place-items:center;width:1.7em;height:1.7em;margin-right:.6em;
     border-radius:999px;background:color-mix(in srgb,var(--forest) 14%,transparent);font-size:.9em;vertical-align:middle}
@@ -152,10 +144,7 @@
   /* ---------- hero (committed dark canopy world) ---------- */
   .hero{position:relative;isolation:isolate;z-index:45;color:#f8f2fc;overflow:hidden;
     background:
-      radial-gradient(ellipse at 50% 40%,transparent 34%,rgba(0,0,0,.4) 100%),
-      radial-gradient(circle at 72% 50%,rgba(191,141,226,.15),transparent 48%),
-      radial-gradient(circle at 50% 34%,rgba(166,127,199,.13),transparent 62%),
-      linear-gradient(180deg,#110b19 0%,#281737 55%,#47275c 100%);
+      #241533;
     min-height:var(--site-viewport-height,100svh);display:flex;align-items:center;
     padding:clamp(64px,10vw,110px) 0 clamp(96px,12vw,140px)}
   .scroll-cue{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:2;
@@ -169,17 +158,10 @@
   #mobile-hero-rain{display:none}
   #meadow-back{z-index:-3}
   #meadow-front{z-index:-1}
-  .stormflash{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;
-    background:linear-gradient(116deg,transparent 43%,rgba(211,165,255,.42) 49%,transparent 53%),
-      radial-gradient(ellipse at 72% 22%,rgba(194,134,244,.48),transparent 24%);animation:purpleLightning 13s steps(1,end) infinite}
   .hero .wrap,.hero .scroll-cue{position:relative;z-index:1}
-  @keyframes purpleLightning{0%,40%,43%,100%{opacity:0}41%,42%{opacity:.18}41.4%{opacity:.42}72%,72.5%{opacity:.12}}
-  @media(prefers-reduced-motion:reduce){.stormflash{animation:none}}
   /* ---------- page-wide rain (falls over every section, under the nav & hero) ---------- */
   #rainall{position:fixed;inset:0;width:100%;height:100%;z-index:40;pointer-events:none}
   @media(prefers-reduced-motion:reduce){#rainall{display:none}}
-  .hero::after{content:"";position:absolute;inset:0;z-index:-1;
-    background:linear-gradient(180deg,transparent 55%,rgba(28,14,38,.56) 100%)}
   .hero .eyebrow{color:#dfc2f1}
   .hero h1{font-size:clamp(2.7rem,6.4vw,5rem);letter-spacing:-.02em;margin:16px 0 0;max-width:15ch}
   .hero .lede{margin-top:22px;max-width:52ch;font-size:clamp(1.1rem,1.7vw,1.32rem);color:#e2d3ec;line-height:1.55}
@@ -236,7 +218,7 @@
 
   /* about split */
   /* Meet Haven — flagship band, moved below the Umbrella4U title page */
-  .havensec{background:linear-gradient(180deg,var(--surface),var(--surface-2))}
+  .havensec{background:var(--surface-2)}
   .havensec .inner{max-width:72ch}
   .havensec .eyebrow{color:var(--amber)}
   .havensec h2{font-size:clamp(1.9rem,3.6vw,2.9rem);letter-spacing:-.015em;margin-top:12px}
@@ -286,7 +268,7 @@
   .prod{position:relative;border:1px solid var(--line);border-radius:20px;padding:28px;background:var(--paper);
     display:flex;flex-direction:column;gap:12px;transition:transform .18s,box-shadow .18s,border-color .18s}
   .prod:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--forest) 40%,var(--line))}
-  .prod.flagship{grid-column:1/-1;background:linear-gradient(135deg,color-mix(in srgb,var(--forest) 12%,var(--paper)),var(--paper))}
+  .prod.flagship{grid-column:1/-1;background:var(--paper)}
   .prod .top{display:flex;align-items:center;gap:14px}
   .prod .ic{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:1.5rem;
     background:var(--surface-2);flex:0 0 auto}
@@ -305,7 +287,7 @@
   .prod{background:color-mix(in srgb,var(--paper) 94%,transparent)}
   /* real-story placeholders: intentionally no invented testimonials */
   .story-wall{position:relative;z-index:41;padding:clamp(54px,7vw,90px) 0;overflow:hidden;
-    background:linear-gradient(135deg,color-mix(in srgb,var(--surface-2) 72%,var(--paper)),var(--surface))}
+    background:var(--surface)}
   .story-wall .wrap{position:relative;z-index:1}
   .story-wall .sec-head{max-width:56ch}
   .polaroids{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:42px}
@@ -334,14 +316,13 @@
   .role-list b{font-weight:650;color:var(--ink)}
   .role-list span{color:var(--ink-3)}
   .apply-cta{margin-top:34px;border:1px solid var(--line);border-radius:20px;padding:26px 30px;
-    background:linear-gradient(135deg,color-mix(in srgb,var(--forest) 13%,var(--surface)),var(--surface));
+    background:var(--surface);
     display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
   .apply-cta .t{max-width:46ch}
   .apply-cta h3{font-size:1.3rem}
   .apply-cta p{color:var(--ink-2);margin-top:6px;font-size:.98rem}
   .mapwrap{margin-top:44px;position:relative;z-index:41;isolation:isolate;border:1px solid var(--line);border-radius:22px;overflow:hidden;min-height:430px;
-    background:radial-gradient(circle at 14% 18%,color-mix(in srgb,var(--purple) 18%,transparent),transparent 28%),
-      linear-gradient(160deg,color-mix(in srgb,var(--forest) 12%,var(--surface)),var(--surface));
+    background:var(--surface);
     padding:clamp(18px,3vw,30px);text-align:left;perspective:900px}
   .mapwrap::before{content:"";position:absolute;z-index:0;left:0;right:0;bottom:0;height:86px;opacity:.36;pointer-events:none;
     background:linear-gradient(to top,rgba(73,37,96,.42),transparent),repeating-linear-gradient(90deg,rgba(76,42,98,.55) 0 22px,transparent 22px 31px,rgba(76,42,98,.38) 31px 53px,transparent 53px 68px);
@@ -349,11 +330,11 @@
   .map-stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(245px,.42fr);gap:22px;align-items:stretch}
   .map-stage{position:relative;z-index:1}
   .map-board{position:relative;min-height:360px;border:1px solid var(--line);border-radius:18px;overflow:hidden;
-    background:linear-gradient(145deg,#efe6f8 0%,#d8c3ee 45%,#b28ad6 100%);
+    background:#e8dcf3;
     box-shadow:0 24px 55px rgba(62,34,84,.22),inset 0 0 0 1px rgba(255,255,255,.48);
     transform:rotateX(6deg) rotateZ(-1.2deg);transform-origin:center;isolation:isolate;
     display:grid;place-items:center;text-align:center;padding:30px}
-  :root[data-theme="dark"] .map-board{background:linear-gradient(145deg,#271533 0%,#3b2052 46%,#684693 100%);
+  :root[data-theme="dark"] .map-board{background:#31203f;
     box-shadow:0 26px 62px rgba(0,0,0,.36),inset 0 0 0 1px rgba(255,255,255,.08)}
   .map-board::before{content:"";position:absolute;inset:0;z-index:0;
     background:linear-gradient(rgba(255,255,255,.24) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.18) 1px,transparent 1px);
@@ -362,7 +343,7 @@
     background:color-mix(in srgb,var(--surface) 92%,transparent);border:1px solid rgba(255,255,255,.42);
     box-shadow:0 18px 45px rgba(43,24,58,.18)}
   .map-placeholder .mark{width:62px;height:62px;border-radius:20px;margin:0 auto 16px;display:grid;place-items:center;
-    background:linear-gradient(135deg,#f6eaff,#b58add);color:#4a236c;font-size:2rem;box-shadow:0 16px 32px rgba(76,35,108,.22)}
+    background:#e3d2f2;color:#4a236c;font-size:2rem}
   .map-placeholder b{display:block;font-family:var(--serif);font-size:1.35rem}
   .map-placeholder p{margin-top:8px;color:var(--ink-2);font-size:.98rem;line-height:1.5}
   .map-board.has-map{display:block;padding:0;text-align:left;transform:none;background:#2a1838}
@@ -387,16 +368,15 @@
 
   /* cta band */
   .cta{position:relative;isolation:isolate;z-index:41;overflow:hidden;
-    background:radial-gradient(120% 150% at 12% 0%,#76509a 0%,#54356c 45%,#2a1838 100%);color:#f8f2fc;text-align:center}
+    background:#4a2d63;color:#f8f2fc;text-align:center}
   .cta .wrap{position:relative;z-index:3}
   .cta h2{font-size:clamp(2rem,4vw,3.2rem);letter-spacing:-.02em;max-width:20ch;margin:0 auto}
   .cta p{margin:18px auto 0;max-width:48ch;color:#dfcfe9;font-size:1.12rem}
   .cta .cta-row{margin-top:32px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
-  footer{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(145deg,#1c0f29,var(--footer) 56%,#2a1838);color:#d4bee2;padding:44px 0}
+  footer{position:relative;isolation:isolate;overflow:hidden;background:var(--footer);color:#d4bee2;padding:44px 0}
   footer::before{content:"";position:absolute;z-index:0;inset:0;opacity:.74;background:
-    radial-gradient(circle at 9% 26%,rgba(244,225,255,.82) 0 1px,transparent 1.7px),radial-gradient(circle at 68% 16%,rgba(244,225,255,.64) 0 1px,transparent 1.7px),radial-gradient(circle at 87% 68%,rgba(244,225,255,.56) 0 1px,transparent 1.7px),
-    radial-gradient(20rem 8rem at 50% 120%,rgba(158,91,205,.24),transparent 68%);background-size:113px 79px,167px 103px,139px 121px,auto}
+    radial-gradient(circle at 9% 26%,rgba(244,225,255,.82) 0 1px,transparent 1.7px),radial-gradient(circle at 68% 16%,rgba(244,225,255,.64) 0 1px,transparent 1.7px),radial-gradient(circle at 87% 68%,rgba(244,225,255,.56) 0 1px,transparent 1.7px);background-size:113px 79px,167px 103px,139px 121px}
   footer .wrap{position:relative;z-index:1}
   @keyframes footerSky{to{background-position:113px 79px,-167px 103px,139px -121px,center}}
   :root[data-theme="light"] footer{color:#ddc8e9}
@@ -427,20 +407,18 @@
     :where(section){padding:42px 0}
     .visual-section::before,.visual-section::after{display:none}
     /* Each band blends into the next, so the page reads as one continuous scroll. */
-    .havensec{background:linear-gradient(180deg,#f8f4fb 0%,var(--surface) 18%,var(--surface-2) 100%)}
-    .goals{background:linear-gradient(180deg,var(--surface-2) 0%,var(--paper) 100%)}
-    .products{background:linear-gradient(180deg,var(--paper) 0%,var(--surface) 100%)}
-    .chapters{background:linear-gradient(180deg,var(--surface) 0%,var(--surface-2) 100%)}
-    .story-wall{background:linear-gradient(180deg,var(--surface-2) 0%,#76509a 100%)}
-    .cta{background:linear-gradient(180deg,#76509a 0%,#54356c 48%,#2a1838 100%)}
+    .havensec{background:var(--surface-2)}
+    .goals{background:var(--paper)}
+    .products{background:var(--surface)}
+    .chapters{background:var(--surface-2)}
+    .story-wall{background:var(--surface-2)}
+    .cta{background:#4a2d63}
     .eyebrow{font-size:.58rem;letter-spacing:.115em}.eyebrow::before{width:1.35em;height:1.35em;margin-right:.38em}
     .nav .wrap{height:54px;padding-left:12px;padding-right:12px}
     .nav .brand{font-size:.68rem;gap:5px;letter-spacing:0}.nav .brand .mark{width:20px;height:20px}
     .nav nav a.cta-link:not(.btn){font-size:.68rem;padding:6px 8px}
     .hero{min-height:0;padding:90px 0 82px;align-items:flex-start}
-    .hero::before{content:"";position:absolute;left:0;right:0;bottom:-1px;height:128px;z-index:0;pointer-events:none;
-      background:linear-gradient(180deg,rgba(61,37,78,0) 0%,rgba(122,82,156,.62) 36%,#f8f4fb 100%)}
-    .hero canvas:not(#mobile-hero-rain),.stormflash,#rainall{display:none}
+    .hero canvas:not(#mobile-hero-rain),#rainall{display:none}
     #mobile-hero-rain{display:block;position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
     .hero .wrap{margin:0 auto;text-align:center;max-width:430px;padding:0 20px}
     .hero h1,.haven-title{justify-content:center;font-size:clamp(2.52rem,12.4vw,3.38rem);margin:8px auto 0;max-width:9.8ch;line-height:.9;text-align:center}
@@ -622,10 +600,9 @@
     <canvas id="umb3d" aria-hidden="true"></canvas>
     <canvas id="meadow-front" class="meadow-canvas" aria-hidden="true"></canvas>
     <canvas id="mobile-hero-rain" aria-hidden="true"></canvas>
-    <div class="stormflash" aria-hidden="true"></div>
     <div class="wrap">
       <h1 class="haven-title"><span class="notranslate">Umbrella4U<i class="splash" id="splash">Break the social norm!</i></span></h1>
-      <p class="lede">Umbrella4U is a non-profit run by students. We build free places where young people can say what they actually think without it costing them anything socially. Haven, our anonymous peer-support app, is the first one.</p>
+      <p class="lede">Umbrella4U is a non-profit run by students, building free places where a young person can say what they actually think without it costing them socially. The first of those is Haven, an anonymous peer-support app that anyone can use right now.</p>
       <div class="mobile-app-note"><i aria-hidden="true">📱</i><div><b>We’re working on a mobile app.</b><span>Haven is being built for your phone, too.</span></div></div>
       <ul class="hero-keys" aria-label="What we stand for">
         <li>Be yourself</li>
@@ -647,7 +624,7 @@
       <div class="about-intro reveal">
         <p class="eyebrow">What is Umbrella4U?</p>
         <h2>A non-profit run by <b>students</b>, building free places where young people don't have to perform.</h2>
-        <p class="sub">We started as a student project and we're still run by volunteers, with adults advising rather than deciding. What we build is free for the people who use it. Chapters are how it spreads: a small team in a school or a city, running things locally.</p>
+        <p class="sub">We started as a student project and we're still run by volunteers, with adults advising rather than deciding what happens. Everything we build stays free for the people who use it, and it spreads through Chapters, which are small teams running things locally in a school or a city.</p>
         <ul class="facts" aria-label="The basics">
           <li><b>Non-profit</b> · free where it counts, forever</li>
           <li><b>Youth-led</b> · built with the people who use it</li>
@@ -660,15 +637,15 @@
       <div class="grid">
         <div class="body reveal">
           <p class="eyebrow">Who we are</p>
-          <p>The idea behind it is not complicated. Nobody should have to edit themselves down to get accepted.</p>
-          <p>So we built <strong>Haven</strong>, an anonymous app where teenagers post what's actually on their mind and get met with something other than judgment. That's the part that exists today.</p>
-          <p>Umbrella4U is the organisation around it. Everything we make gets designed with the people who'll actually use it, and it stays free for them. Where money has to come from, it comes from schools and funders rather than from teenagers.</p>
+          <p>The thinking behind it isn't complicated: nobody should have to edit themselves down to a smaller, safer version just to be accepted by the people around them.</p>
+          <p>So we built <strong>Haven</strong>, an anonymous app where teenagers post what's actually on their mind and get met with something other than judgment. It's the part of all this that exists today, and it's where most of our attention goes.</p>
+          <p>Umbrella4U is the organisation that grew up around Haven and the tools we want to build after it. All of it gets designed with the people who'll actually use it, and it stays free for them, because the money that keeps it running should come from schools and funders rather than from teenagers.</p>
         </div>
         <div class="pillars reveal" aria-label="What we hold to">
           <div class="pillar"><span class="n">1</span><div><h3>Youth-first</h3><p>Co-designed with the people who use it. If a 15-year-old doesn't feel safe using it, we don't ship it.</p></div></div>
-          <div class="pillar"><span class="n">2</span><div><h3>Free for young people</h3><p>Full access, no cost, no trial that runs out. Schools and funders pay for the rest.</p></div></div>
-          <div class="pillar"><span class="n">3</span><div><h3>Moderation and crisis paths</h3><p>Human moderators, a route to real help, and privacy on by default. Built in from the start, because retrofitting this sort of thing doesn't work.</p></div></div>
-          <div class="pillar"><span class="n">4</span><div><h3>Meant to spread</h3><p>One organisation, several tools, run locally by Chapters rather than out of a single office.</p></div></div>
+          <div class="pillar"><span class="n">2</span><div><h3>Free for young people</h3><p>Any young person gets the whole thing at no cost, with nothing that expires or asks for a card. Schools and funders cover what it costs to run.</p></div></div>
+          <div class="pillar"><span class="n">3</span><div><h3>Moderation and crisis paths</h3><p>There are human moderators, a route out to real help, and privacy switched on by default. We built all of that in at the start, because it's very hard to bolt on once a community already exists.</p></div></div>
+          <div class="pillar"><span class="n">4</span><div><h3>Meant to spread</h3><p>One organisation and several tools, run locally by Chapters instead of out of a single office somewhere.</p></div></div>
         </div>
       </div>
     </div>
@@ -680,7 +657,7 @@
       <div class="inner reveal">
         <p class="eyebrow">Our flagship · live today</p>
         <h2>Meet Haven ☂</h2>
-        <p class="lede2">Haven is our anonymous peer-support app. You post whatever is weighing on you, and it gets read by people who have been somewhere similar. When a story lands with someone, they open one umbrella for you, which is a quiet way of saying they're standing with you. There's no comment box, so there's nothing to dread underneath.</p>
+        <p class="lede2">Haven is our anonymous peer-support app. You post whatever is weighing on you, and it gets read by people who have been somewhere similar. When a story lands with someone, they open one umbrella for you, which is a quiet way of saying they're standing with you. There's no comment box anywhere in it, so there's nothing waiting underneath a post for you to dread.</p>
         <ul class="feat">
           <li>No name required</li>
           <li>One umbrella each</li>
@@ -700,15 +677,15 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <p class="eyebrow">Where we're headed</p>
-        <h2>What we're aiming at.</h2>
-        <p class="sub">None of these are numbers we've hit. They're what we're organising around, and you're welcome to hold us to them.</p>
+        <h2>Where we're trying to get to.</h2>
+        <p class="sub">None of these are numbers we've reached yet. They're the targets we plan around, and we'd rather publish them and be held to them than keep things vague.</p>
       </div>
       <div class="g-grid">
-        <div class="goal reveal"><div class="num">1M</div><div class="lbl">young people reached by 2030</div><p>Across Canada and the U.S. Free, anonymous, and awake at 2 a.m.</p></div>
+        <div class="goal reveal"><div class="num">1M</div><div class="lbl">young people reached by 2030</div><p>Across Canada and the U.S., free and anonymous, and awake at two in the morning when a lot of this actually happens.</p></div>
         <div class="goal reveal"><div class="num">5,000</div><div class="lbl">schools & communities</div><p>Counsellors and youth organisations using our tools as part of how they look after kids.</p></div>
-        <div class="goal reveal"><div class="num">&lt;60s</div><div class="lbl">to feeling less alone</div><p>From opening the app to a real person answering. Hard moments don't wait for office hours.</p></div>
+        <div class="goal reveal"><div class="num">&lt;60s</div><div class="lbl">to feeling less alone</div><p>From opening the app to a real person answering, because a hard moment doesn't wait until office hours.</p></div>
       </div>
-      <p class="foot">Targets, not current totals.</p>
+      <p class="foot">These are targets rather than current totals.</p>
     </div>
   </section>
 
@@ -717,25 +694,25 @@
     <div class="wrap">
       <div class="sec-head reveal">
         <p class="eyebrow">Our products</p>
-        <h2>What we're building.</h2>
-        <p class="sub">Haven is the one that exists. The rest are at various stages, and we'd rather show you the plan than pretend it's finished.</p>
+        <h2>The rest of what we're building.</h2>
+        <p class="sub">Haven is the one you can use today. The others are at different stages of design, and we'd rather show you where they're going than present a roadmap as though it has already shipped.</p>
       </div>
       <div class="p-grid">
         <article class="prod reveal">
           <div class="top"><h3>Lighthouse</h3><span class="tag pilot">In pilot</span></div>
-          <p class="dsc">Getting from an emergency to actual help without a maze in between. Crisis lines, local services, and a hand-off to a person, based on where you actually are.</p>
+          <p class="dsc">A short route from an emergency to actual help, instead of the maze you usually get. It points to crisis lines and local services near where you really are, and hands you off to a person rather than to another page.</p>
           <div class="meta">Crisis navigation · Region-aware</div>
         </article>
 
         <article class="prod reveal">
           <div class="top"><h3>Almanac</h3><span class="tag pilot">In design</span></div>
-          <p class="dsc">A private journal. Over time it shows you why some days land harder than others. Nobody else sees it and nothing in it gets scored.</p>
+          <p class="dsc">A private journal that, over enough entries, starts to show you why some days land harder than others. Nobody else can see it, and nothing you write in it gets scored or turned into a number.</p>
           <div class="meta">Private journal · Self-insight</div>
         </article>
 
         <article class="prod reveal">
           <div class="top"><h3>Greenhouse</h3><span class="tag pilot">In design</span></div>
-          <p class="dsc">Short guided things to do in a bad moment: grounding, breathing, getting to sleep. Most of them take about two minutes.</p>
+          <p class="dsc">Short guided things to do in a bad moment, like grounding yourself, slowing your breathing, or getting to sleep. Most take about two minutes, which is usually all anyone has.</p>
           <div class="meta">Coping kit · Guided &amp; short</div>
         </article>
       </div>
@@ -756,7 +733,7 @@
       <div class="sec-head reveal">
         <p class="eyebrow">Chapters &amp; leadership</p>
         <h2>Chapters are how this spreads.</h2>
-        <p class="sub">A <b>Chapter</b> is a small student or community team running Umbrella4U where they live. We're opening them now and we need people to lead them. You don't need experience and you get trained properly. If you've ever wished something like this existed at your school, that's the qualification.</p>
+        <p class="sub">A <b>Chapter</b> is a small student or community team running Umbrella4U where they live. We're opening them now and looking for people to lead them, which doesn't take any experience because we train you properly. If you've ever wished something like this existed at your school, that's most of the qualification.</p>
       </div>
 
       <div class="mapwrap reveal" aria-label="Current Umbrella4U team map">
@@ -788,7 +765,7 @@
         <div class="role-card reveal">
           <p class="kicker">Local · in your school or city</p>
           <h3>Lead a Chapter</h3>
-          <p>Peer support, events, and outreach, run by people who live there. Every Chapter fills some version of these, and small ones double up.</p>
+          <p>A Chapter runs peer support, events and outreach in its own school or city. Most fill some version of the roles below, and smaller ones double up until there are enough people to go round.</p>
           <ul class="role-list">
             <li><b>Chapter Lead</b> <span>· runs the Chapter and is its point person.</span></li>
             <li><b>Co-Lead / VP</b> <span>· shares the load and steps in when needed.</span></li>
@@ -805,7 +782,7 @@
         <div class="role-card reveal">
           <p class="kicker">Regional &amp; national · build the org</p>
           <h3>Join the core team</h3>
-          <p>These sit above Chapter level and keep the network running and safe.</p>
+          <p>These roles sit above Chapter level, and between them they keep the wider network running and safe.</p>
           <ul class="role-list">
             <li><b>Regional Director</b> <span>· grows and supports Chapters across a region.</span></li>
             <li><b>Chapter Success Manager</b> <span>· onboards new Chapters and keeps them healthy.</span></li>
@@ -823,7 +800,7 @@
       <div class="apply-cta reveal">
         <div class="t">
           <h3>Ready to open a Chapter?</h3>
-          <p>The application takes about ten minutes. We read every one and reply with next steps.</p>
+          <p>The application takes about ten minutes to fill in. We read every one that comes through and write back with what happens next.</p>
         </div>
         <a class="btn primary" href="https://docs.google.com/forms/d/e/1FAIpQLScOq_Ia0X5UksN8V68HedMTrIpm3i2HyXCFA9hFeja7pk2tiw/viewform?usp=header" target="_blank" rel="noopener">Apply to lead →</a>
       </div>
@@ -850,7 +827,7 @@
   <section class="cta" id="cta">
     <div class="wrap">
       <h2 class="reveal">If you want to help, there's room.</h2>
-      <p class="reveal">Schools, funders, clinicians, and people who just wish this had existed when they were fifteen. Email us and we'll answer.</p>
+      <p class="reveal">Whether you're a school, a funder, a clinician, or just someone who wishes this had existed when you were fifteen, there's probably something useful you could do here. Email us and we'll write back.</p>
       <div class="cta-row reveal">
         <a class="btn primary" href="mailto:hello@umbrella4u.ca">Partner with us</a>
         <a class="btn ghost" href="#products">Explore the products</a>
