@@ -24,7 +24,7 @@
   --hd-pink:#f49ac1;
   --hd-sky:#e3f1fc;
   --hd-night:#241533;
-  --hd-day:#d6e8f8;
+  --hd-day:var(--hd-cream);
   --hd-lilac:#c49aea;
   --hd-dash:rgba(59,42,84,.32);
 
@@ -97,8 +97,9 @@ header.nav.scrolled{background:var(--hd-lav);border-bottom:2.5px solid var(--hd-
 .btn.ghost:hover{background:var(--hd-cream)}
 
 /* ---------- hero: the umbrella scene, framed like a card on the page ----------
-   A daytime sky from the same family as the cards, so the scene reads as part
-   of the page instead of a dark window cut into it. */
+   Cream, the same as the goal and apply cards, so the scene reads as one of the
+   page's cards instead of a window cut into it. The umbrella is drawn in the
+   palette violet on top. */
 .hero{
   margin:84px clamp(10px,2.4vw,28px) 0;
   min-height:calc(var(--site-viewport-height,100svh) - 112px);
@@ -116,7 +117,7 @@ header.nav.scrolled{background:var(--hd-lav);border-bottom:2.5px solid var(--hd-
 /* the rain over the paper sections read as scratches, so it stays inside the hero */
 #rainall{display:none}
 
-.mobile-app-note{background:var(--hd-cream);color:var(--hd-ink);border:2.5px solid var(--hd-ink);
+.mobile-app-note{background:var(--hd-white);color:var(--hd-ink);border:2.5px solid var(--hd-ink);
   border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 .mobile-app-note span{color:var(--hd-ink-2)}
 .mobile-app-note i{background:var(--hd-yellow);border:2px solid var(--hd-ink);border-radius:9px 7px 10px 8px}
