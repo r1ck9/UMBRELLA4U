@@ -24,6 +24,7 @@
   --hd-pink:#f49ac1;
   --hd-sky:#e3f1fc;
   --hd-night:#241533;
+  --hd-day:#d6e8f8;
   --hd-lilac:#c49aea;
   --hd-dash:rgba(59,42,84,.32);
 
@@ -62,10 +63,7 @@ h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 /* ---------- flat sections, torn-paper dashes between them ---------- */
 .visual-section::before,.visual-section::after{content:none;display:none}
 .sec-head h2,.about-intro h2,.havensec h2{text-shadow:none}
-.about{background:var(--hd-paper)}
-.havensec{background:var(--hd-lav)}
-.goals{background:var(--hd-paper)}
-.chapters{background:var(--hd-lav)}
+.about,.havensec,.goals,.chapters{background:var(--hd-lav)}
 .about,.havensec,.goals,.chapters{border-top:2.5px dashed var(--hd-dash)}
 
 .eyebrow{font-family:var(--hand);font-size:1.5rem;font-weight:700;line-height:1;
@@ -74,7 +72,7 @@ h1,h2,h3{font-weight:800;letter-spacing:-.01em}
 
 /* ---------- nav: ink on paper, since the hero no longer sits under it ---------- */
 header.nav{background:transparent;border-bottom:0}
-header.nav.scrolled{background:var(--hd-paper);border-bottom:2.5px solid var(--hd-ink);box-shadow:none}
+header.nav.scrolled{background:var(--hd-lav);border-bottom:2.5px solid var(--hd-ink);box-shadow:none}
 .nav .brand,.nav.scrolled .brand{color:var(--hd-ink);font-family:var(--serif);font-weight:800}
 .brand .mark{box-shadow:0 0 0 2.5px var(--hd-ink)}
 .nav nav a,.nav.scrolled nav a{color:var(--hd-ink-2);font-weight:700}
@@ -98,39 +96,40 @@ header.nav.scrolled{background:var(--hd-paper);border-bottom:2.5px solid var(--h
 .btn.ghost{background:var(--hd-white);color:var(--hd-ink);border-color:var(--hd-ink)}
 .btn.ghost:hover{background:var(--hd-cream)}
 
-/* ---------- hero: the umbrella scene, framed like a card on the page ---------- */
+/* ---------- hero: the umbrella scene, framed like a card on the page ----------
+   A daytime sky from the same family as the cards, so the scene reads as part
+   of the page instead of a dark window cut into it. */
 .hero{
   margin:84px clamp(10px,2.4vw,28px) 0;
   min-height:calc(var(--site-viewport-height,100svh) - 112px);
-  background:var(--hd-night);color:var(--hd-paper);
+  background:var(--hd-day);color:var(--hd-ink);
   border:3px solid var(--hd-ink);border-radius:40px 30px 42px 32px;
   box-shadow:8px 10px 0 var(--hd-ink);
 }
 .hero::after{content:none}
-.haven-title{color:var(--hd-paper);font-weight:800}
-.hero .lede{color:#e4d6f1}
-.splash{font-family:var(--hand)!important;font-style:normal;font-weight:700;color:var(--hd-yellow);
+.haven-title{color:var(--hd-ink);font-weight:800}
+.hero .lede{color:var(--hd-ink-2)}
+.splash{font-family:var(--hand)!important;font-style:normal;font-weight:700;color:var(--hd-violet);
   text-shadow:none;font-size:clamp(1.2rem,2vw,1.6rem)}
-.scroll-cue{font-family:var(--hand);font-size:1.15rem;letter-spacing:0;text-transform:none;color:#d8c4e8}
+.scroll-cue{font-family:var(--hand);font-size:1.15rem;letter-spacing:0;text-transform:none;color:var(--hd-ink-2)}
 
-/* things inside the dark card cast their shadow in lilac, so they still read */
+/* the rain over the paper sections read as scratches, so it stays inside the hero */
+#rainall{display:none}
+
 .mobile-app-note{background:var(--hd-cream);color:var(--hd-ink);border:2.5px solid var(--hd-ink);
-  border-radius:var(--hd-r-sm);box-shadow:4px 5px 0 var(--hd-lilac)}
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 .mobile-app-note span{color:var(--hd-ink-2)}
 .mobile-app-note i{background:var(--hd-yellow);border:2px solid var(--hd-ink);border-radius:9px 7px 10px 8px}
 
 .hero-keys li{color:var(--hd-ink);font-weight:800;border:2px solid var(--hd-ink);
-  border-radius:var(--hd-r-sm);box-shadow:3px 3px 0 var(--hd-lilac)}
+  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 .hero-keys li:nth-child(4n+1){background:var(--hd-yellow);rotate:-1.5deg}
 .hero-keys li:nth-child(4n+2){background:var(--hd-mint);rotate:1deg}
 .hero-keys li:nth-child(4n+3){background:var(--hd-pink);rotate:-.6deg}
-.hero-keys li:nth-child(4n+4){background:var(--hd-sky);rotate:1.4deg}
+.hero-keys li:nth-child(4n+4){background:var(--hd-white);rotate:1.4deg}
 
-.hero .btn{box-shadow:4px 5px 0 var(--hd-lilac)}
-.hero .btn:hover,.hero .btn:focus-visible{box-shadow:6px 6px 0 var(--hd-lilac)}
-.hero .btn:active{box-shadow:0 0 0 var(--hd-lilac)}
-.hero .btn.ghost{background:transparent!important;color:var(--hd-paper)!important;border-color:var(--hd-paper)!important}
-.hero .btn.ghost:hover{background:rgba(251,247,255,.1)!important}
+.hero .btn.ghost{background:var(--hd-white)!important;color:var(--hd-ink)!important;border-color:var(--hd-ink)!important}
+.hero .btn.ghost:hover{background:var(--hd-cream)!important}
 
 /* ---------- cards ----------
    The real border goes transparent and an ::after draws it instead, run
@@ -220,7 +219,7 @@ header.nav.scrolled{background:var(--hd-paper);border-bottom:2.5px solid var(--h
 .apply-cta p{color:var(--hd-ink-2)}
 
 /* ---------- closing call: a big yellow card on paper ---------- */
-.cta{background:var(--hd-paper);color:var(--hd-ink);border-top:2.5px dashed var(--hd-dash)}
+.cta{background:var(--hd-lav);color:var(--hd-ink);border-top:2.5px dashed var(--hd-dash)}
 .cta .wrap{width:min(860px,calc(100% - 32px));margin:0 auto;background:var(--hd-yellow);
   border-radius:38px 28px 40px 30px;box-shadow:8px 10px 0 var(--hd-ink);
   padding:clamp(34px,5vw,58px) clamp(22px,4vw,48px);rotate:-.5deg}
@@ -255,7 +254,7 @@ footer .fine{color:#c9b6de;border-top:2px dashed rgba(251,247,255,.25)}
    Same system, their own markup: .site-nav, a .cover header, plain
    sections of .col, and a handful of card shapes.
    ===================================================================== */
-.site-nav{background:var(--hd-paper);backdrop-filter:none;border-bottom:2.5px solid var(--hd-ink)}
+.site-nav{background:var(--hd-lav);backdrop-filter:none;border-bottom:2.5px solid var(--hd-ink)}
 .site-brand{color:var(--hd-ink);font-family:var(--serif);font-weight:800}
 .site-brand-logo{box-shadow:0 0 0 2.5px var(--hd-ink)}
 .site-links a{color:var(--hd-ink-2);font-weight:700}
@@ -269,16 +268,15 @@ footer .fine{color:#c9b6de;border-top:2px dashed rgba(251,247,255,.25)}
   border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 
 /* the cover gets framed the same way the homepage hero does */
-.cover{position:relative;z-index:2;margin:18px clamp(10px,2.4vw,28px) 0;background:var(--hd-night)!important;color:var(--hd-paper);
+.cover{position:relative;z-index:2;margin:18px clamp(10px,2.4vw,28px) 0;background:var(--hd-day)!important;color:var(--hd-ink);
   border:3px solid var(--hd-ink);border-radius:40px 30px 42px 32px;box-shadow:8px 10px 0 var(--hd-ink)}
-.cover .eyebrow{color:var(--hd-yellow)}
-.cover h1{color:var(--hd-paper)}
-.cover p.sub{color:#e4d6f1}
+.cover .eyebrow{color:var(--hd-violet)}
+.cover h1{color:var(--hd-ink)}
+.cover p.sub{color:var(--hd-ink-2)}
 .cover .tag{font-family:var(--hand);font-size:1.2rem;letter-spacing:0;color:var(--hd-ink);background:var(--hd-cream);
-  border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:3px 3px 0 var(--hd-lilac)}
+  border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 
 .cover ~ section{background:var(--hd-lav)}
-.cover ~ section:nth-of-type(odd){background:var(--hd-paper)}
 .cover ~ section + section{border-top:2.5px dashed var(--hd-dash)}
 h2.sec{font-weight:800}
 .amber-eye{color:var(--hd-violet)}
