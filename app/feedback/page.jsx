@@ -48,6 +48,9 @@ export default function Feedback() {
                 <button className="btn prim" onClick={submit} disabled={!text.trim() || busy}>{busy ? 'Sending…' : 'Send feedback'}</button>
               </div>
               <p className="sub" style={{ color: 'var(--ink-3)', fontSize: 13, marginTop: 14 }}>
+                Prefer email? Write to <a href="mailto:info@umbrella4u.ca?subject=Feedback%20for%20Umbrella4U">info@umbrella4u.ca</a>, or see the <a href="/contact">contact page</a>.
+              </p>
+              <p className="sub" style={{ color: 'var(--ink-3)', fontSize: 13, marginTop: 8 }}>
                 Nobody watches this box in real time. If something is urgent, use the <Link href="/resources">Resource hub</Link>.
               </p>
             </>

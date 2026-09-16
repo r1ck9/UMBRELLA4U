@@ -60,7 +60,7 @@ export default function Terms() {
         <p>These Terms are governed by the laws of British Columbia, Canada, without regard to conflict-of-law rules.</p>
 
         <h2>14. Contact</h2>
-        <p>Questions or appeals: <strong>hello@yourdomain.com</strong>.</p>
+        <p>Questions or appeals: <strong>info@umbrella4u.ca</strong>.</p>
 
         <p className="legal-note">This is plain-language starter text for a youth community project, not legal advice. Please review it with a trusted adult before public launch.</p>
 

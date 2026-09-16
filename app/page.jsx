@@ -46,6 +46,7 @@ export default function Landing() {
           <Link href="/resources">Resources</Link>
           <Link href="/guidelines">Guidelines</Link>
           <Link href="/feedback">Feedback</Link>
+          <Link href="/contact">Contact</Link>
           <Link href="/privacy">Privacy</Link>
           <Link href="/terms">Terms</Link>
         </nav>

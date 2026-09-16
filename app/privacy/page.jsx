@@ -69,7 +69,7 @@ export default function Privacy() {
         <p>If we update this policy, we'll change the date at the top and, for big changes, let you know in the app.</p>
 
         <h2>Contact</h2>
-        <p>Questions or requests: <strong>hello@yourdomain.com</strong>.</p>
+        <p>Questions or requests: <strong>info@umbrella4u.ca</strong>.</p>
 
         <p className="legal-note">This is a plain-language policy for a youth community project. It isn't legal advice, it should be reviewed with a trusted adult (and, where possible, someone familiar with youth-privacy law) before public launch.</p>
 

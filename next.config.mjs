@@ -35,6 +35,8 @@ const nextConfig = {
         { source: '/team', destination: '/team.html' },
         { source: '/about-us', destination: '/team.html' },   // legacy alias → /team
         { source: '/handbook', destination: '/handbook.html' },
+        { source: '/contact', destination: '/contact.html' },
+        { source: '/contact-us', destination: '/contact.html' },
         { source: '/umbrella4u', destination: '/org.html' },
       ],
     }
