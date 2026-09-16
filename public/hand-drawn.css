@@ -545,3 +545,38 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
   .tape-2{margin:-14px -14px -14px}
   .cover::after{background-size:80px,40px,40px,26px,28px,74px}
 }
+
+
+/* ---- circles ----
+   Rooms inside Haven. The cards reuse the squiggled outline the goal and role
+   cards already use, one pastel each, so a row of them reads as a set of
+   stickers rather than a table. */
+.circles{background:var(--hd-paper);border-top:2.5px dashed var(--hd-dash)}
+/* auto-fit rather than a fixed count: the About page runs these inside a 720px
+   column, where three across breaks the room names onto two lines. */
+.circ-grid{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:20px}
+.circles .circ-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(max-width:980px){.circles .circ-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.circ-grid,.circles .circ-grid{grid-template-columns:minmax(0,1fr)}}
+.circ{position:relative;overflow:visible;display:flex;flex-direction:column;gap:10px;
+  padding:18px 18px 17px;background:var(--hd-white);background-clip:padding-box!important;
+  border:2.5px solid transparent;border-radius:var(--hd-r);box-shadow:var(--hd-shadow)}
+.circ::after{content:"";position:absolute;inset:-2.5px;z-index:3;pointer-events:none;
+  border:3px solid var(--hd-ink);border-radius:inherit;filter:url(#squiggle)}
+.circ-grid .circ:nth-child(1){background:var(--hd-mint);rotate:-1deg}
+.circ-grid .circ:nth-child(2){background:var(--hd-sky);rotate:.7deg}
+.circ-grid .circ:nth-child(3){background:var(--hd-lav);rotate:-.6deg}
+.circ-grid .circ:nth-child(4){background:var(--hd-cream);rotate:.9deg}
+.circ-grid .circ:nth-child(5){background:var(--hd-pink);rotate:-.8deg}
+.circ-grid .circ:nth-child(6){background:var(--hd-yellow);rotate:.5deg}
+.circ-top{display:flex;align-items:center;gap:10px}
+.circ-name{flex:1;font-family:var(--serif);font-weight:800;font-size:1.16rem;color:var(--hd-ink);word-break:break-word}
+.circ-join{font-family:var(--serif);font-weight:800;font-size:.85rem;color:var(--hd-ink);white-space:nowrap;
+  background:var(--hd-white);border:2.5px solid var(--hd-ink);border-radius:var(--hd-r-sm);
+  box-shadow:var(--hd-shadow-sm);padding:4px 12px}
+.circ-tag{margin:0;font-family:var(--hand);font-weight:700;font-size:1.34rem;line-height:1.2;color:var(--hd-violet)}
+.circ-rule{align-self:flex-start;font-family:var(--sans);font-weight:700;font-size:.79rem;color:var(--hd-ink-2);
+  background:var(--hd-white);border:2px solid var(--hd-ink);border-radius:var(--hd-r-sm);padding:3px 10px}
+.circ-note{margin:28px auto 0;max-width:60ch;padding:14px 18px;text-align:center;
+  font-family:var(--hand);font-size:1.3rem;line-height:1.35;color:var(--hd-violet);
+  border:2.5px dashed var(--hd-dash);border-radius:var(--hd-r)}
