@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic'
 //   2. prompt       — a new weekly prompt just went up (a reason to come back)
 //   3. welcome-back — no activity for 2+ weeks (at most once every 30 days)
 // Plus: alert the moderator email about new reports.
-const FROM = process.env.NOTIFY_FROM || 'Umbrella <hello@yourdomain.com>'
+const FROM = process.env.NOTIFY_FROM || 'Umbrella4U <info@umbrella4u.ca>'
 const MOD_EMAIL = process.env.MODERATOR_ALERT_EMAIL || 'ricky.chenruiqi@gmail.com'
 const SITE = process.env.SITE_URL || 'https://umbrella.app'
 
@@ -95,7 +95,7 @@ export async function GET(request) {
   }
   // Diagnostics so a manual hit tells you what's missing.
   out.resendConfigured = !!process.env.RESEND_API_KEY
-  out.fromLooksUnset = !process.env.NOTIFY_FROM || /yourdomain\.com/.test(process.env.NOTIFY_FROM)
+  out.fromLooksUnset = !process.env.NOTIFY_FROM
   // Count every send attempt's real outcome (skipped = no RESEND key).
   const send = async (to, subject, html) => {
     const r = await sendEmail(to, subject, html)
