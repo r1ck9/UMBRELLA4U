@@ -2289,20 +2289,43 @@
       });
     }
 
-    var stickers = document.querySelectorAll('.hero-deco .stk');
+    // The hero stickers answer to two things at once: how far the page has
+    // scrolled, and where the cursor is. Each writes its own axis into a custom
+    // property so neither clobbers the other, and the float animation keeps the
+    // `transform` channel to itself.
+    var stickers = Array.prototype.slice.call(document.querySelectorAll('.hero-deco .stk'));
     if (!stickers.length) return;
-    var pending = false;
+    var depths = stickers.map(function(_, i){ return 0.05 + (i % 4) * 0.035; });
+    var scrollPending = false, pointerFrame = null;
+
     function drift(){
-      pending = false;
+      scrollPending = false;
       var y = window.pageYOffset || 0;
-      Array.prototype.forEach.call(stickers, function(el, i){
-        el.style.translate = '0 ' + (-y * (0.05 + (i % 4) * 0.035)).toFixed(1) + 'px';
-      });
+      for (var i = 0; i < stickers.length; i++){
+        stickers[i].style.setProperty('--sy', (-y * depths[i]).toFixed(1) + 'px');
+      }
     }
     window.addEventListener('scroll', function(){
-      if (!pending){ pending = true; requestAnimationFrame(drift); }
+      if (!scrollPending){ scrollPending = true; requestAnimationFrame(drift); }
     }, { passive: true });
     drift();
+
+    var hero = document.querySelector('.hero-deco');
+    if (hero && matchMedia('(hover:hover) and (pointer:fine)').matches){
+      window.addEventListener('pointermove', function(e){
+        if (pointerFrame) return;
+        pointerFrame = requestAnimationFrame(function(){
+          pointerFrame = null;
+          var x = e.clientX / window.innerWidth - 0.5;
+          var y = e.clientY / window.innerHeight - 0.5;
+          for (var i = 0; i < stickers.length; i++){
+            var d = depths[i] * 220;
+            stickers[i].style.setProperty('--px', (-x * d).toFixed(1) + 'px');
+            stickers[i].style.setProperty('--py', (-y * d * 0.5).toFixed(1) + 'px');
+          }
+        });
+      }, { passive: true });
+    }
   })();
 </script>
 

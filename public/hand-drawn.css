@@ -637,3 +637,44 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 /* .wrap is 1120px wide, so under ~1280px there is no gutter left and these
    would sit under the reading column. Off they go. */
 @media(max-width:1280px){.sec-deco{display:none}}
+
+
+/* ---- real depth, not just shadows ----
+   The tilt puts each card in perspective, so its contents can sit at different
+   heights above the card face. Tilt one and the name lifts clear of the text
+   under it. The two parallax channels live in their own custom properties so
+   scroll and cursor can't overwrite each other, and `transform` is left free
+   for the float animation. */
+.hero-deco .stk,.sec-deco .stk{translate:var(--px,0) var(--sy,0)}
+
+@media (hover:hover) and (pointer:fine){
+  .circ.tilt3d .circ-top{transform:translateZ(26px)}
+  .circ.tilt3d .circ-tag{transform:translateZ(14px)}
+  .circ.tilt3d .circ-rule{transform:translateZ(32px)}
+  .goal.tilt3d .num{transform:translateZ(36px)}
+  .goal.tilt3d .lbl{transform:translateZ(20px)}
+  .goal.tilt3d p{transform:translateZ(8px)}
+  .val.tilt3d h3{transform:translateZ(24px)}
+  .val.tilt3d p{transform:translateZ(8px)}
+  .role-card.tilt3d .kicker{transform:translateZ(16px)}
+  .role-card.tilt3d h3{transform:translateZ(28px)}
+  .role-card.tilt3d .role-list{transform:translateZ(8px)}
+  .cta-box.tilt3d h3{transform:translateZ(24px)}
+  .circ.tilt3d .circ-top,.circ.tilt3d .circ-tag,.circ.tilt3d .circ-rule,
+  .goal.tilt3d .num,.goal.tilt3d .lbl,.goal.tilt3d p,
+  .val.tilt3d h3,.val.tilt3d p,
+  .role-card.tilt3d .kicker,.role-card.tilt3d h3,.role-card.tilt3d .role-list,
+  .cta-box.tilt3d h3{transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+}
+
+/* the target numbers read as carved rather than printed */
+.goal .num{text-shadow:1px 1px 0 var(--hd-violet),2px 2px 0 var(--hd-violet),
+  3px 3px 0 var(--hd-violet),4px 5px 0 var(--hd-ink)}
+
+
+@media (prefers-reduced-motion:reduce){
+  .hero-deco .stk,.sec-deco .stk{translate:none}
+}
+@media(max-width:820px){
+  .goal .num{text-shadow:2px 2px 0 var(--hd-violet),3px 4px 0 var(--hd-ink)}
+}
