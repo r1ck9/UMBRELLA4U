@@ -595,3 +595,45 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 @media (prefers-reduced-motion:reduce){
   .tilt3d{transform:none!important;transition:none}
 }
+
+
+/* ---- section decoration ----
+   Only the hero carried stickers, which left every section below it looking
+   like a template. These sit in the outer gutters, clear of the text column,
+   behind the content and deaf to the pointer. They come off on narrow screens,
+   where there is no gutter to put them in. */
+.about,.havensec,.circles,.goals,.chapters,.cta{position:relative}
+.sec-deco{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.about > .wrap,.havensec > .wrap,.circles > .wrap,.goals > .wrap,
+.chapters > .wrap,.cta > .wrap{position:relative;z-index:2}
+.sec-deco .stk{animation-duration:9s}
+.sec-deco .d-a1{left:1%;top:9%;width:76px;rotate:-7deg}
+.sec-deco .d-a2{right:2.5%;top:17%;width:42px;rotate:8deg}
+.sec-deco .d-a3{left:4%;bottom:15%;width:34px;rotate:-9deg}
+.sec-deco .d-a4{right:2.5%;bottom:11%;width:52px;rotate:13deg}
+.sec-deco .d-h1{right:2%;top:12%;width:64px;rotate:12deg}
+.sec-deco .d-h2{left:2.5%;top:20%;width:50px;rotate:-13deg}
+.sec-deco .d-h3{left:3.5%;bottom:16%;width:38px;rotate:-6deg}
+.sec-deco .d-h4{right:3.5%;bottom:13%;width:32px;rotate:9deg}
+.sec-deco .d-c1{left:2%;top:11%;width:66px;rotate:9deg}
+.sec-deco .d-c2{right:2.5%;top:9%;width:48px;rotate:-11deg}
+.sec-deco .d-c3{left:1.5%;bottom:12%;width:80px;rotate:-4deg}
+.sec-deco .d-c4{right:2%;bottom:15%;width:64px;rotate:6deg}
+.sec-deco .d-g1{right:2%;top:14%;width:44px;rotate:-14deg}
+.sec-deco .d-g2{left:2.5%;top:12%;width:40px;rotate:7deg}
+.sec-deco .d-g3{right:1.5%;bottom:10%;width:72px;rotate:5deg}
+.sec-deco .d-g4{left:4.5%;bottom:16%;width:30px;rotate:-8deg}
+.sec-deco .d-p1{left:2%;top:10%;width:46px;rotate:-12deg}
+.sec-deco .d-p2{right:2.5%;top:15%;width:32px;rotate:10deg}
+.sec-deco .d-p3{right:2%;bottom:9%;width:58px;rotate:-7deg}
+.sec-deco .d-p4{left:4%;bottom:13%;width:36px;rotate:8deg}
+.sec-deco .d-t1{left:3%;top:18%;width:48px;rotate:-10deg}
+.sec-deco .d-t2{right:3.5%;top:14%;width:54px;rotate:14deg}
+.sec-deco .d-t3{left:7%;bottom:18%;width:34px;rotate:6deg}
+.sec-deco .d-t4{right:6%;bottom:16%;width:60px;rotate:-9deg}
+.sec-deco .d-a2,.sec-deco .d-h3,.sec-deco .d-g2,.sec-deco .d-p4{animation-delay:-3s}
+.sec-deco .d-a3,.sec-deco .d-h4,.sec-deco .d-g4,.sec-deco .d-c3{animation-delay:-5s}
+.sec-deco .d-a4,.sec-deco .d-c2,.sec-deco .d-p1,.sec-deco .d-t2{animation-delay:-2s}
+/* .wrap is 1120px wide, so under ~1280px there is no gutter left and these
+   would sit under the reading column. Off they go. */
+@media(max-width:1280px){.sec-deco{display:none}}
