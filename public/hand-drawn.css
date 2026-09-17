@@ -116,11 +116,6 @@ header.nav.scrolled{background:var(--hd-lav);border-bottom:2.5px solid var(--hd-
 /* the rain over the paper sections read as scratches, so it stays inside the hero */
 #rainall{display:none}
 
-.mobile-app-note{background:var(--hd-white);color:var(--hd-ink);border:2.5px solid var(--hd-ink);
-  border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
-.mobile-app-note span{color:var(--hd-ink-2)}
-.mobile-app-note i{background:var(--hd-yellow);border:2px solid var(--hd-ink);border-radius:9px 7px 10px 8px}
-
 .hero-keys li{color:var(--hd-ink);font-weight:800;border:2px solid var(--hd-ink);
   border-radius:var(--hd-r-sm);box-shadow:var(--hd-shadow-sm)}
 .hero-keys li:nth-child(4n+1){background:var(--hd-yellow);rotate:-1.5deg}
@@ -580,3 +575,23 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 .circ-note{margin:28px auto 0;max-width:60ch;padding:14px 18px;text-align:center;
   font-family:var(--hand);font-size:1.3rem;line-height:1.35;color:var(--hd-violet);
   border:2.5px dashed var(--hd-dash);border-radius:var(--hd-r)}
+
+
+/* ---- more depth ----
+   The page already stacks paper: --hd-stack lays two offset sheets under the
+   hero and the cover. These give the card sets the same stack, and let a card
+   tilt toward the cursor so it sits in space instead of flat on the page.
+   The tilt goes on `transform`, which leaves the `rotate` property free for
+   each card's wonky angle and leaves the stickers' float animation alone. */
+.circ,.goal,.val,.role-card,.cta-box{box-shadow:var(--hd-stack-sm)}
+
+@media (hover:hover) and (pointer:fine){
+  .tilt3d{transform-style:preserve-3d;will-change:transform;
+    transition:transform .2s cubic-bezier(.2,.7,.2,1),box-shadow .2s ease}
+  .tilt3d:hover{box-shadow:var(--hd-stack);z-index:2}
+  /* the squiggled outline rides with the card instead of floating off it */
+  .tilt3d::after{transform:translateZ(1px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .tilt3d{transform:none!important;transition:none}
+}

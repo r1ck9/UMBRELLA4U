@@ -126,9 +126,6 @@ header.nav.scrolled{box-shadow:0 8px 24px -22px color-mix(in srgb,var(--ui-plum)
 .scroll-cue{color:var(--ui-lavender)}
 .hero .eyebrow,.hero .lede,.hero .dom,.hero-keys li,.hero-keys li b,.splash{color:var(--ui-lavender)}
 .hero .dom b{color:var(--ui-cloud)}
-.mobile-app-note{color:var(--ui-cloud);background:color-mix(in srgb,var(--ui-cloud) 13%,transparent);border-color:color-mix(in srgb,var(--ui-lavender) 28%,transparent)}
-.mobile-app-note i{background:color-mix(in srgb,var(--ui-lilac) 22%,transparent)}
-.mobile-app-note span{color:var(--ui-lavender)}
 .hero-keys li{border-color:color-mix(in srgb,var(--ui-cloud) 22%,transparent);background:color-mix(in srgb,var(--ui-cloud) 7%,transparent)}
 .haven-title .haven-mark{filter:drop-shadow(0 6px 18px color-mix(in srgb,var(--ui-plum) 25%,transparent))}
 .splash{text-shadow:2px 2px 0 color-mix(in srgb,var(--ui-plum) 70%,transparent)}

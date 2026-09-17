@@ -164,10 +164,6 @@
   .hero .eyebrow{color:#dfc2f1}
   .hero h1{font-size:clamp(2.7rem,6.4vw,5rem);letter-spacing:-.02em;margin:16px 0 0;max-width:15ch}
   .hero .lede{margin-top:22px;max-width:52ch;font-size:clamp(1.1rem,1.7vw,1.32rem);color:#e2d3ec;line-height:1.55}
-  .mobile-app-note{display:inline-flex;align-items:center;gap:11px;margin-top:20px;padding:9px 13px;border-radius:14px;
-    color:#eee2f6;background:rgba(255,255,255,.13);border:1px solid rgba(230,205,244,.2);text-align:left}
-  .mobile-app-note i{font-style:normal;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;background:rgba(208,166,235,.2);font-size:1rem}
-  .mobile-app-note b{display:block;font-size:.82rem;line-height:1.15}.mobile-app-note span{display:block;margin-top:2px;font-size:.73rem;color:#d8c4e5;line-height:1.25}
   .hero .cta-row{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
   /* words to the left, like the original home page */
   .hero .wrap{max-width:560px;margin-left:clamp(24px,8vw,110px);margin-right:auto;padding-right:24px}
@@ -380,7 +376,6 @@
     .splash{position:absolute;left:auto;right:-.7rem;top:-.3rem;margin:0;font-size:.58rem;letter-spacing:.055em;transform:translateY(-50%) rotate(6deg);transform-origin:right center;animation-name:mcbobtitle}
     @keyframes mcbobtitle{0%,100%{transform:translateY(-50%) rotate(6deg) scale(1)}50%{transform:translateY(-50%) rotate(6deg) scale(1.08)}}
     .hero .lede{margin:13px auto 0;font-size:.88rem;line-height:1.46;max-width:35ch}
-    .mobile-app-note{margin:13px auto 0;padding:7px 9px;gap:8px;border-radius:12px;max-width:310px}.mobile-app-note i{width:24px;height:24px;font-size:.86rem}.mobile-app-note b{font-size:.68rem}.mobile-app-note span{font-size:.61rem}
     .hero-keys{display:none}
     .hero-keys li{font-size:.64rem;padding:4px 7px}
     .hero .cta-row{margin-top:18px;gap:8px;justify-content:center}
@@ -575,7 +570,6 @@
     <div class="wrap">
       <h1 class="haven-title"><span class="notranslate">Umbrella4U<i class="splash" id="splash">Break the social norm!</i></span></h1>
       <p class="lede">Umbrella4U is a non-profit run by students, building free places where a young person can say what they actually think without it costing them socially. The first of those is Haven, an anonymous peer-support app that anyone can use right now.</p>
-      <div class="mobile-app-note"><i aria-hidden="true">📱</i><div><b>We’re working on a mobile app.</b><span>Haven is being built for your phone, too.</span></div></div>
       <ul class="hero-keys" aria-label="What we stand for">
         <li>Be yourself</li>
         <li>Judgment-free</li>
@@ -2223,5 +2217,55 @@
       var msg=board.querySelector('.map-placeholder p');
       if(msg)msg.textContent='Mapbox is not configured yet. Check NEXT_PUBLIC_MAPBOX_TOKEN in Vercel, then redeploy.';
     });
+  })();
+</script>
+
+<script>
+  // umbrella4u:depth — cards tilt toward the cursor, and the hero stickers
+  // drift at their own speeds as you scroll, so the layers separate. Both are
+  // decoration, so both sit out when the reader asks for less motion, and the
+  // tilt only runs for a real pointer.
+  (function(){
+    if (matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+
+    if (matchMedia('(hover:hover) and (pointer:fine)').matches){
+      var cards = document.querySelectorAll('.circ,.goal,.val,.role-card,.cta-box');
+      Array.prototype.forEach.call(cards, function(el){
+        el.classList.add('tilt3d');
+        var frame = null, box = null;
+        el.addEventListener('pointerenter', function(){ box = el.getBoundingClientRect(); });
+        el.addEventListener('pointermove', function(e){
+          if (!box) box = el.getBoundingClientRect();
+          var x = (e.clientX - box.left) / box.width - 0.5;
+          var y = (e.clientY - box.top) / box.height - 0.5;
+          if (frame) return;
+          frame = requestAnimationFrame(function(){
+            frame = null;
+            el.style.transform = 'perspective(900px) rotateX(' + (-y * 6).toFixed(2) +
+              'deg) rotateY(' + (x * 7).toFixed(2) + 'deg) translateY(-5px)';
+          });
+        });
+        el.addEventListener('pointerleave', function(){
+          box = null;
+          if (frame){ cancelAnimationFrame(frame); frame = null; }
+          el.style.transform = '';
+        });
+      });
+    }
+
+    var stickers = document.querySelectorAll('.hero-deco .stk');
+    if (!stickers.length) return;
+    var pending = false;
+    function drift(){
+      pending = false;
+      var y = window.pageYOffset || 0;
+      Array.prototype.forEach.call(stickers, function(el, i){
+        el.style.translate = '0 ' + (-y * (0.05 + (i % 4) * 0.035)).toFixed(1) + 'px';
+      });
+    }
+    window.addEventListener('scroll', function(){
+      if (!pending){ pending = true; requestAnimationFrame(drift); }
+    }, { passive: true });
+    drift();
   })();
 </script>
