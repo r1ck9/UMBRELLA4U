@@ -608,29 +608,12 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 .chapters > .wrap,.cta > .wrap{position:relative;z-index:2}
 .sec-deco .stk{animation-duration:9s}
 .sec-deco .d-a1{left:1%;top:9%;width:76px;rotate:-7deg}
-.sec-deco .d-a2{right:2.5%;top:17%;width:42px;rotate:8deg}
-.sec-deco .d-a3{left:4%;bottom:15%;width:34px;rotate:-9deg}
 .sec-deco .d-a4{right:2.5%;bottom:11%;width:52px;rotate:13deg}
-.sec-deco .d-h1{right:2%;top:12%;width:64px;rotate:12deg}
 .sec-deco .d-h2{left:2.5%;top:20%;width:50px;rotate:-13deg}
-.sec-deco .d-h3{left:3.5%;bottom:16%;width:38px;rotate:-6deg}
-.sec-deco .d-h4{right:3.5%;bottom:13%;width:32px;rotate:9deg}
-.sec-deco .d-c1{left:2%;top:11%;width:66px;rotate:9deg}
-.sec-deco .d-c2{right:2.5%;top:9%;width:48px;rotate:-11deg}
-.sec-deco .d-c3{left:1.5%;bottom:12%;width:80px;rotate:-4deg}
-.sec-deco .d-c4{right:2%;bottom:15%;width:64px;rotate:6deg}
-.sec-deco .d-g1{right:2%;top:14%;width:44px;rotate:-14deg}
 .sec-deco .d-g2{left:2.5%;top:12%;width:40px;rotate:7deg}
 .sec-deco .d-g3{right:1.5%;bottom:10%;width:72px;rotate:5deg}
-.sec-deco .d-g4{left:4.5%;bottom:16%;width:30px;rotate:-8deg}
 .sec-deco .d-p1{left:2%;top:10%;width:46px;rotate:-12deg}
-.sec-deco .d-p2{right:2.5%;top:15%;width:32px;rotate:10deg}
-.sec-deco .d-p3{right:2%;bottom:9%;width:58px;rotate:-7deg}
-.sec-deco .d-p4{left:4%;bottom:13%;width:36px;rotate:8deg}
-.sec-deco .d-t1{left:3%;top:18%;width:48px;rotate:-10deg}
 .sec-deco .d-t2{right:3.5%;top:14%;width:54px;rotate:14deg}
-.sec-deco .d-t3{left:7%;bottom:18%;width:34px;rotate:6deg}
-.sec-deco .d-t4{right:6%;bottom:16%;width:60px;rotate:-9deg}
 .sec-deco .d-a2,.sec-deco .d-h3,.sec-deco .d-g2,.sec-deco .d-p4{animation-delay:-3s}
 .sec-deco .d-a3,.sec-deco .d-h4,.sec-deco .d-g4,.sec-deco .d-c3{animation-delay:-5s}
 .sec-deco .d-a4,.sec-deco .d-c2,.sec-deco .d-p1,.sec-deco .d-t2{animation-delay:-2s}
@@ -685,30 +668,14 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
    four left a gap. A stitch over each section seam, in its own layer so it
    survives on phones where the gutter stickers switch off. Tape holding the
    circle cards down. An arrow leaning back toward the main button. */
-.sec-deco .d-a5{left:1.5%;top:38%;width:56px;rotate:-5deg}
 .sec-deco .d-a6{right:2%;top:44%;width:40px;rotate:11deg}
-.sec-deco .d-a7{left:2%;top:62%;width:52px;rotate:7deg}
-.sec-deco .d-a8{right:1.5%;top:66%;width:64px;rotate:-6deg}
-.sec-deco .d-h5{left:2%;top:40%;width:44px;rotate:-9deg}
 .sec-deco .d-h6{right:1.5%;top:34%;width:62px;rotate:6deg}
 .sec-deco .d-h7{left:2.5%;top:64%;width:36px;rotate:12deg}
-.sec-deco .d-h8{right:2%;top:58%;width:46px;rotate:-11deg}
 .sec-deco .d-c5{right:2.5%;top:36%;width:30px;rotate:8deg}
-.sec-deco .d-c6{left:1.5%;top:44%;width:56px;rotate:-10deg}
-.sec-deco .d-c7{right:2%;top:62%;width:38px;rotate:5deg}
 .sec-deco .d-c8{left:2%;top:70%;width:40px;rotate:-13deg}
-.sec-deco .d-g5{left:2%;top:36%;width:44px;rotate:9deg}
-.sec-deco .d-g6{right:1.5%;top:40%;width:54px;rotate:-7deg}
-.sec-deco .d-g7{left:1.5%;top:60%;width:62px;rotate:4deg}
-.sec-deco .d-g8{right:1.5%;top:64%;width:54px;rotate:-5deg}
-.sec-deco .d-p5{left:1.5%;top:34%;width:60px;rotate:-6deg}
 .sec-deco .d-p6{right:2%;top:38%;width:38px;rotate:10deg}
 .sec-deco .d-p7{left:2.5%;top:58%;width:30px;rotate:-8deg}
-.sec-deco .d-p8{right:2%;top:62%;width:44px;rotate:13deg}
-.sec-deco .d-t5{left:3%;top:44%;width:34px;rotate:7deg}
-.sec-deco .d-t6{right:3%;top:40%;width:50px;rotate:-9deg}
 .sec-deco .d-t7{left:4%;top:66%;width:28px;rotate:11deg}
-.sec-deco .d-t8{right:3.5%;top:62%;width:52px;rotate:-6deg}
 
 .sec-stitch{position:absolute;top:-17px;left:50%;translate:-50% 0;width:124px;z-index:3;
   pointer-events:none;line-height:0}
@@ -721,10 +688,11 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 /* all on the left corner: a right-taped card sitting next to a left-taped one
    puts two tapes nose to nose in the gap, and the grid is 3 columns on the
    homepage but 2 on the About page, so alternating sides collides either way. */
-.circ-grid .circ:nth-child(2)::before{rotate:-13deg;width:46px;top:-9px;left:-8px}
-.circ-grid .circ:nth-child(3)::before{rotate:-27deg;width:50px}
+/* not every card is taped down: six identical pieces read as a pattern */
+.circ-grid .circ:nth-child(2)::before,
+.circ-grid .circ:nth-child(3)::before,
+.circ-grid .circ:nth-child(5)::before{content:none}
 .circ-grid .circ:nth-child(4)::before{rotate:-16deg;width:58px;top:-12px}
-.circ-grid .circ:nth-child(5)::before{rotate:-24deg;width:44px;left:-10px}
 .circ-grid .circ:nth-child(6)::before{rotate:-18deg;width:52px;top:-10px}
 
 /* Out of the flex flow: in the row it pushed past the 560px hero column and
