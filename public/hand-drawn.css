@@ -678,3 +678,63 @@ main#top > .hero,main#top > .hero-deco{grid-area:1/1}
 @media(max-width:820px){
   .goal .num{text-shadow:2px 2px 0 var(--hd-violet),3px 4px 0 var(--hd-ink)}
 }
+
+
+/* ---- more of the hand-made stuff ----
+   Four more stickers per section, sitting in the middle bands where the first
+   four left a gap. A stitch over each section seam, in its own layer so it
+   survives on phones where the gutter stickers switch off. Tape holding the
+   circle cards down. An arrow leaning back toward the main button. */
+.sec-deco .d-a5{left:1.5%;top:38%;width:56px;rotate:-5deg}
+.sec-deco .d-a6{right:2%;top:44%;width:40px;rotate:11deg}
+.sec-deco .d-a7{left:2%;top:62%;width:52px;rotate:7deg}
+.sec-deco .d-a8{right:1.5%;top:66%;width:64px;rotate:-6deg}
+.sec-deco .d-h5{left:2%;top:40%;width:44px;rotate:-9deg}
+.sec-deco .d-h6{right:1.5%;top:34%;width:62px;rotate:6deg}
+.sec-deco .d-h7{left:2.5%;top:64%;width:36px;rotate:12deg}
+.sec-deco .d-h8{right:2%;top:58%;width:46px;rotate:-11deg}
+.sec-deco .d-c5{right:2.5%;top:36%;width:30px;rotate:8deg}
+.sec-deco .d-c6{left:1.5%;top:44%;width:56px;rotate:-10deg}
+.sec-deco .d-c7{right:2%;top:62%;width:38px;rotate:5deg}
+.sec-deco .d-c8{left:2%;top:70%;width:40px;rotate:-13deg}
+.sec-deco .d-g5{left:2%;top:36%;width:44px;rotate:9deg}
+.sec-deco .d-g6{right:1.5%;top:40%;width:54px;rotate:-7deg}
+.sec-deco .d-g7{left:1.5%;top:60%;width:62px;rotate:4deg}
+.sec-deco .d-g8{right:1.5%;top:64%;width:54px;rotate:-5deg}
+.sec-deco .d-p5{left:1.5%;top:34%;width:60px;rotate:-6deg}
+.sec-deco .d-p6{right:2%;top:38%;width:38px;rotate:10deg}
+.sec-deco .d-p7{left:2.5%;top:58%;width:30px;rotate:-8deg}
+.sec-deco .d-p8{right:2%;top:62%;width:44px;rotate:13deg}
+.sec-deco .d-t5{left:3%;top:44%;width:34px;rotate:7deg}
+.sec-deco .d-t6{right:3%;top:40%;width:50px;rotate:-9deg}
+.sec-deco .d-t7{left:4%;top:66%;width:28px;rotate:11deg}
+.sec-deco .d-t8{right:3.5%;top:62%;width:52px;rotate:-6deg}
+
+.sec-stitch{position:absolute;top:-17px;left:50%;translate:-50% 0;width:124px;z-index:3;
+  pointer-events:none;line-height:0}
+.sec-stitch svg{width:100%;height:auto;display:block;filter:drop-shadow(2px 3px 0 rgba(59,42,84,.16))}
+
+/* a strip of tape holding each circle card to the page */
+.circ::before{content:"";position:absolute;top:-11px;left:-12px;width:54px;height:19px;z-index:4;
+  background:color-mix(in srgb,var(--hd-yellow) 78%,transparent);
+  border:2px solid var(--hd-ink);border-radius:3px 5px 4px 6px;rotate:-22deg}
+/* all on the left corner: a right-taped card sitting next to a left-taped one
+   puts two tapes nose to nose in the gap, and the grid is 3 columns on the
+   homepage but 2 on the About page, so alternating sides collides either way. */
+.circ-grid .circ:nth-child(2)::before{rotate:-13deg;width:46px;top:-9px;left:-8px}
+.circ-grid .circ:nth-child(3)::before{rotate:-27deg;width:50px}
+.circ-grid .circ:nth-child(4)::before{rotate:-16deg;width:58px;top:-12px}
+.circ-grid .circ:nth-child(5)::before{rotate:-24deg;width:44px;left:-10px}
+.circ-grid .circ:nth-child(6)::before{rotate:-18deg;width:52px;top:-10px}
+
+/* Out of the flex flow: in the row it pushed past the 560px hero column and
+   wrapped to its own line on some widths, landing under the buttons pointing
+   at nothing. Absolute means it can't wrap, and it now aims up at the button. */
+.hero .cta-row{position:relative}
+.hero-arrow{position:absolute;left:10px;top:calc(100% + 4px);width:84px;height:auto;rotate:-2deg}
+
+@media(max-width:820px){
+  .sec-stitch{width:84px;top:-12px}
+  .hero-arrow{display:none}
+  .circ::before{width:44px;height:16px}
+}
