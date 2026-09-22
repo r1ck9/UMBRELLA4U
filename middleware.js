@@ -10,7 +10,7 @@ const PAGE = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Haven is closed for now</title>
+<title>Closed for updates</title>
 <style>
   body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #f7f3fb; color: #2b2233; font: 17px/1.55 system-ui, -apple-system, sans-serif; padding: 24px; box-sizing: border-box; }
   main { max-width: 440px; }
@@ -21,8 +21,8 @@ const PAGE = `<!doctype html>
 </head>
 <body>
 <main>
-  <h1>Haven is closed for now</h1>
-  <p>We've taken the site offline for a while. Thanks for being here.</p>
+  <h1>☂ Closed for updates</h1>
+  <p>Haven is back soon.</p>
   <div class="help">
     <strong>If you need someone to talk to right now</strong><br>
     Call or text <a href="tel:988">988</a> anytime.<br>
