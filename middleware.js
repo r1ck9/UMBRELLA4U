@@ -33,8 +33,15 @@ const PAGE = `<!doctype html>
 </body>
 </html>`;
 
-export function middleware() {
+// The Umbrella4U org pages stay up while Haven itself is closed. These are the
+// rewrites from next.config.mjs that land on the static .html pages.
+const OPEN = ['/', '/umbrella4u', '/about', '/team', '/about-us', '/handbook', '/contact', '/contact-us'];
+
+export function middleware(request) {
   if (!CLOSED) return NextResponse.next();
+  const { pathname } = request.nextUrl;
+  // Org pages, and any file with an extension (css, js, images, icons).
+  if (OPEN.includes(pathname) || pathname.includes('.')) return NextResponse.next();
   return new NextResponse(PAGE, {
     status: 503,
     headers: { 'content-type': 'text/html; charset=utf-8', 'retry-after': '86400', 'cache-control': 'no-store' },
