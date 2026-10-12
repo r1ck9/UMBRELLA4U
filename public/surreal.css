@@ -86,9 +86,10 @@ header.nav{z-index:50}
   content:"";position:absolute;z-index:-1;
   inset:-26px -30px -30px -26px;
   background:radial-gradient(130% 110% at 22% 44%,
-    color-mix(in srgb,var(--hd-paper) 92%,transparent) 0%,
-    color-mix(in srgb,var(--hd-paper) 74%,transparent) 48%,
-    transparent 78%);
+    color-mix(in srgb,var(--hd-paper) 97%,transparent) 0%,
+    color-mix(in srgb,var(--hd-paper) 86%,transparent) 42%,
+    color-mix(in srgb,var(--hd-paper) 52%,transparent) 66%,
+    transparent 82%);
   border-radius:40px;
   pointer-events:none;
 }
@@ -103,6 +104,39 @@ header.nav{z-index:50}
   opacity:.17;
   transform:skewX(-26deg) scaleY(.62);
   transform-origin:top left;
+}
+
+/* ---------- the hero ----------
+   The sky now supplies the clouds, the umbrellas, the moon, the birds and the
+   rain, so the ring of stickers around the frame was saying all of it twice.
+   Three stay, in the colours the sky does not use, and the rest go. The sky
+   itself thins to a few big umbrellas while the hero holds the screen and
+   fills back in as you scroll (surreal-sky.js), so the hero stays open. */
+.hero-deco .stk{display:none}
+.hero-deco .stk-heart,
+.hero-deco .stk-flower,
+.hero-deco .stk-squiggle{display:block}
+
+/* the page's own hero rain duplicated the sky's rain on phones */
+#mobile-hero-rain{display:none}
+
+/* the words arrive one after another, deepest last */
+@media (prefers-reduced-motion:no-preference){
+  .hero .wrap > *{animation:heroRise 1.1s cubic-bezier(.16,1,.3,1) backwards}
+  .hero .wrap > :nth-child(1){animation-delay:.10s}
+  .hero .wrap > :nth-child(2){animation-delay:.26s}
+  .hero .wrap > :nth-child(3){animation-delay:.40s}
+  .hero .wrap > :nth-child(4){animation-delay:.54s}
+  .hero .hero-keys li{animation:heroRise .9s cubic-bezier(.16,1,.3,1) backwards}
+  .hero .hero-keys li:nth-child(1){animation-delay:.46s}
+  .hero .hero-keys li:nth-child(2){animation-delay:.54s}
+  .hero .hero-keys li:nth-child(3){animation-delay:.62s}
+  .hero .hero-keys li:nth-child(4){animation-delay:.70s}
+  @keyframes heroRise{from{opacity:0;translate:0 26px}}
+
+  /* and the cue keeps asking */
+  .hero .scroll-cue{animation:cueBob 2.4s ease-in-out infinite}
+  @keyframes cueBob{0%,100%{translate:0 0}50%{translate:0 7px}}
 }
 
 /* ---------- Magritte headings: the word and its ghost ---------- */

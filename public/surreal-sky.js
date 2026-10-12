@@ -74,8 +74,13 @@
   /* ---- world ---- */
   var W = 0, H = 0, dpr = 1, span = 0, pad = 260;
   var clouds = [], umbs = [], birds = [], doors = [], drops = [];
-  var scroll = 0, t0 = 0;
+  var scroll = 0, t0 = 0, last = 0;
   var bucket = [];
+  var heroEl = null, heroH = 0, calm = 1;      // 1 while the hero holds the screen
+  var rainPhase = 0, windPhase = 0;            // rain falls in gusts, not at a constant
+  var intro = 0;                               // the sky arriving, once, on load
+  var pointer = window.matchMedia('(pointer:fine)');
+  var mx = 0, my = 0, tmx = 0, tmy = 0;        // where the pointer is, and where it is heading
 
   // deterministic noise, so the sky is the same shape on every load
   var seed = 7;
@@ -108,7 +113,8 @@
           fill: [C.sheet, C.lilac, C.lilac][depth],
           bob: rnd() * Math.PI * 2,
           sway: 0.5 + rnd() * 0.8,
-          tilt: (rnd() - 0.5) * 0.18
+          tilt: (rnd() - 0.5) * 0.18,
+          extra: (r * cols + c) % 2 === 1
         });
       }
     }
@@ -121,7 +127,8 @@
         s: (90 + rnd() * 150) * (small ? 0.75 : 1),
         par: 0.06 + rnd() * 0.08,
         drift: (rnd() < 0.5 ? -1 : 1) * (2 + rnd() * 5),
-        dim: 0.28 + rnd() * 0.22
+        dim: 0.28 + rnd() * 0.22,
+        extra: i % 2 === 1
       });
     }
 
@@ -142,9 +149,16 @@
     // never half-swallowed by a panel
     var gutter = Math.max(0, (W - 1120) / 2);
     doors = [];
-    if (gutter > 130 || small) {
-      doors.push({ x: small ? W * 0.72 : W - gutter * 0.62, y: span * 0.2, s: small ? 70 : 104, par: 0.34 });
-      doors.push({ x: small ? W * 0.12 : gutter * 0.3, y: span * 0.7, s: small ? 58 : 86, par: 0.3 });
+    if (small) {
+      doors.push({ x: W * 0.72, y: span * 0.44, s: 70, par: 0.34 });
+      doors.push({ x: W * 0.12, y: span * 0.87, s: 58, par: 0.3 });
+    } else if (gutter > 150) {
+      // a door is about 1.2 of its own size wide once it is standing open, so
+      // centre it in the gutter rather than letting it hang off the edge
+      var sR = Math.min(104, (gutter - 24) / 1.2);
+      var sL = Math.min(86, (gutter - 24) / 1.2);
+      doors.push({ x: W - gutter + (gutter - sR * 1.2) / 2, y: span * 0.44, s: sR, par: 0.34 });
+      doors.push({ x: (gutter - sL * 1.2) / 2, y: span * 0.87, s: sL, par: 0.3 });
     }
 
     drops = [];
@@ -168,20 +182,27 @@
     dpr = Math.min(window.devicePixelRatio || 1, W < 760 ? 1.5 : 2);
     canvas.width = Math.round(W * dpr);
     canvas.height = Math.round(H * dpr);
+    // Only the home page has a full-height hero. While it holds the screen the
+    // sky thins out to a few big umbrellas and fills back in as you scroll, so
+    // the hero stays open and the detail arrives later.
+    heroEl = document.querySelector('main#top > .hero');
+    heroH = heroEl ? heroEl.getBoundingClientRect().height : 0;
     readPalette();
     build();
   }
 
   /* ---- drawing helpers ---- */
+  // Depth shows up three ways: scroll parallax, pointer parallax, and how far
+  // each layer still has to travel in the opening moment.
   function wrapY(y, par, t, drift) {
     var v = (y - scroll * par + (drift || 0) * t) % span;
     if (v < 0) v += span;
-    return v - pad;
+    return v - pad + my * 20 * par + (1 - intro) * 90 * par;
   }
-  function wrapX(x, t, drift) {
+  function wrapX(x, par, t, drift) {
     var v = (x + (drift || 0) * t) % (W + 400);
     if (v < 0) v += W + 400;
-    return v - 200;
+    return v - 200 + mx * 40 * par;
   }
   function alpha(a) { ctx.globalAlpha = a; }
 
@@ -202,7 +223,7 @@
   }
 
   function drawUmbrella(u, x, y, t) {
-    var s = u.s;
+    var s = u.as || u.s;
     var rot = u.tilt + Math.sin(t * 0.5 + u.bob) * 0.035 * u.sway;
     ctx.save();
     ctx.translate(x, y);
@@ -221,8 +242,9 @@
   }
 
   // a door standing in mid-air, ajar, with the light on behind it
-  function drawDoor(d, x, y) {
+  function drawDoor(d, x, y, glow) {
     var s = d.s, w = s * 0.62, h = s * 1.5;
+    var lit = glow == null ? 1 : glow;
     ctx.save();
     ctx.translate(x, y);
     ctx.lineJoin = 'round';
@@ -231,7 +253,7 @@
     ctx.strokeStyle = C.ink;
 
     // the light on the floor of a room that has no floor
-    ctx.globalAlpha *= 0.55;
+    ctx.globalAlpha *= 0.55 * lit;
     ctx.fillStyle = C.cream;
     ctx.beginPath();
     ctx.moveTo(w * 0.1, h);
@@ -240,7 +262,7 @@
     ctx.lineTo(-w * 0.5, h + s * 1.25);
     ctx.closePath();
     ctx.fill();
-    ctx.globalAlpha /= 0.55;
+    ctx.globalAlpha /= 0.55 * lit;
 
     // the opening
     ctx.fillStyle = C.yellow;
@@ -279,9 +301,9 @@
       var u = ups[i];
       var below = py - u.ay;
       if (below < 0) continue;
-      var reach = u.s * 7;
+      var reach = u.reach != null ? u.reach : (u.as || u.s) * 7;
       if (below > reach) continue;
-      var half = u.s * 0.42;
+      var half = u.half != null ? u.half : (u.as || u.s) * 0.42;
       var side = Math.abs(px - u.ax);
       if (side > half) continue;
       // soft at the edges of the column, and fading as the rain closes back over
@@ -293,39 +315,119 @@
     return dry;
   }
 
+  /* ---- the hero's own umbrella stops the rain as well ----
+     The low-poly umbrella in the hero is a plain 2D canvas, so rather than
+     guess where it is pointing we scale it down to a thumbnail every so often
+     and look for the widest painted row. That row is the canopy, whichever way
+     it happens to be tilted, and the rain goes dry underneath it. */
+  var hero3d = null, heroShelter = null, probe = null, pctx = null;
+  var PW = 96, PH = 54;
+  function sampleHero() {
+    if (!hero3d) hero3d = document.getElementById('umb3d');
+    if (!hero3d || !hero3d.width || !hero3d.height) { heroShelter = null; return; }
+    var r = hero3d.getBoundingClientRect();
+    if (r.width < 8 || r.bottom < 0 || r.top > H) { heroShelter = null; return; }
+    if (!probe) {
+      probe = document.createElement('canvas');
+      probe.width = PW; probe.height = PH;
+      pctx = probe.getContext('2d', { willReadFrequently: true });
+    }
+    var data;
+    try {
+      pctx.clearRect(0, 0, PW, PH);
+      pctx.drawImage(hero3d, 0, 0, PW, PH);
+      data = pctx.getImageData(0, 0, PW, PH).data;
+    } catch (e) { heroShelter = null; return; }
+
+    // Per row: where the paint starts, where it ends, how much of it there is.
+    var L = [], R = [], N = [], most = 0, py, px;
+    for (py = 0; py < PH; py++) {
+      var l = -1, rr = -1, n = 0;
+      for (px = 0; px < PW; px++) {
+        if (data[(py * PW + px) * 4 + 3] > 40) { if (l < 0) l = px; rr = px; n++; }
+      }
+      L[py] = l; R[py] = rr; N[py] = n;
+      if (n > most) most = n;
+    }
+    if (most < 4) { heroShelter = null; return; }
+
+    // The canopy is every row with real paint across it; the pole and the
+    // handle are the thin rows below, and they shelter nobody. Taking the
+    // union rather than the single widest row keeps this right when the
+    // umbrella is tilted, which it usually is.
+    var minL = PW, maxR = -1, lowest = -1;
+    for (py = 0; py < PH; py++) {
+      if (N[py] < most * 0.25) continue;
+      if (L[py] < minL) minL = L[py];
+      if (R[py] > maxR) maxR = R[py];
+      lowest = py;
+    }
+    if (maxR < 0 || maxR - minL < PW * 0.1) { heroShelter = null; return; }
+
+    var sx = r.width / PW, sy = r.height / PH;
+    heroShelter = {
+      ax: r.left + (minL + maxR + 1) / 2 * sx,
+      ay: r.top + (lowest + 1) * sy,
+      half: (maxR - minL + 1) / 2 * sx * 0.82,
+      reach: r.height * 1.4
+    };
+  }
+
   /* ---- the frame ---- */
   function frame(now) {
-    var t = reduce.matches ? 0 : (now - t0) / 1000;
-    scroll = reduce.matches ? 0 : (window.scrollY || window.pageYOffset || 0);
+    var still = reduce.matches;
+    var t = still ? 0 : (now - t0) / 1000;
+    var dt = still ? 0 : Math.min(0.05, (now - (last || now)) / 1000);
+    last = now;
+    scroll = still ? 0 : (window.scrollY || window.pageYOffset || 0);
+
+    // the sky arrives once, from below, deepest layers last
+    intro = still ? 1 : Math.min(1, t / 1.5);
+    intro = 1 - Math.pow(1 - intro, 3);
+
+    // how much of the hero is still holding the screen
+    calm = heroH ? Math.max(0, Math.min(1, 1 - scroll / (heroH * 0.7))) : 0;
+    var fill = 1 - calm;          // 0 in the hero, 1 once you are past it
+    var open = 1 + calm * 0.3;    // and what is left up there is bigger
+
+    // the pointer leans the sky, near layers further than far ones
+    mx += (tmx - mx) * Math.min(1, dt * 2.6);
+    my += (tmy - my) * Math.min(1, dt * 2.6);
+
+    // rain comes in gusts rather than at one steady rate
+    var gust = 1 + Math.sin(t * 0.17) * 0.35 + Math.sin(t * 0.41) * 0.15;
+    rainPhase += dt * gust;
+    windPhase += dt * (gust - 1) * 26;
 
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
 
     // sun and moon, both up, almost still
     var hi = wrapY(span * 0.08, 0.03, t);
-    alpha(0.5);
-    shape(P.star, W * 0.12, hi + 40, 54, 100, C.yellow, C.ink, 5, 0.2);
-    alpha(0.42);
-    shape(P.moon, W * 0.88, hi - 10, 62, 100, C.cream, C.ink, 5, -0.15);
+    alpha(0.5 * intro);
+    shape(P.star, W * 0.12, hi + 40, 54 * open, 100, C.yellow, C.ink, 5, 0.2);
+    alpha(0.42 * intro);
+    shape(P.moon, W * 0.88, hi - 10, 62 * open, 100, C.cream, C.ink, 5, -0.15);
 
     // clouds
     var i, x, y;
     for (i = 0; i < clouds.length; i++) {
       var cl = clouds[i];
-      x = wrapX(cl.x, t, cl.drift);
+      x = wrapX(cl.x, cl.par, t, cl.drift);
       y = wrapY(cl.y, cl.par, t);
       if (y < -200 || y > H + 200) continue;
-      alpha(cl.dim);
-      shape(P.cloud, x, y, cl.s, 140, C.sheet, C.ink, 5);
+      alpha(cl.dim * intro * (cl.extra ? fill : 1));
+      if (ctx.globalAlpha < 0.015) continue;
+      shape(P.cloud, x, y, cl.s * (cl.extra ? 1 : 1 + (open - 1) * 0.45), 140, C.sheet, C.ink, 5);
     }
 
     // birds: holes cut in the sky
     for (i = 0; i < birds.length; i++) {
       var bd = birds[i];
-      x = wrapX(bd.x, t, bd.drift);
+      x = wrapX(bd.x, bd.par, t, bd.drift);
       y = wrapY(bd.y, bd.par, t) + Math.sin(t * 0.7 + bd.bob) * 6;
       if (y < -120 || y > H + 120) continue;
-      alpha(0.5);
+      alpha(0.5 * intro * (0.35 + fill * 0.65));
       shape(P.bird, x, y, bd.s, 76, C.paper, C.ink, 4);
     }
 
@@ -333,28 +435,35 @@
     var live = [];
     for (i = 0; i < umbs.length; i++) {
       var u = umbs[i];
-      u.ax = u.x + Math.sin(t * 0.33 + u.bob) * 9 * u.sway;
+      u.a = u.dim * intro * (u.extra ? fill : 1);
+      if (u.a < 0.02) continue;
+      u.as = u.s * (u.extra ? 1 : open);
+      u.ax = u.x + Math.sin(t * 0.33 + u.bob) * 9 * u.sway + mx * 40 * u.par;
       u.ay = wrapY(u.y, u.par, t) + Math.sin(t * 0.5 + u.bob) * 7;
       if (u.ay > -200 && u.ay < H + 200) live.push(u);
     }
+    if (heroShelter && calm > 0.02) live.push(heroShelter);
 
     // Rain, with a dry column hanging under every umbrella. Drops are sorted
     // into a few opacity buckets and each bucket is stroked as one path, so a
     // few hundred drops cost a handful of draw calls rather than one each.
     var BUCKETS = 7;
     for (i = 0; i < BUCKETS; i++) bucket[i] = null;
+    var slant = 1.8 + (gust - 1) * 9;
+    var quiet = intro * (0.55 + fill * 0.45);
     for (i = 0; i < drops.length; i++) {
       var d = drops[i];
-      x = d.x;
-      y = wrapY(d.y, d.par, t, d.v);
+      x = d.x + windPhase * d.par + mx * 40 * d.par;
+      y = wrapY(d.y + d.v * rainPhase, d.par, 0);
       if (y < -40 || y > H + 40) continue;
       var dry = shelter(x, y, live);
       if (dry > 0.92) continue;
-      var a = d.dim * (1 - dry);
+      var a = d.dim * (1 - dry) * quiet;
       var b = Math.min(BUCKETS - 1, Math.round(a / 0.36 * (BUCKETS - 1)));
+      if (b < 1) continue;
       if (!bucket[b]) bucket[b] = new Path2D();
       bucket[b].moveTo(x, y);
-      bucket[b].lineTo(x - 1.8, y + d.len);
+      bucket[b].lineTo(x - slant, y + d.len * gust);
     }
     ctx.lineCap = 'round';
     ctx.lineWidth = 1.6;
@@ -370,14 +479,14 @@
       var dr = doors[i];
       y = wrapY(dr.y, dr.par, t);
       if (y > -300 && y < H + 300) {
-        alpha(0.7);
-        drawDoor(dr, dr.x, y);
+        alpha(0.7 * intro * (0.26 + fill * 0.74));
+        drawDoor(dr, dr.x + mx * 40 * dr.par, y, 1 + Math.sin(t * 0.6 + i * 2) * 0.16);
       }
     }
 
     // the umbrellas themselves, over the rain they are stopping
     for (i = 0; i < live.length; i++) {
-      alpha(live[i].dim);
+      alpha(live[i].a);
       drawUmbrella(live[i], live[i].ax, live[i].ay, t);
     }
 
@@ -401,10 +510,20 @@
     cancelAnimationFrame(raf);
   }
 
+  var probeTimer = 0;
+  function startProbe() {
+    clearInterval(probeTimer);
+    sampleHero();
+    probeTimer = setInterval(function () {
+      if (!document.hidden) sampleHero();
+    }, reduce.matches ? 2000 : 400);
+  }
+
   function boot() {
     mount();
     resize();
     t0 = performance.now();
+    startProbe();
     if (reduce.matches) frame(t0);
     else start();
   }
@@ -412,11 +531,23 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
+  // The pointer leans the whole sky. Fine pointers only, so a touch never
+  // snaps it sideways, and never when less motion has been asked for.
+  if (pointer.matches && !reduce.matches) {
+    window.addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      tmx = (e.clientX / W - 0.5) * 2;
+      tmy = (e.clientY / H - 0.5) * 2;
+    }, { passive: true });
+    window.addEventListener('pointerleave', function () { tmx = 0; tmy = 0; }, { passive: true });
+  }
+
   var rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
     rt = setTimeout(function () {
       resize();
+      sampleHero();
       if (reduce.matches) frame(performance.now());
     }, 160);
   }, { passive: true });
