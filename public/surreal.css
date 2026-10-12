@@ -1,0 +1,179 @@
+/* Surrealism for the Umbrella4U org pages.
+
+   Loaded after hand-drawn.css, so it wins on order rather than on
+   !important. surreal-sky.js paints a Magritte sky on a fixed canvas behind
+   everything; this file gets the page out of its way and then plays the same
+   game in markup:
+
+     The page is a sheet of paper laid on the sky, and the sky keeps going
+     behind it and in the gutters either side. The hero is a frame with the
+     real sky still showing through it, the way the painting on the easel in
+     The Human Condition carries on the view it is standing in front of.
+     Things cast shadows that are not their own shape: the panels throw an
+     umbrella.
+     The footer is night while the rest of the page is broad daylight,
+     which is the whole trick of The Empire of Light.
+
+   Nothing here changes a word of copy, and nothing moves for a reader who
+   has asked for less motion. */
+
+/* ---------- the sky ---------- */
+/* Sections no longer clip their own decoration, so stop the page scrolling
+   sideways. clip rather than hidden, which would stop .surreal-sky being
+   fixed to the viewport. */
+html{overflow-x:clip}
+body{overflow-x:clip}
+.surreal-sky{
+  position:fixed; inset:0; width:100%; height:100%;
+  z-index:0; pointer-events:none; display:block;
+}
+body{
+  background:linear-gradient(177deg,
+    color-mix(in srgb,var(--hd-lilac) 26%,var(--hd-paper)) 0%,
+    var(--hd-lav) 46%,
+    var(--hd-paper) 100%)
+    fixed no-repeat;
+  background-attachment:fixed;
+}
+/* the dot grid belongs to the paper now, not to the sky */
+body,.about,.havensec,.goals,.chapters,.circles,.story-wall,.cta,.cover ~ section{
+  background-image:none;
+}
+.about,.havensec,.goals,.chapters,.circles,.story-wall,.cta,.cover ~ section{
+  background-color:transparent;
+  border-top:0;
+  position:relative;
+  z-index:1;
+  overflow:visible;
+}
+.cover ~ section + section{border-top:0}
+/* keep every real page layer above the canvas */
+header.nav,main,footer,.hero-deco,.tape,.tape-2{position:relative; z-index:2}
+header.nav{z-index:50}
+
+/* ---------- the page as a sheet laid on the sky ---------- */
+:where(.about,.havensec,.goals,.chapters,.circles,.story-wall) > .wrap,
+.cover ~ section > .col{
+  position:relative;
+  background:color-mix(in srgb,var(--hd-paper) 97%,transparent);
+  background-image:var(--hd-dots);
+  background-size:24px 24px;
+  border:2.5px solid var(--hd-ink);
+  border-radius:var(--hd-r);
+  box-shadow:var(--hd-stack-sm);
+  padding:clamp(26px,4vw,46px) clamp(20px,3.4vw,40px);
+  max-width:min(var(--maxw,1120px),calc(100% - clamp(24px,6vw,96px)));
+}
+:where(.about,.havensec,.goals,.chapters,.circles,.story-wall):nth-of-type(odd) > .wrap,
+.cover ~ section:nth-of-type(odd) > .col{rotate:-.35deg}
+:where(.about,.havensec,.goals,.chapters,.circles,.story-wall):nth-of-type(even) > .wrap,
+.cover ~ section:nth-of-type(even) > .col{rotate:.4deg}
+/* sections sit closer together now that each one is its own sheet */
+:where(.about,.havensec,.goals,.chapters,.circles,.story-wall,.cover ~ section){
+  padding-block:clamp(28px,4.5vw,56px);
+}
+
+/* ---------- the hero is a frame with the sky still in it ---------- */
+.hero,.cover{
+  background:transparent!important;
+  background-image:none!important;
+  backdrop-filter:none;
+}
+.hero{position:relative; z-index:2}
+/* a thin wash only behind the words, so the sky reads through the rest */
+.hero .wrap > *,.cover .col > *{position:relative}
+.hero .wrap::before,.cover .col::before{
+  content:"";position:absolute;z-index:-1;
+  inset:-26px -30px -30px -26px;
+  background:radial-gradient(130% 110% at 22% 44%,
+    color-mix(in srgb,var(--hd-paper) 92%,transparent) 0%,
+    color-mix(in srgb,var(--hd-paper) 74%,transparent) 48%,
+    transparent 78%);
+  border-radius:40px;
+  pointer-events:none;
+}
+.cover .col{position:relative;isolation:isolate}
+
+/* the frame throws an umbrella instead of its own shape */
+.hero::before,.cover::before{
+  content:"";position:absolute;z-index:-1;pointer-events:none;
+  right:-18px;bottom:-54px;width:clamp(90px,11vw,150px);aspect-ratio:1;
+  background:no-repeat center/contain
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%233b2a54'%3E%3Cpath d='M8 52 C10 20 90 20 92 52 C82 45 72 45 64 52 C56 45 44 45 36 52 C28 45 18 45 8 52 Z'/%3E%3Cpath d='M47 50 h6 v33 q0 9 -11 9 q-9 0 -10 -8 h6 q1 3 4 3 q5 0 5 -5 z'/%3E%3C/g%3E%3C/svg%3E");
+  opacity:.17;
+  transform:skewX(-26deg) scaleY(.62);
+  transform-origin:top left;
+}
+
+/* ---------- Magritte headings: the word and its ghost ---------- */
+.about h2,.havensec h2,.goals h2,.chapters h2,.circles h2,.story-wall h2,
+.cover ~ section h2{
+  text-shadow:3px 3px 0 var(--hd-lilac);
+}
+.haven-title,.cover h1{text-shadow:4px 4px 0 var(--hd-lilac),9px 9px 0 color-mix(in srgb,var(--hd-lilac) 38%,transparent)}
+
+/* ---------- the stickers drift, because nothing here is nailed down ---------- */
+.hero-deco .stk,.sec-deco .stk{animation:skyfloat 9s ease-in-out infinite alternate}
+.hero-deco .stk:nth-child(2n){animation-duration:12s;animation-delay:-3s}
+.hero-deco .stk:nth-child(3n){animation-duration:15s;animation-delay:-6s}
+.sec-deco .stk:nth-child(2n){animation-duration:13s;animation-delay:-4s}
+@keyframes skyfloat{
+  from{translate:0 0;rotate:-2deg}
+  to{translate:0 -14px;rotate:3deg}
+}
+
+/* ---------- the footer is night, under the same daylight sky ---------- */
+footer{
+  position:relative;z-index:2;
+  background:var(--hd-ink);
+  background-image:
+    /* a lit window in the dark */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 80'%3E%3Crect x='3' y='3' width='54' height='74' rx='4' fill='%23ffc94d' stroke='%23fbf7ff' stroke-width='4'/%3E%3Cpath d='M30 3 V77 M3 40 H57' stroke='%23fbf7ff' stroke-width='4'/%3E%3C/svg%3E"),
+    /* stars */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cg fill='%23fbf7ff'%3E%3Ccircle cx='20' cy='28' r='1.7'/%3E%3Ccircle cx='96' cy='16' r='1.2'/%3E%3Ccircle cx='150' cy='52' r='1.8'/%3E%3Ccircle cx='58' cy='96' r='1.3'/%3E%3Ccircle cx='128' cy='132' r='1.6'/%3E%3Ccircle cx='34' cy='154' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat:no-repeat,repeat;
+  background-position:right clamp(18px,5vw,70px) top 26px,0 0;
+  background-size:clamp(34px,4vw,52px),180px 180px;
+}
+footer > .col{padding-block:clamp(26px,4vw,46px)}
+footer::after{
+  /* the daylight the footer is refusing to have */
+  content:"";position:absolute;inset:0 0 auto;height:3px;
+  background:repeating-linear-gradient(90deg,var(--hd-yellow) 0 14px,transparent 14px 30px);
+  opacity:.5;
+}
+
+/* ---------- a panel arriving is a panel settling ---------- */
+@supports (animation-timeline:view()){
+  @media (prefers-reduced-motion:no-preference){
+    :where(.about,.havensec,.goals,.chapters,.circles,.story-wall) > .wrap,
+    .cover ~ section > .col{
+      animation:settle linear both;
+      animation-timeline:view();
+      animation-range:entry 0% entry 34%;
+    }
+    @keyframes settle{
+      from{opacity:.55;translate:0 34px;scale:.985}
+      to{opacity:1;translate:0 0;scale:1}
+    }
+  }
+}
+
+/* ---------- small screens: less sheet, more sky ---------- */
+@media (max-width:760px){
+  :where(.about,.havensec,.goals,.chapters,.circles,.story-wall) > .wrap,
+  .cover ~ section > .col{
+    max-width:calc(100% - 20px);
+    padding:24px 18px;
+    border-width:2.5px;
+    border-radius:var(--hd-r-sm);
+    box-shadow:4px 5px 0 var(--hd-ink);
+    rotate:0deg!important;
+  }
+  .hero::before,.cover::before{display:none}
+}
+
+/* ---------- less motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  .hero-deco .stk,.sec-deco .stk{animation:none}
+}
