@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 // Site is temporarily closed. Every page and API route gets the notice below.
 // To reopen, set CLOSED to false (or delete this file) and push.
-const CLOSED = true;
+const CLOSED = false;
 
 const PAGE = `<!doctype html>
 <html lang="en">
